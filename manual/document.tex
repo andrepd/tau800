@@ -69,7 +69,7 @@
 \counterwithout{section}{chapter}
 
 % Section headers
-\setsubsubsecheadstyle{\itshape}
+\setsubsubsecheadstyle{\sffamily\itshape}
 \setsecheadstyle{\sffamily\bfseries}
 \setsubsecheadstyle{\sffamily\bfseries}
 
@@ -99,6 +99,11 @@
 \newcommand\companyname%
 %	{Aperture Science\,\copyright}
 	{Jikan Systems Corp.\copyright}
+	
+% Shortcut since we use monospace so much
+\let\ttt\texttt
+%\newcommand\t[1]{\texttt{#1}}
+
 
 
 
@@ -140,7 +145,7 @@
 	\warningbox{%
 		\textbf{\textsf{Please ensure that the Novikov module has sufficient power throughout the operation of the machine. Failure to supply the minimum rated power may cause time inconsistency paradoxes.}} \\[2pt]
 		In the unlikely case of forced inconsistency contact our hotline \\
-		\hfill\textbf{1-800-NOTIME}}
+		\hfill\textsf{\textbf{1-800-NOTIME}}}
 \end{footnotesize}
 
 
@@ -163,6 +168,7 @@
 Congratulations of becoming the proud owner of a \machinename{}, the latest technology in time-based computing. The following document serves as an introduction to the architecture and operation modes of this time-assisted arithmetic computing unit, as well as to any other extensions offered by \companyname{} compatible with the \machinename{} that were acquired as part of your commercial agreement.
 
 For more information regarding available computing extension hardware compatible with your computing unit contact your local \companyname{} sales representative. Missing documentation of acquired computing extension hardware and advanced time operation modes of the computing unit can be obtained upon written request with proof of purchase to \companyname{} Main Shenzen Headquarters.
+\todo{Jikan=japão, mas Shenzen=china?}
 
 Please note that this document \underline{does not} preclude the consultation of the complete reference manual, which should have been provided to you alongside this document and the computing unit. If the complete reference manual was not provided to you upon purchase, please contact your local sales representative.
 
@@ -193,69 +199,192 @@ Quick facts:
 
 \subsection*{CPU registers}
 
-The CPU has 4 (four) general purpose word-sized registers \texttt{A}, \texttt{B}, \texttt{C}, and \texttt{D}.
-These registers can be given as operands wherever an absolute memory address is expected.
+The CPU has a total of 10 (ten) words of register memory. 
+Of these, 5 (five) words are general-purpose registers 
+and 5 (five) are special-purpose registers. 
 
-Furthermore, one stack pointer and one flag register are available.
-The flag register cannot be written to (except as a side-effect of arithmetic and comparison operations),
-%and the stack pointer cannot be read or written except by the \texttt{CAL}, \texttt{RET}, \texttt{PUS}, 
-and the stack pointer is altered by the \texttt{CAL}, \texttt{RET}, \texttt{PSH}, \texttt{POP} instructions
-(besides being able to be read and written as a general purpose register).
+The general purpose registers are the following: \ttt{A}, \ttt{BH}, \ttt{BL}, \ttt{CH}, \ttt{CL}. 
+The latter two pairs of registers can be used to store 2-word values, high word and low word respectively. 
+These registers are used readable and writable via move and arithmetic-logic instructions. 
 
-16-bit addresses are read and stored as two words in big-endian order: \texttt{\%llhh}.
-In order to perform 16-bit arithmetic, you must process the two words manually.\footnotemark
+%Then, the CPU has one flag register \ttt{F}, where each bit has the following meaning (left to right: \ttt{SZ--NC})
+%\begin{itemize}
+%\item[A]
+%\end{itemize}
+Then, the CPU has one flag register \ttt{F}, with the following bits: \verb|SZ--NC|, respectively sign, zero, negative, and carry flags. 
+These are set and cleared by arithmetic and logical instructions, 
+and can be queried by the conditional branch instructions. 
+The flag register cannot be written to, but it can be read and copied to memory or another register. 
+\todo{Se calhar é melhor não se copiar e pronto}
 
-\footnotetext{
-  Advanced mathematical subroutine hardware extensions are available for purchase, please contact your sales representative.}
+The \ttt{X} register is an index register: it can be read and written to like a general purpose register, 
+%and it can be added as an offset to a location in memory 
+and it can be used in the indexed addressing mode to access a location obtained by adding the contents of the register to a base address. 
 
-Finally, the 16-bit program counter can be modified by jump, branching, and subroutine instructions.
+The CPU also has a stack pointer, that points to one-past the top of the stack. 
+It can be read or written to as a general purpose register, but it is also altered by the \ttt{CAL}, \ttt{RET}, \ttt{PSH}, \ttt{POP} instructions. 
+
+Finally, the two-word program counter stores the address of the next instruction, and can be modified by jump, branching and subroutine instructions
+
+12-bit addresses are read and stored as two words in big-endian order: \ttt{\%llhh}.
+In order to perform 12-bit arithmetic, you must process the two words manually.\footnotemark
+
+\footnotetext{Advanced mathematical subroutines are available for purchase, please contact your regional sales representative.}
 
 \subsection*{Addressing modes}
 
 The following addressing modes are available:
 
-\begin{itemize}[nosep]
-	\item Register (\texttt{\%a}): addresses a named register.
-	\item Immediate (\texttt{\#ff}): represents a literal value.
-	\item Absolute (\texttt{\#llhh}): the memory address $\texttt{ll}+2^8\texttt{hh}$.
-	\item Indirect (\texttt{\#llhh}): the address stored at memory address $\texttt{ll}+2^8\texttt{hh}$.
-\end{itemize}
+%\begin{itemize}[nosep]
+%	\item Register \ttt{\%a}: addresses a named register.
+%	\item Immediate \ttt{\#ff}: represents a literal one-word value.
+%	\item Immediate \ttt{\#fff}: represents a literal two-word value.
+%	\item Absolute \ttt{\%llhh}: the memory address $\ttt{ll}+2^8\ttt{hh}$.
+%	\item Indexed \ttt{\%llhh,X}: the memory address $\ttt{ll}+2^8\ttt{hh}+\textrm{contents of \ttt{X}}$.
+%	\item Indirect \ttt{(\%llhh)}: the address stored at memory address $\ttt{ll}+2^8\ttt{hh}$.
+%	\item Indirect \ttt{(\%b)} \ttt{(\%c)}: the address $\ttt{c}$
+%\end{itemize}
+
+% Estas tabelas com linhas em todo o lado são péssimas xD mas faz parte da aesthetic, que achas?
+\begin{center}
+\begin{tabular}{|l|l|l|}
+	\hline
+	\textbf{Mode} & \textbf{Notation} & \textbf{Description} \\ \hline
+	Register  & \ttt{\%a} & a named register \\ \hline
+	Immediate & \ttt{\#ff} & represents a literal one-word value \\ \hline
+	Immediate & \ttt{\#fff} & represents a literal two-word value \\ \hline
+	Absolute  & \ttt{\%llhh} & the memory address $\ttt{ll}+2^6×\ttt{hh}$ \\ \hline
+	Indexed   & \ttt{\%llhh,X} & the memory address $\ttt{ll}+2^6×\ttt{hh}+\textrm{contents of \ttt{X}}$ \\ \hline
+	Indirect  & \hspace{-0.2em}\ttt{(\%llhh)} & the address stored at memory address $\ttt{ll}+2^6×\ttt{hh}$  \\ \hline
+%	Indirect  & \hspace{-0.2em}\ttt{(\%b)}\,\ttt{(\%c)} & the address stored at memory address $\ttt{bh}$ (resp c)\\ \hline
+	Indirect  & \hspace{-0.2em}\ttt{(\%r)} & the address stored at memory address $\ttt{rl}+2^6×\ttt{rh}$\footnotemark \\ \hline
+\end{tabular}
+\end{center}
+
+\footnotetext{Where \ttt{r} is \ttt{b} or \ttt{c}}
 
 \subsection*{List of instructions}
 
-The following is a quick-reference list of instructions.
+The following is a quick-reference list of instructions. 
 
-\subsubsection*{Memory management}
+\newcommand\instruction[2]{%
+	\noindent
+	\begin{minipage}[t]{0.22\textwidth} \texttt{#1} \end{minipage}
+	\hspace{0.03\textwidth}
+	\begin{minipage}[t]{0.75\textwidth} #2 \end{minipage}
+%	\medskip
+}
 
-\noindent\texttt{MOV src dst} \quad Set word at \texttt{dst} to contents of \texttt{src}.
+\subsubsection*{Memory}
+
+\instruction{MOV src dst}{Set word at \texttt{dst} to contents of \texttt{src}.}
+
+\instruction{PSH src}{Push \ttt{src} onto the stack and increment \ttt{sp}.}
+
+\instruction{POP dst}{Pop value on the top of the stack onto \ttt{dst} and decrement \ttt{sp}.}
 
 \subsubsection*{Arithmetic}
 
-\noindent\texttt{ADD src dst} \quad Set word at \texttt{dst} to $\texttt{src}+\texttt{dst}$. Set carry flag on overflow.
+\instruction{ADD src dst}{%
+	Set word at \texttt{dst} to $\texttt{src}+\texttt{dst}+\ttt{C}$. \\ 
+	Flags: set \ttt{C} on overflow. 
+}
 
-\noindent\texttt{SUB src dst} \quad Set word at \texttt{dst} to $\texttt{src}-\texttt{dst}$. Set carry flag on underflow.
+\todo{O que acontece em SUB se C estiver set?}
+\instruction{SUB src dst}{%
+	Set word at \texttt{dst} to $\texttt{src}-\texttt{dst}$. \\ 
+	Flags: set \ttt{C} on underflow, set \ttt{N} on negative result, set \ttt{Z} on zero result. 
+}
 
-\noindent\texttt{MUL src dst} \quad Set word at \texttt{dst} to $\texttt{src}×\texttt{dst}$. Set carry flag on overflow.
+\instruction{MUL src dst}{%
+	Set word at \texttt{dst} to $\texttt{src}×\texttt{dst}$, where operands are unsigned values. \\ 
+	Flags: set \ttt{C} on overflow.
+}
+
+\instruction{MUS src dst}{%
+	Set word at \texttt{dst} to $\texttt{src}×\texttt{dst}$, where operands are signed values. \\ 
+	Flags: set \ttt{C} on overflow.
+}
+
+\instruction{DIV src dst}{%
+	Set word at \texttt{dst} to $\texttt{src}\div\texttt{dst}$, where operands are unsigned values.  
+}
+
+\instruction{DIS src dst}{%
+	Set word at \texttt{dst} to $\texttt{src}\div\texttt{dst}$, where operands are signed values. 
+}
+
+\renewcommand\mod%
+	{\mathrel{\mathrm{mod}}}
+
+\instruction{MOD src dst}{%
+	Set word at \texttt{dst} to $\texttt{src}\mod\texttt{dst}$, where operands are unsigned values. 
+}
+
+\instruction{MOS src dst}{%
+	Set word at \texttt{dst} to $\texttt{src}\mod\texttt{dst}$, where operands are signed values. 
+}
+
+
+\instruction{AND src dst}{%
+	Set word at \ttt{dst} to bitwise-and of \ttt{src} and \ttt{dst}.
+}
+
+\instruction{OR~ src dst}{%
+	Set word at \ttt{dst} to bitwise-or of \ttt{src} and \ttt{dst}.
+}
+
+\instruction{XOR src dst}{%
+	Set word at \ttt{dst} to bitwise-xor of \ttt{src} and \ttt{dst}.
+}
+
+\instruction{LSL dst}{%
+	Shift bits in \ttt{dst} to the left. \\ 
+	Flags: set \ttt{C} on overflow.  
+}
+
+\instruction{LSR dst}{%
+	Shift bits in \ttt{dst} to the right. 
+}
+
+
 
 \subsubsection*{Comparison}
 
-\noindent\texttt{CMP src dst} \quad If $\texttt{src}>\texttt{dst}$ set carry flag. If $\texttt{src}=\texttt{dst}$ set zero flag.
+\instruction{CMP src dst}{If $\texttt{src}>\texttt{dst}$ set carry flag. If $\texttt{src}=\texttt{dst}$ set zero flag.}
+
+%\instruction{TST src dst}{If $\texttt{src}>\texttt{dst}$ set carry flag. If $\texttt{src}=\texttt{dst}$ set zero flag.}
+
+
+
 
 \subsubsection*{Jump}
 
-\noindent\texttt{JMP dst} \quad Jump execution to \texttt{dst}.
+\instruction{JMP dst}{Jump execution to \texttt{dst}.}
 
 \subsubsection*{Branching}
 
+\instruction{BCC off}{Branch to $\ttt{pc}+\ttt{off}$ if \ttt{C} clear (signed offset).}
+
+\instruction{BCS off}{Branch to $\ttt{pc}+\ttt{off}$ if \ttt{C} set (signed offset).}
+
+\instruction{BNE off}{Branch to $\ttt{pc}+\ttt{off}$ if \ttt{Z} clear (signed offset).}
+
+\instruction{BEQ off}{Branch to $\ttt{pc}+\ttt{off}$ if \ttt{Z} set (signed offset).}
+
+\instruction{BPL off}{Branch to $\ttt{pc}+\ttt{off}$ if \ttt{N} clear (signed offset).}
+
+\instruction{BMI off}{Branch to $\ttt{pc}+\ttt{off}$ if \ttt{N} set (signed offset).}
+
 \subsubsection*{Subroutines}
 
-\noindent\texttt{CAL dst} \quad Store current \texttt{pc} in stack, increment \texttt{sp}, and jump to \texttt{dst}.
+\instruction{CAL dst}{Store current \texttt{pc} in stack, increment \texttt{sp}, and jump to \texttt{dst}.}
 
-\noindent\texttt{RET~~~~} \quad Read \texttt{pc} from stack, decrement \texttt{sp}, and jump.
+\instruction{RET~~~~}{Read \texttt{pc} from stack, decrement \texttt{sp}, and jump.}
 
 \subsubsection*{Miscellaneous}
 
-\noindent\texttt{NOP} \quad No-op.
+\instruction{NOP}{No-op.}
 
 
 
