@@ -1,0 +1,64 @@
+@font-face {
+  font-family: 'vtfmono';
+  src: url("../assets/VTFMono.ttf") format("truetype");
+  src: url("../assets/VTFMono.woff") format("woff");
+}
+
+#content {
+  width: 100vw;
+  height: 100vh;
+  background-color: #ffedf0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 3vh;
+}
+
+.vtf {
+  font-family: 'vtfmono';
+}
+
+#katakana-middle {
+  max-height: 10vh;
+  max-width: 30vw;
+  -webkit-transform: translateY(-3vh);
+          transform: translateY(-3vh);
+}
+
+#clock {
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+#clock .number {
+  line-height: 30%;
+  font-size: \min(20vw, 40vh);
+}
+
+#clock #separator {
+  width: 2vw;
+  height: 2vw;
+  background-color: #222;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 1em;
+  margin-right: 1em;
+}
+/*# sourceMappingURL=styles.css.map */
