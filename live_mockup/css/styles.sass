@@ -1,51 +1,79 @@
 $black: #222
 $pink-dark: #a56f78
 $pink-med: #deb1b7
-$pink-light: #ffedf0
+$pink-light: #867175
 $white: #ffffff
-$grey-med: #e5e5e5
-$grey-dark: #c3c3c3
 
 @font-face
     font-family: 'vtfmono'
     src: url('../assets/VTFMono.ttf') format('truetype')
     src: url('../assets/VTFMono.woff') format('woff')
 
-#content
+.vtf
+    font-family: 'vtfmono'
+
+#viewport
     width: 100vw
     height: 100vh
-    background-color: $pink-light
+    background-color: $pink-med
+
+#bg-letters-container
+    width: 100%
+    height: 100%
+
+    position: fixed
+    top: 0
+    left: 0
+
+    overflow: hidden
+
+    img
+        width: 200%
+        height: 200%
+        object-fit: cover
+
+        position: fixed
+        top: 50%
+        left: 50%
+        transform: translate(-50%,-50%)
+
+#center-material
+    width: 100%
+    height: 100%
+
+    position: fixed
+    top: 0
+    left: 0
 
     display: flex
     flex-direction: column
     justify-content: center
     align-items: center
-    gap: 3vh
+    gap: \min(3vh, 3vw)
 
-.vtf
-    font-family: 'vtfmono'
+    #katakana-middle
+        max-height: 10vh
+        max-width: 30vw
+        transform: translateY(-3vh)
 
-#katakana-middle
-    max-height: 10vh
-    max-width: 30vw
-    transform: translateY(-3vh)
+    #clock
+        display: inline-flex
+        justify-content: center
+        align-items: center
 
+        .number
+            line-height: 30%
+            font-size: \min(20vw, 40vh)
 
-#clock
-    display: inline-flex
-    justify-content: center
-    align-items: center
-    
-    .number
-        line-height: 30%
-        font-size: \min(20vw, 40vh)
-        
-    #separator
-        width: 2vw
-        height: 2vw
-        background-color: $black
-        border-radius: 50%
-        display: inline-block
+        #separator
+            width: 1vw
+            height: 1vw
+            background-color: $black
+            border-radius: 50%
+            display: inline-block
 
-        margin-left: 1em
-        margin-right: 1em
+            margin-left: 1.5em
+            margin-right: 1.5em
+
+    #bar-middle
+        max-width: \min(30vw, 50vh)
