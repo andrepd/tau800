@@ -260,4 +260,33 @@
   bottom: 55%;
   left: -1px;
 }
+
+.side-material-container .left-material .top-material .overhang .right .balls {
+  width: 70%;
+  position: absolute;
+  bottom: calc(55% + .5px);
+  left: 28%;
+  -webkit-transform: translateY(50%);
+          transform: translateY(50%);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+  gap: 1em;
+}
+
+.side-material-container .left-material .top-material .overhang .right .balls img {
+  width: \min(2vw, 2vh);
+}
 /*# sourceMappingURL=styles.css.map */
