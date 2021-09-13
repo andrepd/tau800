@@ -4,6 +4,9 @@ $pink-med: #deb1b7
 $pink-light: #867175
 $white: #ffffff
 
+*
+    box-sizing: border-box
+
 @font-face
     font-family: 'vtfmono'
     src: url('../assets/VTFMono.ttf') format('truetype')
@@ -87,7 +90,6 @@ $white: #ffffff
     box-sizing: border-box
 
     max-width: calc(1.7777*100vh)
-    //max-height: calc(0.5625*100vw)
 
     position: fixed
     top: 50%
@@ -112,7 +114,7 @@ $white: #ffffff
 
         .top-material
             width: 80%
-            height: 4vw
+            height: 4vh
 
             display: flex
             flex-direction: row
@@ -127,14 +129,52 @@ $white: #ffffff
 
             #overhang
                 width: 100%
-                height: 50%
+                height: 100%
 
-                #text
+                display: inline-flex
+                flex-direction: row
+                flex-wrap: nowrap
+                justify-content: space-between
+                align-items: stretch
+
+                .left
                     height: 100%
-                    width: auto
-                    
-                    position: relative
-                    top: -5px
+                    min-width: 30%
 
-                #line
-                    width: 40%
+                    flex-grow: 100
+
+                    display: inline-block
+                    vertical-align: top
+
+                    position: relative
+
+                    #text-left
+                        width: auto
+                        height: 50%
+                        
+                        max-width: 100%
+                        
+                        position: absolute
+                        bottom: 50%
+                        left: 0                        
+                    
+                    #line
+                        width: 100%
+                        height: 1px
+                        
+                        position: absolute
+                        bottom: 50%
+                        left: 0
+                
+                #text-middle
+                    img
+                        height: 200%
+                    
+                    padding-left: 1vw
+                    padding-right: 1vw
+                
+                .right
+                    flex-grow: 100
+
+* > svg
+    vector-effect: "non-scaling-stroke"
