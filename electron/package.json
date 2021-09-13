@@ -1,0 +1,14 @@
+{
+  "name": "anachronic",
+  "version": "1.0.0",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Miguel Murça, André Duarte",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "electron": "^14.0.1"
+  },
+  "description": ""
+}
