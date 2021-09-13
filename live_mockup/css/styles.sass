@@ -15,12 +15,12 @@ $white: #ffffff
 .vtf
     font-family: 'vtfmono'
 
-#viewport
+.viewport
     width: 100vw
     height: 100vh
     background-color: $pink-med
 
-#bg-letters-container
+.bg-letters-container
     width: 100%
     height: 100%
 
@@ -40,7 +40,7 @@ $white: #ffffff
         left: 50%
         transform: translate(-50%,-50%)
 
-#center-material
+.center-material
     width: 100%
     height: 100%
 
@@ -54,12 +54,12 @@ $white: #ffffff
     align-items: center
     gap: \min(3vh, 3vw)
 
-    #katakana-middle
+    .katakana-middle
         max-height: 10vh
         max-width: 30vw
         transform: translateY(-3vh)
 
-    #clock
+    .clock
         display: inline-flex
         justify-content: center
         align-items: center
@@ -68,7 +68,7 @@ $white: #ffffff
             line-height: 30%
             font-size: \min(30vw, 40vh)
 
-        #separator
+        .separator
             width: 1vw
             height: 1vw
             background-color: $black
@@ -78,11 +78,11 @@ $white: #ffffff
             margin-left: \min(1vw, 1vh)
             margin-right: \min(1vw, 1vh)
 
-    #bar-middle
+    .bar-middle
         max-width: \min(40vw, 50vh)
 
 
-#side-material-container
+.side-material-container
     width: 100%
     height: 100%
 
@@ -102,7 +102,7 @@ $white: #ffffff
     justify-content: space-between
     align-items: stretch
 
-    #left-material
+    .left-material
         width: 100%
         height: 100%
 
@@ -113,8 +113,8 @@ $white: #ffffff
         align-items: flex-start
 
         .top-material
-            width: 80%
-            height: 4vh
+            width: 100%
+            height: 2.6vw
 
             display: flex
             flex-direction: row
@@ -122,13 +122,13 @@ $white: #ffffff
             justify-content: flex-start
             align-items: flex-start
 
-            #corner-decoration
+            .corner-decoration
                 width: auto
                 height: 100%
                 padding-right: 1ex
 
-            #overhang
-                width: 100%
+            .overhang
+                width: calc(100% - 2.6vw)
                 height: 100%
 
                 display: inline-flex
@@ -139,42 +139,70 @@ $white: #ffffff
 
                 .left
                     height: 100%
-                    min-width: 30%
+                    width: 10%
 
-                    flex-grow: 100
+                    display: inline-block
+                    vertical-align: top
+
+                    flex-grow: 1
+
+                    position: relative
+
+                    .text-left
+                        width: auto
+                        height: 50%
+                        
+                        max-width: 80%
+                        
+                        position: absolute
+                        bottom: 70%
+                        left: -2px          
+
+                        flex-shrink: 0
+                    
+                    .line
+                        width: 100%
+                        height: 1px
+                        
+                        position: absolute
+                        bottom: 55%
+                        left: -1px
+                
+                .text-middle
+                    height: 100%
+
+                    padding-left: 1vw
+                    padding-right: 1vw
+
+                    display: inline-block
+                    vertical-align: top
+
+                    flex-shrink: 0
+
+                    img
+                        height: 150%
+                        max-width: 100%
+
+                        position: relative
+                        top: 0
+                
+                .right
+                    height: 100%
+                    min-width: 20%
+
+                    flex-grow: 2
 
                     display: inline-block
                     vertical-align: top
 
                     position: relative
 
-                    #text-left
-                        width: auto
-                        height: 50%
-                        
-                        max-width: 100%
-                        
-                        position: absolute
-                        bottom: 50%
-                        left: 0                        
-                    
-                    #line
-                        width: 100%
+                    .line
+                        width: 30%
                         height: 1px
                         
                         position: absolute
-                        bottom: 50%
-                        left: 0
-                
-                #text-middle
-                    img
-                        height: 200%
+                        bottom: 55%
+                        left: -1px
                     
-                    padding-left: 1vw
-                    padding-right: 1vw
-                
-                .right
-                    flex-grow: 100
-
-* > svg
-    vector-effect: "non-scaling-stroke"
+                    .balls
