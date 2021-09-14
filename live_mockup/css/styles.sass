@@ -81,26 +81,18 @@ $white: #ffffff
     .bar-middle
         max-width: \min(40vw, 50vh)
 
-
 .side-material-container
     width: 100%
     height: 100%
 
-    padding: 2.5vw
+    padding: 2.5vw // Margin does not go inside
     box-sizing: border-box
 
-    max-width: calc(1.7777*100vh)
-
     position: fixed
-    top: 50%
-    left: 50%
-    transform: translate(-50%,-50%)
+    top: 0
+    left: 0
 
-    display: flex
-    flex-direction: row
-    flex-wrap: nowrap
-    justify-content: space-between
-    align-items: stretch
+    //max-width: calc(1.7777*100vh)
 
     .left-material
         width: 100%
@@ -206,7 +198,7 @@ $white: #ffffff
                         left: -1px
                     
                     .balls
-                        width: 70%
+                        width: 40%
 
                         position: absolute
                         bottom: calc(55% + .5px) // Probably unnecessary
@@ -219,8 +211,21 @@ $white: #ffffff
                         flex-wrap: nowrap
                         justify-content: flex-start
                         align-items: stretch
-                        gap: 1em
+                        gap: \min(1em, 1vw)
 
                         img
                             width: \min(2vw, 2vh)
 
+    .right-material-container
+        // This item is needed to be able to use "relative absolute" positioning
+        position: relative
+
+        .right-material
+            position: absolute
+            top: 0
+            right: 0
+
+            .text
+                width: 5vw
+                height: auto
+                max-height: 80vh

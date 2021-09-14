@@ -106,27 +106,9 @@
   padding: 2.5vw;
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
-  max-width: calc(1.7777*100vh);
   position: fixed;
-  top: 50%;
-  left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: row;
-          flex-direction: row;
-  -ms-flex-wrap: nowrap;
-      flex-wrap: nowrap;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  -webkit-box-align: stretch;
-      -ms-flex-align: stretch;
-          align-items: stretch;
+  top: 0;
+  left: 0;
 }
 
 .side-material-container .left-material {
@@ -262,7 +244,7 @@
 }
 
 .side-material-container .left-material .top-material .overhang .right .balls {
-  width: 70%;
+  width: 40%;
   position: absolute;
   bottom: calc(55% + .5px);
   left: 28%;
@@ -283,10 +265,26 @@
   -webkit-box-align: stretch;
       -ms-flex-align: stretch;
           align-items: stretch;
-  gap: 1em;
+  gap: \min(1em, 1vw);
 }
 
 .side-material-container .left-material .top-material .overhang .right .balls img {
   width: \min(2vw, 2vh);
+}
+
+.side-material-container .right-material-container {
+  position: relative;
+}
+
+.side-material-container .right-material-container .right-material {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.side-material-container .right-material-container .right-material .text {
+  width: 5vw;
+  height: auto;
+  max-height: 80vh;
 }
 /*# sourceMappingURL=styles.css.map */
