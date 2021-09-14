@@ -12,6 +12,7 @@ incompatible things (time-wise), e.g., 19th century man on a motorcycle.
 From meaning:
 
   - Y2K imagery (e.g. Evangelion)
+  - Modern look vs extremely old "organization" (parachronism)
   
 From literal interpretation:
 
