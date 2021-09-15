@@ -1,22 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
-<svg
-   viewBox="0 0 7.7147388 7.7147388"
-   preserveAspectRatio="xMaxYmin meet"
-   version="1.1"
-   id="svg37480"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <defs
-     id="defs37477" />
-  <g
-     id="layer1"
-     transform="translate(-86.73336,-169.87043)">
-    <path
-       vector-effect="non-scaling-stroke" 
-       style="display:inline;fill:none;fill-opacity:1;stroke:#f5dbdf;stroke-width:1px;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
-       id="path21436"
-       d="m 87.143464,177.17506 a 6.8945308,6.8945308 0 0 1 6.89453,-6.89453" />
-  </g>
+<svg viewBox="0 0 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+   <defs>
+      <path id="arc" d="M -0.1 1 L 0 1 M 0 1 C 0 0.5 0.5 0 1 0"/>
+      <clipPath id="arc-inside">
+      <path id="arc" d="M -0.1 1 L 0 1 M 0 1 C 0 0.5 0.5 0 1 0 L 1 1 Z"/>
+      </clipPath>
+   </defs>
+   <g>
+      <use href="#arc" clip-path="url(#arc-inside)" vector-effect="non-scaling-stroke" stroke="#f5dbdf" fill="none" stroke-width="1px"/>
+   </g>
 </svg>

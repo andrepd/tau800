@@ -257,17 +257,16 @@
   position: relative;
   width: 100%;
   height: 100%;
+  --ball-size: \min(1.1vh, 1.5ex);
+  --corner-decoration-size: 1.3vw;
 }
 
 .side-material-container .right-material-container .right-material {
   width: 100%;
   height: 100%;
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
@@ -280,56 +279,68 @@
   -webkit-box-align: end;
       -ms-flex-align: end;
           align-items: flex-end;
-  --ball-size: \min(\min(1.2vw, 1.2vh), 2ex);
 }
 
 .side-material-container .right-material-container .right-material .text {
-  width: 5vw;
+  width: 6vw;
   height: auto;
   max-height: 80vh;
+  padding-bottom: 1em;
 }
 
 .side-material-container .right-material-container .right-material .line-right-container {
-  position: relative;
   width: var(--ball-size);
-  height: 80%;
+  height: 100%;
   min-height: 5vh;
+  -ms-flex-negative: 100;
+      flex-shrink: 100;
+  -webkit-box-flex: 100;
+      -ms-flex-positive: 100;
+          flex-grow: 100;
   /* The way everything is aligned here is very weird, but using flex
                     does not work better, and also requires weird tuning hacks to get
                         the meets between the ball/line and line/decorator to work well.*/
-  display: inline-block;
-  padding-top: 1.5em;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
-  -webkit-transform: translate(100%, 1px);
-          transform: translate(100%, 1px);
+  -webkit-transform: translateX(-0.8vw) translateY(1px);
+          transform: translateX(-0.8vw) translateY(1px);
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+  position: relative;
 }
 
-.side-material-container .right-material-container .right-material .line-right-container .line-right {
+.side-material-container .right-material-container .right-material .line-right-container .line {
+  width: 2px;
   height: 100%;
-  width: 1px;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
-  padding-top: 2px;
-  -webkit-transform: translateX(-0.8vw);
-          transform: translateX(-0.8vw);
+  -webkit-box-flex: 100;
+      -ms-flex-positive: 100;
+          flex-grow: 100;
+  -ms-flex-negative: 100;
+      flex-shrink: 100;
 }
 
 .side-material-container .right-material-container .right-material .line-right-container .ball {
-  position: fixed;
-  right: 50%;
-  width: var(--ball-size);
-  -webkit-transform: translateX(-0.8vw);
-          transform: translateX(-0.8vw);
+  width: 100%;
+  -webkit-transform: translate(50%, 50%) translateX(-2px);
+          transform: translate(50%, 50%) translateX(-2px);
 }
 
-.side-material-container .right-material-container .right-material .corner-decoration-container {
-  width: 120%;
-  height: 1.3vw;
-  position: relative;
+.side-material-container .right-material-container .corner-decoration-container {
+  width: 100%;
+  height: var(--corner-decoration-size);
   -webkit-transform: translateX(-0.8vw);
           transform: translateX(-0.8vw);
-  margin-right: -1px;
   -ms-flex-negative: 0;
       flex-shrink: 0;
   display: -webkit-box;
@@ -349,14 +360,21 @@
           align-items: flex-end;
 }
 
-.side-material-container .right-material-container .right-material .corner-decoration-container .corner-decoration {
+.side-material-container .right-material-container .corner-decoration-container .corner-decoration {
   width: auto;
   height: 100%;
 }
 
-.side-material-container .right-material-container .right-material .corner-decoration-container .line {
-  width: 10%;
-  height: 1px;
-  margin-right: -1px;
+.side-material-container .right-material-container .corner-decoration-container .line {
+  width: 30%;
+  height: 2px;
+  -webkit-transform: translateX(1px);
+          transform: translateX(1px);
+}
+
+.side-material-container .right-material-container .corner-decoration-container .ball {
+  width: var(--ball-size);
+  -webkit-transform: translate(50%, 50%) translateY(-2px);
+          transform: translate(50%, 50%) translateY(-2px);
 }
 /*# sourceMappingURL=styles.css.map */
