@@ -4,9 +4,6 @@ $pink-med: #deb1b7
 $pink-light: #867175
 $white: #ffffff
 
-*
-    box-sizing: border-box
-
 @font-face
     font-family: 'vtfmono'
     src: url('../assets/VTFMono.ttf') format('truetype')
@@ -19,6 +16,7 @@ $white: #ffffff
     width: 100vw
     height: 100vh
     background-color: $pink-med
+    select: none
 
 .bg-letters-container
     width: 100%
@@ -235,39 +233,62 @@ $white: #ffffff
                 height: auto
                 max-height: 80vh
 
+            $line-and-corner-offset: -.8vw
+            --ball-size: \min(\min(1.2vw, 1.2vh), 2ex)
+
             .line-right-container
                 position: relative
 
-                width: 1px
-                height: auto
-                min-height: 5px
+                width: var(--ball-size)
+                height: 80%
+                min-height: 5vh
 
-                flex-shrink: 100
-                flex-grow: 100
+                /* The way everything is aligned here is very weird, but using flex
+                    does not work better, and also requires weird tuning hacks to get
+                        the meets between the ball/line and line/decorator to work well.*/
 
-                padding-top: 1em
+                display: inline-block
+                padding-top: 1.5em
                 box-sizing: border-box
 
-                transform: translate(-50%, 1px)
+                transform: translate(100%, 1px)
 
                 .line-right
                     height: 100%
-                    width: 100%
+                    width: 1px
 
                     box-sizing: border-box
                     padding-top: 2px
-                
+
+                    transform: translateX($line-and-corner-offset)
+
                 .ball
                     position: fixed
                     right: 50%
-                    transform: translateX(50%)
-
-                    width: \min(1vw, 1vh)
+                    width: var(--ball-size)
+                    transform: translateX($line-and-corner-offset)
     
-            .corner-decoration
+            .corner-decoration-container
                 // half the size of the other decoration to mimic the arc
-                width: auto
+                width: 120%
                 height: 1.3vw
-            
-            .right-decoration
-                transform: translateX(-1ex)
+                position: relative
+                transform: translateX($line-and-corner-offset)
+                margin-right: -1px
+
+                flex-shrink: 0
+
+                display: flex
+                flex-direction: row
+                flex-wrap: nowrap
+                justify-content: flex-end
+                align-items: flex-end
+
+                .corner-decoration
+                    width: auto
+                    height: 100%
+                
+                .line
+                    width: 10%
+                    height: 1px
+                    margin-right: -1px

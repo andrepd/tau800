@@ -2,9 +2,7 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="2.379878mm"
-   height="2.379878mm"
-   viewBox="0 0 2.379878 2.379878"
+   viewBox="-0.1 -0.1 1.1 1.1"
    version="1.1"
    id="svg37684"
    xmlns="http://www.w3.org/2000/svg"
@@ -12,13 +10,12 @@
   <defs
      id="defs37681" />
   <g
-     id="layer1"
-     transform="translate(-149.03014,-127.2425)">
+     id="layer1">
     <circle
        style="display:inline;fill:#f6dde0;fill-opacity:1;stroke:none;stroke-width:0.529167;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path304486-4-8"
-       cx="150.22008"
-       cy="128.43243"
-       r="1.189939" />
+       cx="0.5"
+       cy="0.5"
+       r="0.5" />
   </g>
 </svg>
