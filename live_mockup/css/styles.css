@@ -139,7 +139,7 @@
 }
 
 .side-material-container .left-material .top-material .overhang {
-  width: calc(100% - 2.6vw);
+  width: 100%;
   height: 100%;
   display: -webkit-inline-box;
   display: -ms-inline-flexbox;
@@ -206,11 +206,13 @@
 }
 
 .side-material-container .left-material .top-material .overhang .right {
+  width: auto;
   height: 100%;
-  min-width: 20%;
   -webkit-box-flex: 2;
       -ms-flex-positive: 2;
           flex-grow: 2;
+  -ms-flex-negative: 100;
+      flex-shrink: 100;
   display: inline-block;
   vertical-align: top;
   position: relative;
@@ -282,8 +284,8 @@
 }
 
 .side-material-container .right-material-container .right-material .right-text {
-  width: 6vw;
-  height: auto;
+  width: auto;
+  height: 70vh;
   max-height: 80vh;
   padding-bottom: 1em;
 }
@@ -361,9 +363,9 @@
 }
 
 .side-material-container .right-material-container .corner-decoration-container .text {
-  height: 125%;
+  height: 105%;
   float: right;
-  padding-right: 1.5vw;
+  padding-right: 0.5vw;
   -webkit-transform: translateY(30%);
           transform: translateY(30%);
 }
@@ -374,7 +376,7 @@
 }
 
 .side-material-container .right-material-container .corner-decoration-container .line {
-  width: 12%;
+  width: 14%;
   height: 2px;
   -webkit-transform: translateX(1px);
           transform: translateX(1px);
@@ -389,11 +391,11 @@
 .side-material-container .right-material-container .corner-decoration-container .stack-container {
   position: absolute;
   bottom: 0;
-  right: 4vw;
+  right: 11vw;
 }
 
 .side-material-container .right-material-container .corner-decoration-container .stack-container .support {
-  width: 20vw;
+  width: 12vw;
 }
 
 .side-material-container .right-material-container .corner-decoration-container .stack-container .stack {
@@ -414,8 +416,8 @@
           align-items: center;
   gap: 2px;
   margin-bottom: 4px;
-  -webkit-transform: translateX(-25%);
-          transform: translateX(-25%);
+  -webkit-transform: translateX(-20%);
+          transform: translateX(-20%);
 }
 
 .side-material-container .right-material-container .corner-decoration-container .stack-container .stack .stack-box {
