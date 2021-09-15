@@ -228,7 +228,7 @@ $white: #ffffff
             justify-content: flex-start
             align-items: flex-end
 
-            .text
+            .right-text
                 width: 6vw
                 height: auto
                 max-height: 80vh
@@ -281,15 +281,43 @@ $white: #ffffff
             justify-content: flex-end
             align-items: flex-end
 
+            .text
+                height: 125%
+                float: right
+                padding-right: 1.5vw
+                transform: translateY(30%)
+
             .corner-decoration
                 width: auto
                 height: 100%
             
             .line
-                width: 30%
+                width: 12%
                 height: 2px
                 transform: translateX(1px)
             
             .ball
                 width: var(--ball-size)
                 transform: translate(50%, 50%) translateY(-2px)
+
+            .stack-container
+                position: absolute
+                bottom: 0
+                right: 4vw
+
+                .support
+                    width: 20vw
+
+                .stack
+                    display: flex
+                    flex-direction: column
+                    flex-wrap: nowrap
+                    justify-content: flex-end
+                    align-items: center
+                    gap: 2px
+
+                    margin-bottom: 4px
+                    transform: translateX(-25%)
+
+                    .stack-box
+                        width: 6vw

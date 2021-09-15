@@ -281,7 +281,7 @@
           align-items: flex-end;
 }
 
-.side-material-container .right-material-container .right-material .text {
+.side-material-container .right-material-container .right-material .right-text {
   width: 6vw;
   height: auto;
   max-height: 80vh;
@@ -360,13 +360,21 @@
           align-items: flex-end;
 }
 
+.side-material-container .right-material-container .corner-decoration-container .text {
+  height: 125%;
+  float: right;
+  padding-right: 1.5vw;
+  -webkit-transform: translateY(30%);
+          transform: translateY(30%);
+}
+
 .side-material-container .right-material-container .corner-decoration-container .corner-decoration {
   width: auto;
   height: 100%;
 }
 
 .side-material-container .right-material-container .corner-decoration-container .line {
-  width: 30%;
+  width: 12%;
   height: 2px;
   -webkit-transform: translateX(1px);
           transform: translateX(1px);
@@ -376,5 +384,41 @@
   width: var(--ball-size);
   -webkit-transform: translate(50%, 50%) translateY(-2px);
           transform: translate(50%, 50%) translateY(-2px);
+}
+
+.side-material-container .right-material-container .corner-decoration-container .stack-container {
+  position: absolute;
+  bottom: 0;
+  right: 4vw;
+}
+
+.side-material-container .right-material-container .corner-decoration-container .stack-container .support {
+  width: 20vw;
+}
+
+.side-material-container .right-material-container .corner-decoration-container .stack-container .stack {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 2px;
+  margin-bottom: 4px;
+  -webkit-transform: translateX(-25%);
+          transform: translateX(-25%);
+}
+
+.side-material-container .right-material-container .corner-decoration-container .stack-container .stack .stack-box {
+  width: 6vw;
 }
 /*# sourceMappingURL=styles.css.map */
