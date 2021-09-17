@@ -1,8 +1,4 @@
-/*use std::ops::Add;*/
-
-/*use std::{mem, ops::Add};*/
-
-use crate::{basics::*, ram_state::RamState};
+use crate::prelude::*;
 
 
 
@@ -45,7 +41,6 @@ pub enum Operands {
   ImmInd {src: Word,            dst: Timed<Address> }, 
 }
 
-/*pub type Offset = Word;  // As signed*/
 #[derive(Debug)]
 pub struct Offset (
   SWord
@@ -148,7 +143,7 @@ impl Offset {
 
 impl Instruction {
   /// Decode the next instruction at memory[pc].
-  /// Encoding scheme: 5 bits for instruction, 3 bits for addressing mode (or 4/4?)
+  /// Encoding scheme: 5 bits for instruction, 3 bits for addressing mode
   fn decode(memory: &RamState, pc: &mut Address) -> Self {
     use Instruction::*;  // Fds eu ter de dizer use `Foo::*` dentro de `impl Foo` também é de génio
     let word = memory[*pc];

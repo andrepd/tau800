@@ -1,11 +1,9 @@
-// use crate::cpu_state::CpuState;
-use crate::cpu_state::{self, CpuState};
-use crate::ram_state::{self, RamState};
+use crate::prelude::*;
 
 #[derive(Debug)]
 pub struct MachineState {
-  cpu: cpu_state::CpuState,
-  ram: ram_state::RamState,
+  cpu: CpuState,
+  ram: RamState,
 }
 
 impl MachineState {
