@@ -1,2 +1,12 @@
 **/.*
 !.gitignore
+
+interpreter/debug
+interpreter/target
+# interpreter/Cargo.lock
+
+manual/document.aux
+manual/document.log
+manual/document.out
+manual/document.synctex.gz
+manual/document.toc
