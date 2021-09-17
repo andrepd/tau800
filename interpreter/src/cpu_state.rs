@@ -21,13 +21,13 @@ impl Flags {
 
 #[derive(Debug)]
 pub struct CpuState {
-  a: Word,
-  b: Word,
-  c: Word,
-  d: Word,
-  sp: Word,
-  pc: Address,
-  flags: Flags,
+  pub a: Word,
+  pub b: Word,
+  pub c: Word,
+  pub d: Word,
+  pub sp: Word,
+  pub pc: Address,
+  pub flags: Flags,
 }
 
 impl CpuState {

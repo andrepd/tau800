@@ -2,8 +2,8 @@ use crate::prelude::*;
 
 #[derive(Debug)]
 pub struct MachineState {
-  cpu: CpuState,
-  ram: RamState,
+  pub cpu: CpuState,  // Preciso por pub em tudo o que é merda, whyyyy
+  pub ram: RamState,
 }
 
 impl MachineState {
