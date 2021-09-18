@@ -104,24 +104,24 @@
 \frontmatter
 
 \begin{titlingpage}
-\calccentering{\unitlength}
-\begin{adjustwidth*}{\unitlength}{-\unitlength}
-	\centering
-	
-	\vspace*{4\baselineskip}
-	
-	\begin{tikzpicture}
-		\node[rectangle,draw,very thick,inner sep=18pt,align=center] {
-			{\HUGE \machinename} 
-			\\[32pt] 
+	\calccentering{\unitlength}
+	\begin{adjustwidth*}{\unitlength}{-\unitlength}
+		\centering
+
+		\vspace*{4\baselineskip}
+
+		\begin{tikzpicture}
+			\node[rectangle,draw,very thick,inner sep=18pt,align=center] {
+			{\HUGE \machinename}
+			\\[32pt]
 			{\LARGE Quick-start guide}
-		};
-	\end{tikzpicture}
-	
-	\vfill
-	
-	{\footnotesize \companyname \\ 時間システム}
-\end{adjustwidth*}
+			};
+		\end{tikzpicture}
+
+		\vfill
+
+		{\footnotesize \companyname \\ 時間システム}
+	\end{adjustwidth*}
 \end{titlingpage}
 
 
@@ -129,15 +129,18 @@
 \thispagestyle{empty}
 
 \begin{footnotesize}
-\noindent
-This is a quick-start guide to your \machinename\ time-computing machine. 
-Please ensure you have thoroughly read and understood the User Manual and the Warranty Disclaimer before attempting to utilize the machine. 
-\companyname\ is not responsible for any damages resulting from improper use of the time jump facilities of this machine. 
-\todo{Meter warnings, disclaimers, etc, tipo “please always ensure your program does not contain any causality-breaking closed timelike loops”}
-
-~
-
-\warningbox{Example warning box. This product is without the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. \\[4pt] \textbf{\textsf{UNDER NO CIRCUMSTANCES SHOULD YOU COISO!}}}
+	\noindent
+	This is a quick-start guide to your \machinename\ time-computing machine.
+	Please ensure you have thoroughly read and understood the User Manual and the Warranty Disclaimer before attempting to utilize the machine.
+	\companyname\ is not responsible for any damages resulting from improper use of the time jump facilities of this machine.
+	
+	\medskip
+	\warningbox{%
+		This product is without the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. \\[4pt] %
+		\textbf{\textsf{Please ensure that the Novikov module has sufficient power throughout the operation of the machine. Failure to supply the minimum rated power may cause time inconsistency paradoxes.}} \\[2pt] %
+		In the unlikely case of forced inconsistency contact our hotline \\
+		\hfill\textbf{1-800-NOTIME}} 
+	\todo{O (!) devia estar centrado verticalmente}
 \end{footnotesize}
 
 
@@ -166,85 +169,85 @@ Please ensure you have thoroughly read and understood the User Manual and the Wa
 \vspace*{-20pt}\rule{\textwidth}{0.8pt}
 
 \noindent
-The following is a quick-reference guide to \machinename\ assembly language. Please use ONLY the officially licensed assembler programs by \companyname\ (ensure you have been supplied with all 9 (nine) floppy diskettes for installation of the assembler). 
+The following is a quick-reference guide to \machinename\ assembly language. Please use ONLY the officially licensed assembler programs by \companyname\ (ensure you have been supplied with all 9 (nine) floppy diskettes for installation of the assembler).
 
 %The CPU word size is 8 bits.
 
 Quick facts:
 \begin{itemize}[nosep]
-	\item 8-bit word size, 16-bit address space. 
-	\item 0.66\,MHz clock speed. 
+	\item 8-bit word size, 16-bit address space.
+	\item 0.66\,MHz clock speed.
 	\item Four general purpose word registers.
-	\item Six-word stack. 
+	\item Six-word stack.
 	\item Time jumps of up to 200 clock cycles in any direction.\footnotemark
-	\item Memory-mapped IO. 
-	\item Big endian. 
+	\item Memory-mapped IO.
+	\item Big endian.
 \end{itemize}
 \footnotetext[1]{Note: for jumps of over 80 clock cycles an upgraded SPS-3-6000 power supply with at least 6\,kW of peak power output must be purchased. \textbf{Serious damage may occur if you attempt to use these operations without sufficient power!}}
 
 \subsection*{CPU registers}
 
-The CPU has 4 (four) general purpose word-sized registers \texttt{A}, \texttt{B}, \texttt{C}, and \texttt{D}. 
-These registers can be given as operands wherever an absolute memory address is expected. 
+The CPU has 4 (four) general purpose word-sized registers \texttt{A}, \texttt{B}, \texttt{C}, and \texttt{D}.
+These registers can be given as operands wherever an absolute memory address is expected.
 
-Furthermore, one stack pointer and one flag register are available. 
-The flag register cannot be written to (except as a side-effect of arithmetic and comparison operations), 
+Furthermore, one stack pointer and one flag register are available.
+The flag register cannot be written to (except as a side-effect of arithmetic and comparison operations),
 %and the stack pointer cannot be read or written except by the \texttt{CAL}, \texttt{RET}, \texttt{PUS}, 
-and the stack pointer is altered by the \texttt{CAL}, \texttt{RET}, \texttt{PSH}, \texttt{POP} instructions 
-(besides being able to be read and written as a general purpose register). 
+and the stack pointer is altered by the \texttt{CAL}, \texttt{RET}, \texttt{PSH}, \texttt{POP} instructions
+(besides being able to be read and written as a general purpose register).
 
-16-bit addresses are read and stored as two words in big-endian order: \texttt{\%llhh}. 
-In order to perform 16-bit arithmetic, you must process the two words manually 
-(mathematical subroutines can be purchased for as low as \$799 for non-commercial use, please contact your sales representative). 
+16-bit addresses are read and stored as two words in big-endian order: \texttt{\%llhh}.
+In order to perform 16-bit arithmetic, you must process the two words manually
+(mathematical subroutines can be purchased for as low as \$799 for non-commercial use, please contact your sales representative).
 
-Finally, the 16-bit program counter can be modified by jump, branching, and subroutine instructions. 
+Finally, the 16-bit program counter can be modified by jump, branching, and subroutine instructions.
 
 \subsection*{Addressing modes}
 
 The following addressing modes are available:
 
 \begin{itemize}[nosep]
-	\item Register (\texttt{\%a}): addresses a named register. 
-	\item Immediate (\texttt{\#ff}): represents a literal value. 
-	\item Absolute (\texttt{\#llhh}): the memory address $\texttt{ll}+2^8\texttt{hh}$. 
-	\item Indirect (\texttt{\#llhh}): the address stored at memory address $\texttt{ll}+2^8\texttt{hh}$. 
+	\item Register (\texttt{\%a}): addresses a named register.
+	\item Immediate (\texttt{\#ff}): represents a literal value.
+	\item Absolute (\texttt{\#llhh}): the memory address $\texttt{ll}+2^8\texttt{hh}$.
+	\item Indirect (\texttt{\#llhh}): the address stored at memory address $\texttt{ll}+2^8\texttt{hh}$.
 \end{itemize}
 
 \subsection*{List of instructions}
 
-The following is a quick-reference list of instructions. 
+The following is a quick-reference list of instructions.
 
 \subsubsection*{Memory management}
 
-\noindent\texttt{MOV src dst} \quad Set word at \texttt{dst} to contents of \texttt{src}. 
+\noindent\texttt{MOV src dst} \quad Set word at \texttt{dst} to contents of \texttt{src}.
 
 \subsubsection*{Arithmetic}
 
-\noindent\texttt{ADD src dst} \quad Set word at \texttt{dst} to $\texttt{src}+\texttt{dst}$. Set carry flag on overflow.  
+\noindent\texttt{ADD src dst} \quad Set word at \texttt{dst} to $\texttt{src}+\texttt{dst}$. Set carry flag on overflow.
 
-\noindent\texttt{SUB src dst} \quad Set word at \texttt{dst} to $\texttt{src}-\texttt{dst}$. Set carry flag on underflow. 
+\noindent\texttt{SUB src dst} \quad Set word at \texttt{dst} to $\texttt{src}-\texttt{dst}$. Set carry flag on underflow.
 
-\noindent\texttt{MUL src dst} \quad Set word at \texttt{dst} to $\texttt{src}×\texttt{dst}$. Set carry flag on overflow. 
+\noindent\texttt{MUL src dst} \quad Set word at \texttt{dst} to $\texttt{src}×\texttt{dst}$. Set carry flag on overflow.
 
 \subsubsection*{Comparison}
 
-\noindent\texttt{CMP src dst} \quad If $\texttt{src}>\texttt{dst}$ set carry flag. If $\texttt{src}=\texttt{dst}$ set zero flag. 
+\noindent\texttt{CMP src dst} \quad If $\texttt{src}>\texttt{dst}$ set carry flag. If $\texttt{src}=\texttt{dst}$ set zero flag.
 
 \subsubsection*{Jump}
 
-\noindent\texttt{JMP dst} \quad Jump execution to \texttt{dst}. 
+\noindent\texttt{JMP dst} \quad Jump execution to \texttt{dst}.
 
 \subsubsection*{Branching}
 
 \subsubsection*{Subroutines}
 
-\noindent\texttt{CAL dst} \quad Store current \texttt{pc} in stack, increment \texttt{sp}, and jump to \texttt{dst}. 
+\noindent\texttt{CAL dst} \quad Store current \texttt{pc} in stack, increment \texttt{sp}, and jump to \texttt{dst}.
 
-\noindent\texttt{RET~~~~} \quad Read \texttt{pc} from stack, decrement \texttt{sp}, and jump. 
+\noindent\texttt{RET~~~~} \quad Read \texttt{pc} from stack, decrement \texttt{sp}, and jump.
 
 \subsubsection*{Miscellaneous}
 
-\noindent\texttt{NOP} \quad No-op. 
+\noindent\texttt{NOP} \quad No-op.
 
 
 
