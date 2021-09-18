@@ -13,14 +13,11 @@ $white: #ffffff
     font-family: 'eurostyle'
     src: url('../assets/EuroStyle.ttf') format('truetype')
 
-.vtf
-    font-family: 'vtfmono'
-
 .viewport
     width: 100vw
     height: 100vh
     background-color: $pink-med
-    select: none
+    user-select: none 
 
 .bg-letters-container
     width: 112%
@@ -68,6 +65,7 @@ $white: #ffffff
         align-items: center
 
         .number
+            font-family: 'vtfmono'
             line-height: 30%
             font-size: \min(42vw, 52vh)
 
@@ -491,3 +489,34 @@ $white: #ffffff
                 
                 .index-8
                     padding-left: 2ex
+
+.command-display-container
+    position: absolute
+    top: 0
+    left: 0
+    width: 100vw
+    height: 100vh
+
+    .command-display
+        width: max-content
+        height: auto
+
+        font-family: 'vtfmono'
+        color: #e5e5e5
+        position: absolute
+        left: 50%
+        transform: translateX(-50%)
+
+        &.top
+            bottom: 13%
+            font-size: 18vh
+
+        &.mid
+            bottom: 7%
+            font-size: 15vh
+            opacity: 50%
+        
+        &.bottom
+            bottom: 3%
+            font-size: 11vh
+            opacity: 10%

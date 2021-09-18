@@ -9,15 +9,14 @@
   src: url("../assets/EuroStyle.ttf") format("truetype");
 }
 
-.vtf {
-  font-family: 'vtfmono';
-}
-
 .viewport {
   width: 100vw;
   height: 100vh;
   background-color: #deb1b7;
-  select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 
 .bg-letters-container {
@@ -85,6 +84,7 @@
 }
 
 .center-material .clock .number {
+  font-family: 'vtfmono';
   line-height: 30%;
   font-size: \min(42vw, 52vh);
 }
@@ -657,5 +657,43 @@
 
 .side-material-container .register-material-container .register-group .register .index-8 {
   padding-left: 2ex;
+}
+
+.command-display-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.command-display-container .command-display {
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+  height: auto;
+  font-family: 'vtfmono';
+  color: #e5e5e5;
+  position: absolute;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+}
+
+.command-display-container .command-display.top {
+  bottom: 13%;
+  font-size: 18vh;
+}
+
+.command-display-container .command-display.mid {
+  bottom: 7%;
+  font-size: 15vh;
+  opacity: 50%;
+}
+
+.command-display-container .command-display.bottom {
+  bottom: 3%;
+  font-size: 11vh;
+  opacity: 10%;
 }
 /*# sourceMappingURL=styles.css.map */
