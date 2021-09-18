@@ -1,4 +1,4 @@
 #!/bin/bash
 
 mkdir -p out
-latexmk -output-directory=out -pdfdvi document.tex
+latexmk -output-directory=out -pdf document.tex $@
