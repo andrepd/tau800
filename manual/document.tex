@@ -54,10 +54,12 @@
 % Style %
 % ----- %
 
+% Margins
 \setlrmarginsandblock{1.5cm}{*}{*}
 \setulmarginsandblock{3cm}{*}{1.2}
 \checkandfixthelayout
 
+% Chapter headers
 \chapterstyle{plain}
 %\cftsetindents{chapter}{1.5em}{2.3em}
 %\renewcommand\cftchapterfont{\normalfont}
@@ -66,12 +68,19 @@
 %\renewcommand\cftchapterafterpnum{\par\vskip-10pt}
 \counterwithout{section}{chapter}
 
+% Section headers
 \setsubsubsecheadstyle{\itshape}
-
 \setsecheadstyle{\sffamily\bfseries}
 \setsubsecheadstyle{\sffamily\bfseries}
 
+% Line spacing
 \OnehalfSpacing
+
+% Header/footer
+\createmark{section}{right}{nonumber}{}{}
+\makeevenhead{headings}{\thepage}           {}{\sffamily\MakeUppercase{Quick-start guide}}
+\makeoddhead {headings}{\sffamily\rightmark}{}{\thepage}
+%\makeheadrule{headings}{\textwidth}{0.4}
 
 
 
