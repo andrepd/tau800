@@ -9,6 +9,10 @@ $white: #ffffff
     src: url('../assets/VTFMono.ttf') format('truetype')
     src: url('../assets/VTFMono.woff') format('woff')
 
+@font-face
+    font-family: 'eurostyle'
+    src: url('../assets/EuroStyle.ttf') format('truetype')
+
 .vtf
     font-family: 'vtfmono'
 
@@ -23,13 +27,14 @@ $white: #ffffff
     height: 100%
 
     position: fixed
-    top: 0
-    left: 0
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
 
     overflow: hidden
 
     img
-        width: 200%
+        width: 230%
         height: auto
         object-fit: cover
 
@@ -122,8 +127,8 @@ $white: #ffffff
                 align-items: stretch
 
                 .left
+                    width: 8%
                     height: 100%
-                    width: 10%
 
                     display: inline-block
                     vertical-align: top
@@ -155,8 +160,8 @@ $white: #ffffff
                 .text-middle
                     height: 100%
 
-                    padding-left: 1vw
-                    padding-right: 1vw
+                    padding-left: .5vw
+                    padding-right: .5vw
 
                     display: inline-block
                     vertical-align: top
@@ -164,7 +169,7 @@ $white: #ffffff
                     flex-shrink: 0
 
                     img
-                        height: 150%
+                        height: 167%
                         max-width: 100%
 
                         position: relative
@@ -324,15 +329,15 @@ $white: #ffffff
                         width: 6vw
 
     .register-material-container
-        --register-height: 20vh
-        --padding: 3vw
+        --register-group-height: 15vh
+        --padding-top: 2.7vw
         
         width: auto
         height: 100%
 
         box-sizing: border-box
-        padding-top: var(--padding)
-        padding-left: var(--padding)
+        padding-top: var(--padding-top)
+        padding-left: 2vw
 
         display: flex
         flex-direction: column
@@ -341,9 +346,9 @@ $white: #ffffff
         align-items: flex-start
 
         .lines
-            width: 22vw
+            width: 19vw
             min-height: 0
-            max-height: calc(100vh - 2*var(--register-height) - var(--padding))
+            max-height: calc(100vh - 2*var(--register-group-height) - var(--padding-top))
 
             flex-shrink: 100
             flex-grow: 100
@@ -373,7 +378,7 @@ $white: #ffffff
                     position: absolute
                     bottom: 0
                     right: 0
-                    transform: translate(50%, 50%)
+                    transform: translate(50%, 50%) translateY(-.5px)
 
             .top-to-mid-and-mid
                 width: 100%
@@ -401,15 +406,17 @@ $white: #ffffff
                     position: absolute
                     bottom: 0
                     right: 0
-                    transform: translate(50%, 50%)
+                    transform: translate(50%, 50%) translateY(-.5px)
 
             .mid-to-bottom
+                --padding-top: 11%
+
                 width: 100%
                 height: 100%
                 min-height: 0
                 aspect-ratio: 60 / 277
 
-                padding-left: 6%
+                padding-left: var(--padding-top)
 
                 transform: translateY(-1px)
 
@@ -421,11 +428,54 @@ $white: #ffffff
                 .ball
                     position: absolute
                     bottom: 0
-                    left: 6%
-                    transform: translate(-50%, 50%)
+                    left: var(--padding-top)
+                    transform: translateX(-17.5%) translate(-50%, 50%)
 
-        .register
-            width: 10vw
-            height: var(--register-height)
+        .register-group
+            width: auto
+            height: var(--register-group-height)
+
+            box-sizing: border-box
+            padding-bottom: 1em
+
+            display: flex
+            flex-direction: column
+            flex-wrap: nowrap
+            justify-content: stretch
+            align-items: flex-start
 
             flex-shrink: 0
+            gap: .5em
+
+            .register
+                width: 20vw
+                height: 100%
+                min-height: 0
+
+                ratio: 1
+                
+                display: flex
+                flex-direction: row
+                flex-flow: nowrap
+                justify-content: stretch
+                align-items: flex-start
+
+                gap: 2px
+
+                .label
+                    font-family: 'eurostyle'
+                    color: #ffedf0
+                    font-size: 3.5vh
+                    width: 1.2em
+
+                    margin-right: .5ex
+
+                    transform: translateY(-2px)
+
+                .register-box
+                    width: auto
+                    height: 100%
+                    ratio: 1
+                
+                .index-8
+                    padding-left: 2ex
