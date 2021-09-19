@@ -78,11 +78,14 @@
 
 % Header/footer
 \createmark{section}{right}{nonumber}{}{}
-\makeevenhead{headings}{\thepage}           {}{\sffamily\MakeUppercase{Quick-start guide}}
+\makeevenhead{headings}{\thepage}{}{\sffamily\MakeUppercase{Quick-start guide}}
 \makeoddhead {headings}{\sffamily\rightmark}{}{\thepage}
 %\makeheadrule{headings}{\textwidth}{0.4}
 
-
+\makeatletter
+\let\@copyright@old\copyright
+\def\copyright{\makebox[.6ex][l]{\hspace{-.4ex}\textsuperscript{\@copyright@old}}}
+\makeatother
 
 % -------- %
 % Document %
@@ -95,7 +98,7 @@
 
 \newcommand\companyname%
 %	{Aperture Science\,\copyright}
-	{Jikan Systems Corp.\,\copyright}
+	{Jikan Systems Corp.\copyright}
 
 
 
@@ -120,7 +123,7 @@
 
 		\vfill
 
-		{\footnotesize \companyname \\ 時間システム}
+		{\footnotesize \companyname \\ 時間システム\copyright}
 	\end{adjustwidth*}
 \end{titlingpage}
 
@@ -130,17 +133,14 @@
 
 \begin{footnotesize}
 	\noindent
-	This is a quick-start guide to your \machinename\ time-computing machine.
+	This is a quick-start guide to your \machinename{} time-computing machine.
 	Please ensure you have thoroughly read and understood the User Manual and the Warranty Disclaimer before attempting to utilize the machine.
-	\companyname\ is not responsible for any damages resulting from improper use of the time jump facilities of this machine.
-	
-	\medskip
+	\companyname{} is not responsible for any damages resulting from improper use of the time jump facilities of this machine.
+	\vfill
 	\warningbox{%
-		This product is without the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. \\[4pt] %
-		\textbf{\textsf{Please ensure that the Novikov module has sufficient power throughout the operation of the machine. Failure to supply the minimum rated power may cause time inconsistency paradoxes.}} \\[2pt] %
+		\textbf{\textsf{Please ensure that the Novikov module has sufficient power throughout the operation of the machine. Failure to supply the minimum rated power may cause time inconsistency paradoxes.}} \\[2pt]
 		In the unlikely case of forced inconsistency contact our hotline \\
-		\hfill\textbf{1-800-NOTIME}} 
-	\todo{O (!) devia estar centrado verticalmente}
+		\hfill\textbf{1-800-NOTIME}}
 \end{footnotesize}
 
 
@@ -160,16 +160,20 @@
 \vspace*{-20pt}\rule{\textwidth}{0.8pt}
 
 \noindent
-%Congratulations of being the proud owner 
+Congratulations of becoming the proud owner of a \machinename{}, the latest technology in time-based computing. The following document serves as an introduction to the architecture and operation modes of this time-assisted arithmetic computing unit, as well as to any other extensions offered by \companyname{} compatible with the \machinename{} that were acquired as part of your commercial agreement.
 
+For more information regarding available computing extension hardware compatible with your computing unit contact your local \companyname{} sales representative. Missing documentation of acquired computing extension hardware and advanced time operation modes of the computing unit can be obtained upon written request with proof of purchase to \companyname{} Main Shenzen Headquarters.
 
+Please note that this document \underline{does not} preclude the consultation of the complete reference manual, which should have been provided to you alongside this document and the computing unit. If the complete reference manual was not provided to you upon purchase, please contact your local sales representative.
+
+\companyname{} is not liable for damages incurred in the misuse of the equipment to the extent of but not limited to the operation modes described in this document.
 
 \clearpage
 \section{The Machine Language}
 \vspace*{-20pt}\rule{\textwidth}{0.8pt}
 
 \noindent
-The following is a quick-reference guide to \machinename\ assembly language. Please use ONLY the officially licensed assembler programs by \companyname\ (ensure you have been supplied with all 9 (nine) floppy diskettes for installation of the assembler).
+The following is a quick-reference guide to \machinename{} assembly language. Please use ONLY the officially licensed assembler programs by \companyname{} (ensure you have been supplied with all 9 (nine) floppy diskettes for installation of the assembler).
 
 %The CPU word size is 8 bits.
 
@@ -183,7 +187,9 @@ Quick facts:
 	\item Memory-mapped IO.
 	\item Big endian.
 \end{itemize}
-\footnotetext[1]{Note: for jumps of over 80 clock cycles an upgraded SPS-3-6000 power supply with at least 6\,kW of peak power output must be purchased. \textbf{Serious damage may occur if you attempt to use these operations without sufficient power!}}
+%
+\footnotetext{
+	Note: for jumps of over 80 clock cycles an upgraded SPS-3-6000 power supply with at least 6\,kW of peak power output must be purchased. \textbf{Serious damage may occur if you attempt to use these operations without sufficient power!}}
 
 \subsection*{CPU registers}
 
