@@ -1,5 +1,7 @@
 use crate::prelude::*;
 
+
+
 #[derive(Debug)]
 pub struct Flags (
   u8
@@ -22,16 +24,18 @@ impl Flags {
 #[derive(Debug)]
 pub struct CpuState {
   pub a: Word,
-  pub b: Word,
-  pub c: Word,
-  pub d: Word,
+  pub flags: Flags,
+  pub bh: Word,
+  pub bl: Word,
+  pub ch: Word,
+  pub cl: Word,
+  pub x: Word,
   pub sp: Word,
   pub pc: Address,
-  pub flags: Flags,
 }
 
 impl CpuState {
   pub fn new() -> Self { 
-    Self { a: 0, b: 0, c: 0, d: 0, sp: 0, pc: 0, flags: Flags::new() } 
+    Self { a: 0, bh: 0, bl: 0, ch: 0, cl: 0, x: 0, sp: 0, pc: 0, flags: Flags::new() } 
   }
 }

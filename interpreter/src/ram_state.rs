@@ -18,7 +18,10 @@ impl std::ops::Index<Address> for RamState {
   type Output = Word;
 
   fn index(&self, address: Address) -> &Self::Output {
-    &self[address]
+    debug_assert!((address as usize) < RAM_SIZE);
+    let value = &self[address];
+    debug_assert!((*value as usize) < MAX_WORD);
+    value
   }
 }
 
@@ -26,6 +29,9 @@ impl std::ops::IndexMut<Address> for RamState {
   // type Output = Word;
 
   fn index_mut(&mut self, address: Address) -> &mut Self::Output {
-    &mut self[address]
+    debug_assert!((address as usize) < RAM_SIZE);
+    let value = &mut self[address];
+    debug_assert!((*value as usize) < MAX_WORD);
+    value
   }
 }
