@@ -1,6 +1,11 @@
-use std::{marker::PhantomData, ops::Add};
+use std::marker::PhantomData;
 
+/// The number of bits in a word.
+/// (In reality words are represented by at least an `u8`, but checks are in place
+///  to prevent "overflows".)
 const WORD_SIZE: usize = 6;
+
+/// The maximum value an unsigned word can represent.
 const MAX_UNSIGNED_VALUE: u8 = 1 << WORD_SIZE;
 
 pub mod word {
@@ -14,6 +19,8 @@ pub mod word {
 }
 
 #[derive(Debug, Clone, Copy)]
+/// A value with `WORD_SIZE` bits, that can represent a signed or unsigned bit,
+/// as indicated by the `Signature` type.
 pub struct Word<X>
 where
     X: word::Signature,
@@ -79,6 +86,13 @@ where
 }
 
 #[derive(Debug, Clone, Copy)]
+/// A "word" that actually consists of two `Words`, representing high-value bits
+/// and low-value bits.
+///
+/// Although the type admits `word::Signed` and `word::Unsigned` variants, the
+/// `word::Signed` variant does not implement a conversion into a value, because
+/// both (high and low) words are required to have the same signature, and so the
+/// sign of the value is not well defined.
 pub struct LongWord<S>
 where
     S: word::Signature,
