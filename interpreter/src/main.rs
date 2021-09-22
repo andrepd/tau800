@@ -1,11 +1,10 @@
 mod prelude;
-mod basics;
-mod cpu_state;
-mod ram_state;
-mod machine_state;
+mod word;
+mod state;
+mod machine;
 mod instruction;
 
 fn main() {
-  let state = machine_state::MachineState::new();  // Sintaxe linda, escuta
+  let state = machine::Machine::new();
   
 }
