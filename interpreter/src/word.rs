@@ -1,17 +1,15 @@
 use std::marker::PhantomData;
 
+use crate::prelude::Address;
+
 /// The number of bits in a word.
 /// (In reality words are represented by at least an `u8`, but checks are in place
 ///  to prevent "overflows".)
 pub const WORD_SIZE: usize = 6;
 
-/// The maximum value an unsigned word can represent.
-pub const MAX_UNSIGNED_WORD_VALUE: u8 = (1 << (WORD_SIZE + 1)) - 1;
-
-/// The maximum absolute value a signed word can represent.
-pub const MAX_SIGNED_WORD_VALUE: u8 = (1 << WORD_SIZE) - 1;
-
-const SIGN_BIT: u8 = 1 << WORD_SIZE;
+const MAX_UNSIGNED_VALUE: u8 = (1 << WORD_SIZE) as u8 - 1;
+const MAX_SIGNED_VALUE: u8 = (1 << (WORD_SIZE - 1)) as u8 - 1;
+const SIGN_BIT: u8 = (1 << WORD_SIZE) as u8;
 
 pub mod sig {
     pub trait Signature {}
@@ -81,7 +79,7 @@ impl Word<sig::Unsigned> {
 
 impl From<u8> for Word<sig::Unsigned> {
     fn from(value: u8) -> Self {
-        debug_assert!(value <= MAX_UNSIGNED_WORD_VALUE);
+        debug_assert!(value <= MAX_UNSIGNED_VALUE);
         Word {
             value,
             phantom: PhantomData::default(),
@@ -99,12 +97,7 @@ impl From<Word<sig::Unsigned>> for u8 {
 
 impl Word<sig::Signed> {
     pub fn value(&self) -> i8 {
-        let absolute_value = (self.value & MAX_SIGNED_WORD_VALUE) as i8;
-        if self.value & SIGN_BIT != 0 {
-            -absolute_value
-        } else {
-            absolute_value
-        }
+        self.value as i8
     }
 
     pub fn cast_to_unsigned(self) -> Word<sig::Unsigned> {
@@ -117,17 +110,15 @@ impl Word<sig::Signed> {
 
 impl From<i8> for Word<sig::Signed> {
     fn from(value: i8) -> Self {
-        debug_assert!((value as u8 & MAX_SIGNED_WORD_VALUE) <= MAX_SIGNED_WORD_VALUE);
+        let negative = value < 0;
+        let value = value.abs() as u8;
 
-        // Note that the sign bit is the `WORD_SIZE`th bit, not the last/first one.
-        let value = if value < 0 {
-            SIGN_BIT | (value as u8 & MAX_SIGNED_WORD_VALUE)
-        } else {
-            value as u8
-        };
+        debug_assert!(value <= MAX_SIGNED_VALUE);
+
+        let twos_complement = ((!value & MAX_UNSIGNED_VALUE) + 1) & MAX_SIGNED_VALUE;
 
         Word {
-            value: (value as u8),
+            value: twos_complement,
             phantom: PhantomData::default(),
         }
     }
@@ -135,7 +126,11 @@ impl From<i8> for Word<sig::Signed> {
 
 impl From<Word<sig::Signed>> for i8 {
     fn from(word: Word<sig::Signed>) -> Self {
-        word.value()
+        if (word.value & SIGN_BIT) != 0 {
+            -((!(word.value - 1) & MAX_UNSIGNED_VALUE) as i8)
+        } else {
+            word.value as i8
+        }
     }
 }
 
@@ -156,6 +151,8 @@ where
     pub high: Word<S>,
     pub low: Word<S>,
 }
+
+pub type UnsignedLongWord = LongWord<sig::Unsigned>;
 
 impl<S> LongWord<S>
 where
@@ -194,4 +191,43 @@ impl Default for LongWord<sig::Unsigned> {
     }
 }
 
-pub type UnsignedLongWord = LongWord<sig::Unsigned>;
+// Checked increment trait and implementations
+
+pub trait CheckedIncrement {
+    fn try_increment(&mut self) -> Result<(), ()>;
+}
+
+impl CheckedIncrement for Word<sig::Signed> {
+    fn try_increment(&mut self) -> Result<(), ()> {
+        let value = self.value();
+        if value + 1 <= MAX_SIGNED_VALUE as i8 {
+            *self.raw_inner_mut() = (value + 1) as u8;
+            Ok(())
+        } else {
+            Err(())
+        }
+    }
+}
+
+impl CheckedIncrement for Word<sig::Unsigned> {
+    fn try_increment(&mut self) -> Result<(), ()> {
+        let value = self.value();
+        if value + 1 <= MAX_UNSIGNED_VALUE {
+            *self.raw_inner_mut() = value + 1;
+            Ok(())
+        } else {
+            Err(())
+        }
+    }
+}
+
+impl CheckedIncrement for Address {
+    fn try_increment(&mut self) -> Result<(), ()> {
+        if self.low.try_increment().is_ok() {
+            Ok(())
+        } else {
+            self.low = Word::zero();
+            self.high.try_increment()
+        }
+    }
+}

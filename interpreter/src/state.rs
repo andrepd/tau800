@@ -3,10 +3,10 @@ use flagset::flags;
 
 const RAM_SIZE: usize = 1 << (2 * WORD_SIZE);
 
-pub struct Ram([UnsignedLongWord; RAM_SIZE]);
+pub struct Ram([Word<sig::Unsigned>; RAM_SIZE]);
 
 impl std::ops::Index<usize> for Ram {
-    type Output = UnsignedLongWord;
+    type Output = Word<sig::Unsigned>;
 
     fn index(&self, index: usize) -> &Self::Output {
         &self.0[index]
@@ -15,7 +15,7 @@ impl std::ops::Index<usize> for Ram {
 
 impl Default for Ram {
     fn default() -> Self {
-        Self([UnsignedLongWord::zero(); RAM_SIZE])
+        Self([Word::<sig::Unsigned>::zero(); RAM_SIZE])
     }
 }
 
@@ -59,34 +59,7 @@ impl FlagWord {
     }
 }
 
-#[derive(Debug)]
-pub struct Address(LongWord<sig::Unsigned>);
-
-impl Address {
-    pub fn from_words(high: Word<sig::Unsigned>, low: Word<sig::Unsigned>) -> Self {
-        Address(LongWord::<sig::Unsigned>::from_words(high, low))
-    }
-
-    pub fn increment(&mut self) {
-        if self.0.low.value() < MAX_UNSIGNED_WORD_VALUE {
-            *self.0.low.raw_inner_mut() += 1;
-        } else {
-            *self.0.low.raw_inner_mut() = 0;
-            debug_assert!(self.0.high.value() < MAX_UNSIGNED_WORD_VALUE);
-            *self.0.high.raw_inner_mut() += 1;
-        }
-    }
-
-    pub fn value(&self) -> u16 {
-        self.0.value()
-    }
-}
-
-impl Default for Address {
-    fn default() -> Self {
-        Self(Default::default())
-    }
-}
+pub type Address = LongWord<sig::Unsigned>;
 
 pub struct Cpu {
     pub a: Word<sig::Unsigned>,

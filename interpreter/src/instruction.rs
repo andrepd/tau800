@@ -68,12 +68,11 @@ pub enum Instruction {
     Nop,
 }
 
-/// Reads and decodes the byte representation of a timed register, i.e., in `Word`s,
-/// (Register opcode, Time).
+/// Read a timed register from the RAM.
 fn read_timed_register(m: &mut Machine) -> Timed<Register> {
     use Register::*;
 
-    let register= match m.read_pc().value() {
+    let op = match m.read_pc().value() {
         0x0 => A,
         0x1 => F,
         0x2 => BH,
@@ -86,4 +85,74 @@ fn read_timed_register(m: &mut Machine) -> Timed<Register> {
     };
 
     let time = m.read_pc().cast_to_signed();
+    Timed { op, time }
+}
+
+/// Read a literal word from the RAM.
+fn read_word(m: &mut Machine) -> Word<sig::Unsigned> {
+    m.read_pc()
+}
+
+/// Read a timed address from the RAM.
+fn read_timed_address(m: &mut Machine) -> Timed<Address> {
+    let high = m.read_pc();
+    let low = m.read_pc();
+    let op = Address::from_words(high, low);
+    let time = m.read_pc().cast_to_signed();
+    Timed { op, time }
+}
+
+impl Operand {
+    fn decode(m: &mut Machine, mode: Word<sig::Unsigned>) -> Self {
+        use Operand::*;
+        match mode.value() {
+            0x0 => Reg(read_timed_register(m)),
+            0x1 => Imm(read_word(m)),
+            0x2 => Abs(read_timed_address(m)),
+            0x3 => Ind(read_timed_address(m)),
+            _ => unreachable!(),
+        }
+    }
+}
+
+impl Operands {
+    fn decode(m: &mut Machine, mode: Word<sig::Unsigned>) -> Self {
+        use Operand::*;
+
+        match mode.value() {
+            0x0 => Operands {
+                src: Reg(read_timed_register(m)),
+                dest: Reg(read_timed_register(m)),
+            },
+            0x1 => Operands  {
+                src: Imm(read_word(m)),
+                dest: Reg(read_timed_register(m)),
+            },
+            0x2 => Operands  {
+                src: Abs(read_timed_address(m)),
+                dest: Reg(read_timed_register(m)),
+            },
+            0x3 => Operands  {
+                src: Ind(read_timed_address(m)),
+                dest: Reg(read_timed_register(m)),
+            },
+            0x4 => Operands  {
+                src: Reg(read_timed_register(m)),
+                dest: Abs(read_timed_address(m)),
+            },
+            0x5 => Operands  {
+                src: Reg(read_timed_register(m)),
+                dest: Ind(read_timed_address(m)),
+            },
+            0x6 => Operands  {
+                src: Imm(read_word(m)),
+                dest: Abs(read_timed_address(m)),
+            },
+            0x7 => Operands  {
+                src: Imm(read_word(m)),
+                dest: Ind(read_timed_address(m)),
+            },
+            _ => unreachable!(),
+        }
+    }
 }
