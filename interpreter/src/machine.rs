@@ -13,7 +13,7 @@ impl Machine {
         }
     }
 
-    pub fn read_pc(&mut self) -> Word<sig::Unsigned> {
+    pub fn read_pc(&mut self) -> LongWord<sig::Unsigned> {
         let word = self.ram[self.cpu.pc.value() as usize];
         self.cpu.pc.increment();
         word

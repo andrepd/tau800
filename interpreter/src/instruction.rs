@@ -3,8 +3,8 @@ use crate::prelude::*;
 #[derive(Debug)]
 pub struct Timed<T> {
     op: T,
-    /// Should be signed.
-    time: SWord,
+    /// Relative time of operation (w.r.t. call)
+    time: Word<sig::Signed>,
 }
 
 #[derive(Debug)]
@@ -19,20 +19,16 @@ pub enum Register {
     SP,
 }
 
-/// `Reg`: named register
-///
-/// `Imm`: literal value
-///
-/// `Abs`: absolute address (byte order: hi lo)
-///
-/// `Ind`: indirect address (address is value at that address, hi lo order)
 #[derive(Debug)]
 pub enum Operand {
+    /// Named register
     Reg(Timed<Register>),
-    Imm(Word),
+    /// Literal value
+    Imm(Word<sig::Unsigned>),
+    /// Absolute address (byte order: hi, lo)
     Abs(Timed<Address>),
+    /// Indirect access (address is value at that address, hi lo order)
     Ind(Timed<Address>),
-    // Ind {hi: Word, lo: Word},
 }
 
 #[derive(Debug)]
@@ -41,9 +37,8 @@ pub enum Operands {
         src: Timed<Register>,
         dst: Timed<Register>,
     },
-
     ImmReg {
-        src: Word,
+        src: Word<sig::Unsigned>,
         dst: Timed<Register>,
     },
     AbsReg {
@@ -54,7 +49,6 @@ pub enum Operands {
         src: Timed<Address>,
         dst: Timed<Register>,
     },
-
     RegAbs {
         src: Timed<Register>,
         dst: Timed<Address>,
@@ -63,19 +57,18 @@ pub enum Operands {
         src: Timed<Register>,
         dst: Timed<Address>,
     },
-
     ImmAbs {
-        src: Word,
+        src: Word<sig::Unsigned>,
         dst: Timed<Address>,
     },
     ImmInd {
-        src: Word,
+        src: Word<sig::Unsigned>,
         dst: Timed<Address>,
     },
 }
 
 #[derive(Debug)]
-pub struct Offset(SWord);
+pub struct Offset(Word<sig::Signed>);
 
 #[derive(Debug)]
 pub enum Instruction {
@@ -100,8 +93,8 @@ pub enum Instruction {
     Nop,
 }
 
-fn decode_reg(m: &mut MachineState) -> Timed<Register> {
-    let op = match m.read_pc() {
+fn decode_reg(m: &mut Machine) -> Timed<Register> {
+    let op = match m.read_pc().value() {
         0x0 => Register::A,
         0x1 => Register::F,
         0x2 => Register::BH,
@@ -112,25 +105,24 @@ fn decode_reg(m: &mut MachineState) -> Timed<Register> {
         0x7 => Register::SP,
         _ => unreachable!(),
     };
-    let time = m.read_pc() as SWord;
+    let time = Word::from(m.read_pc().value() as i8);
     Timed { op, time }
 }
 
-fn decode_word(m: &mut MachineState) -> Word {
-    let word = m.read_pc();
-    word
+fn decode_word(m: &mut Machine) -> Word<sig::Unsigned> {
+    m.read_pc()
 }
 
-fn decode_addr(m: &mut MachineState) -> Timed<Address> {
-    let hi: Word = m.read_pc();
-    let lo: Word = m.read_pc();
-    let op: Address = ((hi as Address) << 8) + (lo as Address);
-    let time = m.read_pc() as SWord;
+fn decode_addr(m: &mut Machine) -> Timed<Address> {
+    let high: Word = m.read_pc();
+    let low: Word = m.read_pc();
+    let op: Address = Address::from_words(high, low);
+    let time = Word::<sig::Signed>::from(m.read_pc());
     Timed { op, time }
 }
 
 impl Operand {
-    fn decode(m: &mut MachineState, mode: Word) -> Self {
+    fn decode(m: &mut Machine, mode: Word<sig::Unsigned>) -> Self {
         use Operand::*;
         match mode {
             0x0 => Reg(decode_reg(m)),
@@ -143,7 +135,7 @@ impl Operand {
 }
 
 impl Operands {
-    fn decode(m: &mut MachineState, mode: Word) -> Self {
+    fn decode(m: &mut Machine, mode: Word<sig::Unsigned>) -> Self {
         use Operands::*;
         match mode {
             0x0 => RegReg {
@@ -184,16 +176,16 @@ impl Operands {
 }
 
 impl Offset {
-    fn decode(m: &mut MachineState) -> Self {
-        let word = m.read_pc();
-        Offset(word as SWord)
+    fn decode(m: &mut Machine) -> Self {
+        let word = Word::<sig::Signed>::from(m.read_pc() as i8);
+        Offset(word as Word)
     }
 }
 
 impl Instruction {
     /// Decode the next instruction at memory[pc].
     /// Encoding scheme: 5 bits for instruction, 3 bits for addressing mode
-    fn decode(m: &mut MachineState) -> Self {
+    fn decode(m: &mut Machine) -> Self {
         // One-word instructions
         /*let word = memory[*pc];
         let (opcode, addressing) = (word >> 3, word & ((1<<3) - 1));*/

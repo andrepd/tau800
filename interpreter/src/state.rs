@@ -3,11 +3,19 @@ use flagset::flags;
 
 const RAM_SIZE: usize = 1 << (2 * WORD_SIZE);
 
-pub type Ram = [UnsignedLongWord; RAM_SIZE];
+pub struct Ram([UnsignedLongWord; RAM_SIZE]);
+
+impl std::ops::Index<usize> for Ram {
+    type Output = UnsignedLongWord;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.0[index]
+    }
+}
 
 impl Default for Ram {
     fn default() -> Self {
-        Self(Default::default())
+        Self([UnsignedLongWord::zero(); RAM_SIZE])
     }
 }
 
@@ -17,6 +25,12 @@ flags! {
         A,
         B,
         C,
+    }
+}
+
+impl From<Flag> for u8 {
+    fn from(flag: Flag) -> Self {
+        flag.into()
     }
 }
 
@@ -35,29 +49,44 @@ impl Default for FlagWord {
 
 impl FlagWord {
     pub fn read(&self, flag: Flag) -> bool {
-        (self.word.value() & flag) != 0
+        (self.word.value() & u8::from(flag)) != 0
     }
 
     pub fn write(&self, flag: Flag, value: bool) -> () {
-        let value = (value as u8) << flag;
+        let value = (value as u8) << u8::from(flag);
         let new = (self.word.value() & !value) | value;
-        self.word.raw_inner_mut() = value;
+        *self.word.raw_inner_mut() = value;
     }
 }
 
 pub type Register = Word<sig::Unsigned>;
 
+#[derive(Debug)]
 pub struct Address(LongWord<sig::Unsigned>);
 
 impl Address {
+    pub fn from_words(high: Word<sig::Unsigned>, low: Word<sig::Unsigned>) -> Self {
+        Address(LongWord::<sig::Unsigned>::from_words(high, low))
+    }
+
     pub fn increment(&mut self) {
         if self.0.low.value() < MAX_UNSIGNED_WORD_VALUE {
-            self.0.low.raw_inner_mut() += 1;
+            *self.0.low.raw_inner_mut() += 1;
         } else {
-            self.0.low.raw_inner_mut() = 0;
+            *self.0.low.raw_inner_mut() = 0;
             debug_assert!(self.0.high.value() < MAX_UNSIGNED_WORD_VALUE);
-            self.0.high.raw_inner_mut() += 1;
+            *self.0.high.raw_inner_mut() += 1;
         }
+    }
+
+    pub fn value(&self) -> u16 {
+        self.0.value()
+    }
+}
+
+impl Default for Address {
+    fn default() -> Self {
+        Self(Default::default())
     }
 }
 
