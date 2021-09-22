@@ -52,14 +52,12 @@ impl FlagWord {
         (self.word.value() & u8::from(flag)) != 0
     }
 
-    pub fn write(&self, flag: Flag, value: bool) -> () {
+    pub fn write(&mut self, flag: Flag, value: bool) -> () {
         let value = (value as u8) << u8::from(flag);
         let new = (self.word.value() & !value) | value;
         *self.word.raw_inner_mut() = value;
     }
 }
-
-pub type Register = Word<sig::Unsigned>;
 
 #[derive(Debug)]
 pub struct Address(LongWord<sig::Unsigned>);
@@ -91,14 +89,14 @@ impl Default for Address {
 }
 
 pub struct Cpu {
-    pub a: Register,
+    pub a: Word<sig::Unsigned>,
     pub flags: FlagWord,
-    pub bh: Register,
-    pub bl: Register,
-    pub ch: Register,
-    pub cl: Register,
-    pub x: Register,
-    pub sp: Register,
+    pub bh: Word<sig::Unsigned>,
+    pub bl: Word<sig::Unsigned>,
+    pub ch: Word<sig::Unsigned>,
+    pub cl: Word<sig::Unsigned>,
+    pub x: Word<sig::Unsigned>,
+    pub sp: Word<sig::Unsigned>,
     pub pc: Address,
 }
 

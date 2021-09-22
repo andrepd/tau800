@@ -13,6 +13,8 @@ impl Machine {
         }
     }
 
+    /// Read the next value in ram, as indicated by the Program Counter (PC) in
+    /// CPU, and increment the PC.
     pub fn read_pc(&mut self) -> LongWord<sig::Unsigned> {
         let word = self.ram[self.cpu.pc.value() as usize];
         self.cpu.pc.increment();

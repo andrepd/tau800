@@ -11,7 +11,7 @@ pub const MAX_UNSIGNED_WORD_VALUE: u8 = (1 << (WORD_SIZE + 1)) - 1;
 /// The maximum absolute value a signed word can represent.
 pub const MAX_SIGNED_WORD_VALUE: u8 = (1 << WORD_SIZE) - 1;
 
-const SIGN_BIT: u8 = (1 << WORD_SIZE);
+const SIGN_BIT: u8 = 1 << WORD_SIZE;
 
 pub mod sig {
     pub trait Signature {}
@@ -70,6 +70,13 @@ impl Word<sig::Unsigned> {
     pub fn value(&self) -> u8 {
         self.value
     }
+
+    pub fn cast_to_signed(self) -> Word<sig::Signed> {
+        Word::<sig::Signed> {
+            value: self.value,
+            phantom: PhantomData::default(),
+        }
+    }
 }
 
 impl From<u8> for Word<sig::Unsigned> {
@@ -97,6 +104,13 @@ impl Word<sig::Signed> {
             -absolute_value
         } else {
             absolute_value
+        }
+    }
+
+    pub fn cast_to_unsigned(self) -> Word<sig::Unsigned> {
+        Word::<sig::Unsigned> {
+            value: self.value,
+            phantom: PhantomData::default(),
         }
     }
 }
