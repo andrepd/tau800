@@ -115,10 +115,14 @@ impl From<i8> for Word<sig::Signed> {
 
         debug_assert!(value <= MAX_SIGNED_VALUE);
 
-        let twos_complement = ((!value & MAX_UNSIGNED_VALUE) + 1) & MAX_SIGNED_VALUE;
+        let value = if negative {
+            ((!value & MAX_UNSIGNED_VALUE) + 1) & MAX_SIGNED_VALUE
+        } else {
+            value
+        };
 
         Word {
-            value: twos_complement,
+            value,
             phantom: PhantomData::default(),
         }
     }
@@ -151,8 +155,6 @@ where
     pub high: Word<S>,
     pub low: Word<S>,
 }
-
-pub type UnsignedLongWord = LongWord<sig::Unsigned>;
 
 impl<S> LongWord<S>
 where

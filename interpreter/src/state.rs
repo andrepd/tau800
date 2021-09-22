@@ -55,7 +55,7 @@ impl FlagWord {
     pub fn write(&mut self, flag: Flag, value: bool) -> () {
         let value = (value as u8) << u8::from(flag);
         let new = (self.word.value() & !value) | value;
-        *self.word.raw_inner_mut() = value;
+        *self.word.raw_inner_mut() = new;
     }
 }
 
