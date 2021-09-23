@@ -94,7 +94,7 @@
 \newcommand\machinename%
 %	{SNX-800B Type 5}
 %	{STR-800B \textsf{\textit{Super}}}
-	{\textsf{STR-800B \textit{Super}}}
+	{\textsf{TAU-800B \textit{Super}}}
 
 \newcommand\companyname%
 %	{Aperture Science\,\copyright}
@@ -123,7 +123,7 @@
 
 		\vfill
 
-		{\footnotesize \companyname \\ 時間システム\copyright}
+		{\footnotesize \companyname \\ 時間システム Corp.\copyright}
 	\end{adjustwidth*}
 \end{titlingpage}
 
@@ -133,7 +133,7 @@
 
 \begin{footnotesize}
 	\noindent
-	This is a quick-start guide to your \machinename{} time-computing machine.
+  This is a quick-start guide to your Time Arithmetic Unit (revision 800-B, \textit{Super} edition) time-assisted computing machine.
 	Please ensure you have thoroughly read and understood the User Manual and the Warranty Disclaimer before attempting to utilize the machine.
 	\companyname{} is not responsible for any damages resulting from improper use of the time jump facilities of this machine.
 	\vfill
@@ -203,8 +203,10 @@ and the stack pointer is altered by the \texttt{CAL}, \texttt{RET}, \texttt{PSH}
 (besides being able to be read and written as a general purpose register).
 
 16-bit addresses are read and stored as two words in big-endian order: \texttt{\%llhh}.
-In order to perform 16-bit arithmetic, you must process the two words manually
-(mathematical subroutines can be purchased for as low as \$799 for non-commercial use, please contact your sales representative).
+In order to perform 16-bit arithmetic, you must process the two words manually.\footnotemark
+
+\footnotetext{
+  Advanced mathematical subroutine hardware extensions are available for purchase, please contact your sales representative.}
 
 Finally, the 16-bit program counter can be modified by jump, branching, and subroutine instructions.
 
