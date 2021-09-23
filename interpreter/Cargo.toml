@@ -8,4 +8,3 @@ edition = "2018"
 
 [dependencies]
 flagset = "^0.4.2"
-num-traits = "^0.2.14"
