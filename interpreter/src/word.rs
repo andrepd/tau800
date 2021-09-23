@@ -116,7 +116,7 @@ impl From<i8> for Word<sig::Signed> {
         debug_assert!(value <= MAX_SIGNED_VALUE);
 
         let value = if negative {
-            ((!value & MAX_UNSIGNED_VALUE) + 1) & MAX_SIGNED_VALUE
+            ((!value & MAX_UNSIGNED_VALUE) + 1) & MAX_UNSIGNED_VALUE
         } else {
             value
         };

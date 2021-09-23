@@ -124,31 +124,31 @@ impl Operands {
                 src: Reg(read_timed_register(m)),
                 dest: Reg(read_timed_register(m)),
             },
-            0x1 => Operands  {
+            0x1 => Operands {
                 src: Imm(read_word(m)),
                 dest: Reg(read_timed_register(m)),
             },
-            0x2 => Operands  {
+            0x2 => Operands {
                 src: Abs(read_timed_address(m)),
                 dest: Reg(read_timed_register(m)),
             },
-            0x3 => Operands  {
+            0x3 => Operands {
                 src: Ind(read_timed_address(m)),
                 dest: Reg(read_timed_register(m)),
             },
-            0x4 => Operands  {
+            0x4 => Operands {
                 src: Reg(read_timed_register(m)),
                 dest: Abs(read_timed_address(m)),
             },
-            0x5 => Operands  {
+            0x5 => Operands {
                 src: Reg(read_timed_register(m)),
                 dest: Ind(read_timed_address(m)),
             },
-            0x6 => Operands  {
+            0x6 => Operands {
                 src: Imm(read_word(m)),
                 dest: Abs(read_timed_address(m)),
             },
-            0x7 => Operands  {
+            0x7 => Operands {
                 src: Imm(read_word(m)),
                 dest: Ind(read_timed_address(m)),
             },
