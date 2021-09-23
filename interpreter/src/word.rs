@@ -223,7 +223,7 @@ impl CheckedIncrement for Word<sig::Unsigned> {
     }
 }
 
-impl CheckedIncrement for Address {
+impl CheckedIncrement for LongWord<sig::Unsigned> {
     fn try_increment(&mut self) -> Result<(), ()> {
         if self.low.try_increment().is_ok() {
             Ok(())
