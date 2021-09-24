@@ -7,6 +7,7 @@ This document outiles the conventions for interaction between the frontend
 
 ## Sequence of Operation
 
+```
 							 Backend
 
 							 ┌─────┐
@@ -35,3 +36,16 @@ This document outiles the conventions for interaction between the frontend
 	└─┤Update visual state     │
 	  │to reflect current state│
 	  └────────────────────────┘
+```
+
+## Poll Object
+
+The Electron side expects, upon poll, an object with the following properties:
+
+```
+{
+	"number_register_bits": {
+		
+	}
+}
+```
