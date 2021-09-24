@@ -1,5 +1,5 @@
-const { app, BrowserWindow } = require('electron')
-const { sleep } = require('./sleep')
+const { app, BrowserWindow, ipcMain } = require('electron')
+const path = require('path')
 
 let win;
 
@@ -10,13 +10,14 @@ function createWindow() {
 		webPreferences: {
 			nodeIntegration: true,
 			preload: path.join(__dirname, 'preload.js'),
+			nativeWindowOpen: true,
 		}
 	})
 
 	win.loadFile('main.html')
 }
 
-app.whenReady().then(createWindow).catch()
+app.whenReady().then(createWindow)
 
 app.on('window-all-closed', () => {
 	if (process.platform != 'darwin') {
