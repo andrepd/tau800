@@ -1,0 +1,699 @@
+@font-face {
+  font-family: 'vtfmono';
+  src: url("../assets/VTFMono.ttf") format("truetype");
+  src: url("../assets/VTFMono.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'eurostyle';
+  src: url("../assets/EuroStyle.ttf") format("truetype");
+}
+
+.viewport {
+  width: 100vw;
+  height: 100vh;
+  background-color: #deb1b7;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
+.bg-letters-container {
+  width: 112%;
+  height: 112%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  overflow: hidden;
+}
+
+.bg-letters-container img {
+  width: 235%;
+  height: auto;
+  -o-object-fit: cover;
+     object-fit: cover;
+  position: fixed;
+  top: 55%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+
+.center-material {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: \min(3vh, 3vw);
+}
+
+.center-material .katakana-middle {
+  max-height: 10vh;
+  max-width: 30vw;
+  -webkit-transform: translateY(-3vh);
+          transform: translateY(-3vh);
+}
+
+.center-material .clock {
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.center-material .clock .number {
+  font-family: 'vtfmono';
+  line-height: 30%;
+  font-size: \min(42vw, 52vh);
+}
+
+.center-material .clock .separator {
+  width: 1vw;
+  height: 1vw;
+  background-color: #222;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: \min(1vw, 1vh);
+  margin-right: \min(1vw, 1vh);
+}
+
+.center-material .bar-middle {
+  max-width: \min(44vw, 54vh);
+}
+
+.side-material-container {
+  width: 100%;
+  height: 100%;
+  padding: 2.5vw;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.side-material-container .left-material {
+  width: 100%;
+  height: 100%;
+}
+
+.side-material-container .left-material .top-material {
+  width: 100%;
+  height: 2.6vw;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+
+.side-material-container .left-material .top-material .corner-decoration {
+  width: auto;
+  height: 100%;
+  padding-right: 1ex;
+}
+
+.side-material-container .left-material .top-material .overhang {
+  width: 100%;
+  height: 100%;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+}
+
+.side-material-container .left-material .top-material .overhang .left {
+  width: 8%;
+  height: 100%;
+  display: inline-block;
+  vertical-align: top;
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  position: relative;
+}
+
+.side-material-container .left-material .top-material .overhang .left .text-left {
+  width: auto;
+  height: 50%;
+  max-width: 80%;
+  position: absolute;
+  bottom: 70%;
+  left: -2px;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+}
+
+.side-material-container .left-material .top-material .overhang .left .line {
+  width: 100%;
+  height: 1px;
+  position: absolute;
+  bottom: 55%;
+  left: -1px;
+}
+
+.side-material-container .left-material .top-material .overhang .text-middle {
+  height: 100%;
+  padding-left: .5vw;
+  padding-right: .5vw;
+  display: inline-block;
+  vertical-align: top;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+}
+
+.side-material-container .left-material .top-material .overhang .text-middle img {
+  height: 167%;
+  max-width: 100%;
+  position: relative;
+  top: 0;
+}
+
+.side-material-container .left-material .top-material .overhang .right {
+  width: auto;
+  height: 100%;
+  -webkit-box-flex: 2;
+      -ms-flex-positive: 2;
+          flex-grow: 2;
+  -ms-flex-negative: 100;
+      flex-shrink: 100;
+  display: inline-block;
+  vertical-align: top;
+  position: relative;
+}
+
+.side-material-container .left-material .top-material .overhang .right .line {
+  width: 30%;
+  height: 1px;
+  position: absolute;
+  bottom: 55%;
+  left: -1px;
+}
+
+.side-material-container .left-material .top-material .overhang .right .balls {
+  width: 40%;
+  position: absolute;
+  bottom: calc(55% + .5px);
+  left: 28%;
+  -webkit-transform: translateY(50%);
+          transform: translateY(50%);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+  gap: \min(1em, 1vw);
+}
+
+.side-material-container .left-material .top-material .overhang .right .balls img {
+  width: \min(2vw, 2vh);
+}
+
+.side-material-container .right-material-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  --ball-size: \min(1.1vh, 1.5ex);
+  --corner-decoration-size: 1.3vw;
+}
+
+.side-material-container .right-material-container .right-material {
+  width: 100%;
+  height: 100%;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+}
+
+.side-material-container .right-material-container .right-material .right-text {
+  width: auto;
+  height: 70vh;
+  max-height: 80vh;
+  padding-bottom: 1em;
+}
+
+.side-material-container .right-material-container .right-material .line-right-container {
+  width: var(--ball-size);
+  height: 100%;
+  min-height: 5vh;
+  -ms-flex-negative: 100;
+      flex-shrink: 100;
+  -webkit-box-flex: 100;
+      -ms-flex-positive: 100;
+          flex-grow: 100;
+  /* The way everything is aligned here is very weird, but using flex
+                    does not work better, and also requires weird tuning hacks to get
+                        the meets between the ball/line and line/decorator to work well.*/
+  -webkit-transform: translateX(-0.8vw) translateY(1px);
+          transform: translateX(-0.8vw) translateY(1px);
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+  position: relative;
+}
+
+.side-material-container .right-material-container .right-material .line-right-container .line {
+  width: 2px;
+  height: 100%;
+  -webkit-box-flex: 100;
+      -ms-flex-positive: 100;
+          flex-grow: 100;
+  -ms-flex-negative: 100;
+      flex-shrink: 100;
+}
+
+.side-material-container .right-material-container .right-material .line-right-container .ball {
+  width: 100%;
+  -webkit-transform: translate(50%, 50%) translateX(-2px);
+          transform: translate(50%, 50%) translateX(-2px);
+}
+
+.side-material-container .right-material-container .corner-decoration-container {
+  width: 100%;
+  height: var(--corner-decoration-size);
+  -webkit-transform: translateX(-0.8vw);
+          transform: translateX(-0.8vw);
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+}
+
+.side-material-container .right-material-container .corner-decoration-container .text {
+  height: 105%;
+  float: right;
+  padding-right: 0.5vw;
+  -webkit-transform: translateY(30%);
+          transform: translateY(30%);
+}
+
+.side-material-container .right-material-container .corner-decoration-container .corner-decoration {
+  width: auto;
+  height: 100%;
+}
+
+.side-material-container .right-material-container .corner-decoration-container .line {
+  width: 8%;
+  height: 2px;
+  -webkit-transform: translateX(1px);
+          transform: translateX(1px);
+}
+
+.side-material-container .right-material-container .corner-decoration-container .ball {
+  width: var(--ball-size);
+  -webkit-transform: translate(50%, 50%) translateY(-2px);
+          transform: translate(50%, 50%) translateY(-2px);
+}
+
+.side-material-container .right-material-container .corner-decoration-container .stack-container {
+  position: absolute;
+  bottom: 0;
+  right: 5vw;
+}
+
+.side-material-container .right-material-container .corner-decoration-container .stack-container .support {
+  width: 12vw;
+}
+
+.side-material-container .right-material-container .corner-decoration-container .stack-container .stack {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 2px;
+  margin-bottom: 4px;
+  -webkit-transform: translateX(-20%);
+          transform: translateX(-20%);
+}
+
+.side-material-container .right-material-container .corner-decoration-container .stack-container .stack .stack-box {
+  width: 6vw;
+}
+
+.side-material-container .register-material-container {
+  --padding-top: 2.6vw;
+  width: auto;
+  height: 100%;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  padding-top: var(--padding-top);
+  padding-left: 2vw;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+
+.side-material-container .register-material-container .lines {
+  width: 19vw;
+  height: 100%;
+  min-height: 0;
+  -ms-flex-negative: 2;
+      flex-shrink: 2;
+  -webkit-box-flex: 2;
+      -ms-flex-positive: 2;
+          flex-grow: 2;
+  padding-left: 1ex;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+
+.side-material-container .register-material-container .lines .ball {
+  width: \min(2vw, 2vh);
+}
+
+.side-material-container .register-material-container .lines .top {
+  width: 50%;
+  height: 1px;
+  -webkit-transform: translateY(1px);
+          transform: translateY(1px);
+  position: relative;
+}
+
+.side-material-container .register-material-container .lines .top .line {
+  width: 100%;
+  height: 100%;
+  vertical-align: top;
+}
+
+.side-material-container .register-material-container .lines .top .ball {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  -webkit-transform: translate(50%, 50%) translateY(-0.5px);
+          transform: translate(50%, 50%) translateY(-0.5px);
+}
+
+.side-material-container .register-material-container .lines .top-to-mid-and-mid {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  -ms-flex-negative: 1;
+      flex-shrink: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+  position: relative;
+}
+
+.side-material-container .register-material-container .lines .top-to-mid-and-mid .top-to-mid {
+  width: auto;
+  height: 100%;
+  aspect-ratio: 60 / 277;
+}
+
+.side-material-container .register-material-container .lines .top-to-mid-and-mid .mid {
+  width: 100%;
+  height: 1px;
+}
+
+.side-material-container .register-material-container .lines .top-to-mid-and-mid .ball {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  -webkit-transform: translate(50%, 50%) translateY(-0.5px);
+          transform: translate(50%, 50%) translateY(-0.5px);
+}
+
+.side-material-container .register-material-container .lines .mid-to-bottom {
+  --padding-left: 11%;
+  --padding-bottom: 1ex;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: 60 / 277;
+  -ms-flex-negative: 1.2;
+      flex-shrink: 1.2;
+  padding-left: var(--padding-left);
+  padding-bottom: var(--padding-bottom);
+  -webkit-transform: translateY(-1px);
+          transform: translateY(-1px);
+}
+
+.side-material-container .register-material-container .lines .mid-to-bottom .line {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 60 / 277;
+}
+
+.side-material-container .register-material-container .lines .mid-to-bottom .ball {
+  position: absolute;
+  bottom: var(--padding-bottom);
+  left: var(--padding-left);
+  -webkit-transform: translateX(-17.5%) translate(-50%, 50%);
+          transform: translateX(-17.5%) translate(-50%, 50%);
+}
+
+.side-material-container .register-material-container .register-group-high {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  padding-bottom: 1em;
+}
+
+.side-material-container .register-material-container .register-group-low {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  padding-top: 1em;
+}
+
+.side-material-container .register-material-container .register-group {
+  width: 26vw;
+  height: auto;
+  min-height: 0;
+  gap: .5em;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+  -webkit-box-pack: stretch;
+      -ms-flex-pack: stretch;
+          justify-content: stretch;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+
+.side-material-container .register-material-container .register-group .register {
+  width: auto;
+  height: 100%;
+  min-height: 0;
+  -ms-flex-negative: 1;
+      flex-shrink: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -ms-flex-flow: nowrap;
+      flex-flow: nowrap;
+  -webkit-box-pack: stretch;
+      -ms-flex-pack: stretch;
+          justify-content: stretch;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  gap: 1px;
+}
+
+.side-material-container .register-material-container .register-group .register .label {
+  font-family: 'eurostyle';
+  color: #ffedf0;
+  font-size: 180%;
+  width: 1.2em;
+  margin-right: .5ex;
+  -webkit-transform: translateY(-2px);
+          transform: translateY(-2px);
+}
+
+.side-material-container .register-material-container .register-group .register .register-box {
+  width: auto;
+  height: 100%;
+  ratio: 1;
+}
+
+.side-material-container .register-material-container .register-group .register .index-8 {
+  padding-left: 2ex;
+}
+
+.command-display-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.command-display-container .command-display {
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+  height: auto;
+  font-family: 'vtfmono';
+  color: #e5e5e5;
+  position: absolute;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+}
+
+.command-display-container .command-display.top {
+  bottom: 13%;
+  font-size: 18vh;
+}
+
+.command-display-container .command-display.mid {
+  bottom: 7%;
+  font-size: 15vh;
+  opacity: 50%;
+}
+
+.command-display-container .command-display.bottom {
+  bottom: 3%;
+  font-size: 11vh;
+  opacity: 10%;
+}
+/*# sourceMappingURL=styles.css.map */
