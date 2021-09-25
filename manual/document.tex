@@ -211,8 +211,10 @@ These registers are used readable and writable via move and arithmetic-logic ins
 %\begin{itemize}
 %\item[A]
 %\end{itemize}
-%Then, the CPU has one flag register \ttt{F}, with the following bits: \verb|N--PZC|, respectively negative, parity, zero, and carry flags. 
-Then, the CPU has one flag register \ttt{F}, with the following bits: \verb|N---ZC|, respectively negative, zero, and carry flags. 
+Then, the CPU has one flag register \ttt{F}, 
+%with the following bits: \verb|N--PZC|, respectively negative, parity, zero, and carry flags. 
+%with the following bits: \verb|N---ZC|, respectively negative, zero, and carry flags. 
+with the following bits: \verb|NV--ZC|, respectively negative, overflow, zero, and carry flags. 
 These are set and cleared by arithmetic and logical instructions, 
 and can be queried by the conditional branch instructions. 
 The flag register cannot be written to, but it can be read and copied to memory or another register. 
@@ -278,10 +280,10 @@ The following is a quick-reference list of instructions.
 }
 
 \noindent
-\textit{\small Note: unless otherwise noted, instructions that 「set the \ttt{Z} flag」 set it if the result is zero, and clear it otherwise, and instructions that 「set the \ttt{N} flag」 set it to the value of the most significant bit of the result (i.e.\ set if negative, clear otherwise)}. 
+\textit{\small Note: unless otherwise noted, instructions that 「set the \ttt{Z} flag」 set it if the result is zero, and clear it otherwise, instructions that 「set the \ttt{N} flag」 set it to the value of the most significant bit of the result (i.e.\ set if negative, clear otherwise); and instructions that  set the \ttt{V} flag」  set it to the value of the second most significant bit of the result (i.e.\ set if signed arithmetic overflows, clear otherwise).}. 
 \subsubsection*{Memory}
 
-\instruction{MOV src dst}{Set word at \texttt{dst} to contents of \texttt{src}. \\ Flags: set \ttt{Z}, \ttt{N}.}
+\instruction{MOV src dst}{Set word at \texttt{dst} to contents of \texttt{src}. \\ Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.}
 
 \instruction{PSH src}{Push \ttt{src} onto the stack and increment \ttt{sp}.}
 
@@ -291,22 +293,22 @@ The following is a quick-reference list of instructions.
 
 \instruction{ADD src dst}{%
 	Set word at \texttt{dst} to $\texttt{src}+\texttt{dst}+\ttt{C}$. \\ 
-	Flags: set \ttt{Z}, \ttt{N}, set \ttt{C} on overflow. 
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on overflow. 
 }
 
 \instruction{SUB src dst}{%
 	Set word at \texttt{dst} to $\texttt{src}-\texttt{dst}-\overline{\ttt{C}}$. \\ 
-	Flags: set \ttt{Z}, \ttt{N}, set \ttt{C} on underflow. 
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on underflow. 
 }
 
 \instruction{MUL src dst}{%
 	Set word at \texttt{dst} to $\texttt{src}×\texttt{dst}$, where operands are unsigned values. \\ 
-	Flags: set \ttt{Z}, \ttt{N}, set \ttt{C} on overflow.
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on overflow.
 }
 
 \instruction{MUS src dst}{%
 	Set word at \texttt{dst} to $\texttt{src}×\texttt{dst}$, where operands are signed values. \\ 
-	Flags: set \ttt{Z}, \ttt{N}, set \ttt{C} on overflow.
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on overflow.
 }
 
 %\todo{Como fazer handle de divisoes por zero?}
@@ -336,27 +338,27 @@ The following is a quick-reference list of instructions.
 
 \instruction{AND src dst}{%
 	Set word at \ttt{dst} to bitwise-and of \ttt{src} and \ttt{dst}. \\
-	Flags: set \ttt{Z}, \ttt{N}. 
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}. 
 }
 
 \instruction{OR~ src dst}{%
 	Set word at \ttt{dst} to bitwise-or of \ttt{src} and \ttt{dst}. \\
-	Flags: set \ttt{Z}, \ttt{N}. 
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}. 
 }
 
 \instruction{XOR src dst}{%
 	Set word at \ttt{dst} to bitwise-xor of \ttt{src} and \ttt{dst}. \\
-	Flags: set \ttt{Z}, \ttt{N}. 
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}. 
 }
 
 \instruction{LSL dst}{%
 	Shift bits in \ttt{dst} to the left. \\ 
-	Flags: set \ttt{Z}, \ttt{N}, set \ttt{C} on overflow.  
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on overflow.  
 }
 
 \instruction{LSR dst}{%
 	Shift bits in \ttt{dst} to the right. \\ 
-	Flags: set \ttt{Z}, \ttt{N}. 
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}. 
 }
 
 
@@ -365,7 +367,8 @@ The following is a quick-reference list of instructions.
 
 \instruction{CMP src dst}{Flags: set \ttt{C} to $\texttt{src}>\texttt{dst}$, set \ttt{Z} to $\texttt{src}=\texttt{dst}$.}
 
-\instruction{BIT src dst}{Flags: set \ttt{Z} to $\neg(\texttt{src}\land\texttt{dst})$. Set \ttt{N} to msb of $\ttt{src}\land\ttt{dst}$.}
+\instruction{BIT src dst}{Flags: set \ttt{Z} to $\neg(\texttt{src}\land\texttt{dst})$.}
+%Set \ttt{N} to msb of $\ttt{src}\land\ttt{dst}$.
 
 
 
