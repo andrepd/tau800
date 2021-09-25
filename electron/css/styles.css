@@ -1,7 +1,11 @@
 @font-face {
   font-family: 'vtfmono';
   src: url("../assets/VTFMono.ttf") format("truetype");
-  src: url("../assets/VTFMono.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'vtfmono-digits-centered';
+  src: url("../assets/VTFMono_DigitsCentered.ttf") format("truetype");
 }
 
 @font-face {
@@ -75,6 +79,10 @@
   display: -webkit-inline-box;
   display: -ms-inline-flexbox;
   display: inline-flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
@@ -84,9 +92,18 @@
 }
 
 .center-material .clock .number {
-  font-family: 'vtfmono';
+  font-family: 'vtfmono-digits-centered';
   line-height: 30%;
   font-size: \min(42vw, 52vh);
+  width: 2em;
+}
+
+.center-material .clock .left > .number {
+  text-align: right;
+}
+
+.center-material .clock .right > .number {
+  text-align: left;
 }
 
 .center-material .clock .separator {

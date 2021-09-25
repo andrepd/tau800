@@ -17,9 +17,11 @@ function initialize() {
     stack_boxes = document.querySelectorAll('.stack-box > g > rect')
     register_labels = document.querySelectorAll('.register > .label')
     register_boxes = Array.from(document.getElementsByClassName('register'))
-        .forEach((register_group) => {
-            register_group.getElementsByClassName('register-box')
-        })
+        .map((register_group) =>
+            Array.from(register_group.getElementsByClassName('register-box')).map(
+                (element) => element.querySelector('rect'))
+        )
+    console.log(register_boxes)
 
     cmd_displays = document.getElementsByClassName('command-display')
 
@@ -39,8 +41,21 @@ function report_command_history(commands) {
     commands.forEach((value, index) => { cmd_displays[index] = value })
 }
 
+function write_register(register, values) {
+    let register_group = register_boxes[register]
+
+    register_group.forEach((box, index) => {
+        if (values[index]) {
+            box.style.fill = '#ffffff'
+        } else {
+            box.style.fill = 'none'
+        }
+    })
+}
+
 module.exports = {
     initialize,
     write_clock,
     report_command_history,
+    write_register,
 }

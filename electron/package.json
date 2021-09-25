@@ -1,7 +1,7 @@
 {
   "name": "anachronic",
   "version": "1.0.0",
-  "main": "src/main.js",
+  "main": "src/backend/main.js",
   "scripts": {
     "start": "webpack && electron ."
   },
