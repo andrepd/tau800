@@ -8,6 +8,18 @@ const REGISTER_X = 6
 const REGISTER_SP = 7
 const REGISTER_PC = 8
 
+const REGISTERS = [
+    REGISTER_A,
+    REGISTER_F,
+    REGISTER_BH,
+    REGISTER_BL,
+    REGISTER_CH,
+    REGISTER_CL,
+    REGISTER_X,
+    REGISTER_SP,
+    REGISTER_PC,
+]
+
 module.exports = {
     REGISTER_A,
     REGISTER_F,
