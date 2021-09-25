@@ -17,7 +17,7 @@ pub enum Register {
 pub struct Timed<T> {
     pub op: T,
     /// Relative time of operation (w.r.t. call)
-    pub time: Word<sig::Signed>,
+    pub time: IWord,
 }
 
 #[derive(Debug)]
@@ -25,9 +25,9 @@ pub enum Operand {
     /// Named register
     Reg(Timed<Register>),
     /// Literal one-word value
-    Imm(Word<sig::Unsigned>),
+    Imm(UWord),
     /*/// Literal two-word value
-    Iml(LongWord<sig::Unsigned>),*/
+    Iml(LongUWord),*/
     /// Absolute address (byte order: lo hi)
     Abs(Timed<Address>),
     /// Absolute address + X register
@@ -50,7 +50,7 @@ pub struct Operands {
     pub dst: Operand,
 }
 
-pub type Offset = Word<sig::Signed>;
+pub type Offset = IWord;
 
 pub enum Instruction {
     Mov(Operands),
@@ -116,7 +116,7 @@ fn read_timed_register(m: &mut Machine) -> Timed<Register> {
 }
 
 /// Read a literal word from the RAM.
-fn read_word(m: &mut Machine) -> Word<sig::Unsigned> {
+fn read_word(m: &mut Machine) -> UWord {
     m.read_pc()
 }
 
@@ -130,7 +130,7 @@ fn read_timed_address(m: &mut Machine) -> Timed<Address> {
 }
 
 impl Operand {
-    fn decode(m: &mut Machine, mode: Word<sig::Unsigned>) -> Self {
+    fn decode(m: &mut Machine, mode: UWord) -> Self {
         use Operand::*;
         match mode.value() {
             0x0 => Reg(read_timed_register(m)),
@@ -143,7 +143,7 @@ impl Operand {
 }
 
 impl Operands {
-    fn decode(m: &mut Machine, mode: Word<sig::Unsigned>) -> Self {
+    fn decode(m: &mut Machine, mode: UWord) -> Self {
         use Operand::*;
         match mode.value() {
             0x0 => Operands {

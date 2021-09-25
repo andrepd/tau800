@@ -24,7 +24,7 @@ impl From<Flag> for u8 {
 
 #[derive(Debug, Clone, Copy)]
 pub struct FlagWord {
-    word: Word<sig::Unsigned>,
+    word: UWord,
 }
 
 impl Default for FlagWord {
@@ -47,17 +47,17 @@ impl FlagWord {
     }
 }
 
-pub type Address = LongWord<sig::Unsigned>;
+pub type Address = LongUWord;
 
 pub struct Cpu {
-    pub a: Word<sig::Unsigned>,
+    pub a: UWord,
     pub flags: FlagWord,
-    pub bh: Word<sig::Unsigned>,
-    pub bl: Word<sig::Unsigned>,
-    pub ch: Word<sig::Unsigned>,
-    pub cl: Word<sig::Unsigned>,
-    pub x: Word<sig::Unsigned>,
-    pub sp: Word<sig::Unsigned>,
+    pub bh: UWord,
+    pub bl: UWord,
+    pub ch: UWord,
+    pub cl: UWord,
+    pub x: UWord,
+    pub sp: UWord,
     pub pc: Address,
 }
 
@@ -81,10 +81,10 @@ impl Default for Cpu {
 
 const RAM_SIZE: usize = 1 << (2 * WORD_SIZE);
 
-pub struct Ram([Word<sig::Unsigned>; RAM_SIZE]);
+pub struct Ram([UWord; RAM_SIZE]);
 
 impl std::ops::Index<usize> for Ram {
-    type Output = Word<sig::Unsigned>;
+    type Output = UWord;
 
     fn index(&self, index: usize) -> &Self::Output {
         &self.0[index]
@@ -92,7 +92,7 @@ impl std::ops::Index<usize> for Ram {
 }
 
 impl std::ops::Index<Address> for Ram {
-    type Output = Word<sig::Unsigned>;
+    type Output = UWord;
 
     fn index(&self, index: Address) -> &Self::Output {
         &self.0[index.value() as usize]

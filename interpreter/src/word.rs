@@ -62,6 +62,9 @@ where
     }
 }
 
+pub type UWord = Word<sig::Unsigned>;
+pub type IWord = Word<sig::Signed>;
+
 // Implementations for unsigned word:
 
 impl Word<sig::Unsigned> {
@@ -171,6 +174,8 @@ where
         }
     }
 }
+
+pub type ULongWord = LongWord<sig::Unsigned>;
 
 impl LongWord<sig::Unsigned> {
     pub fn value(self) -> u16 {

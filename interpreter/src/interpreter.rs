@@ -8,7 +8,7 @@ use crate::state::Flag;
 // De momento tá a ignorar o time, depois temos de fazer um struct estado total que tem 
 // os estados em todos os momentos.
 // fn operand_to_ref<'a, Signedness: sig::Signature>(state: &'a Machine, operand: &Operand) -> &'a Word<Signedness> {
-fn operand_to_ref<'a>(state: &'a Machine, operand: &'a Operand) -> &'a Word<sig::Unsigned> {
+fn operand_to_ref<'a>(state: &'a Machine, operand: &'a Operand) -> &'a UWord {
     use Register as R;
     type TR = Timed<Register>;
     type TA = Timed<Address>;
@@ -41,7 +41,7 @@ fn operand_to_ref<'a>(state: &'a Machine, operand: &'a Operand) -> &'a Word<sig:
     }
 }
 
-fn operand_to_mut_ref<'a>(state: &'a mut Machine, operand: &'a Operand) -> &'a mut Word<sig::Unsigned> {
+fn operand_to_mut_ref<'a>(state: &'a mut Machine, operand: &'a Operand) -> &'a mut UWord {
     use Register as R;
     type TR = Timed<Register>;
     type TA = Timed<Address>;
@@ -77,19 +77,19 @@ fn operand_to_mut_ref<'a>(state: &'a mut Machine, operand: &'a Operand) -> &'a m
 
 
 
-fn set_flag_z(state: &mut Machine, value: &Word<sig::Unsigned>) {
+fn set_flag_z(state: &mut Machine, value: &UWord) {
     state.cpu.flags.write(Flag::Z, value.value() == 0)
 }
 
-fn set_flag_n(state: &mut Machine, value: &Word<sig::Unsigned>) {
+fn set_flag_n(state: &mut Machine, value: &UWord) {
     state.cpu.flags.write(Flag::Z, value.value() < 0)
 }
 
-fn set_flag_v(state: &mut Machine, value: &Word<sig::Unsigned>) {
+fn set_flag_v(state: &mut Machine, value: &UWord) {
     unimplemented!();  // Pá ainda não tenho bem a certeza como se implementa isto
 }
 
-fn set_flag_nvz(state: &mut Machine, value: &Word<sig::Unsigned>) {
+fn set_flag_nvz(state: &mut Machine, value: &UWord) {
     set_flag_n(state, value);
     set_flag_v(state, value);
     set_flag_z(state, value);
@@ -98,11 +98,11 @@ fn set_flag_nvz(state: &mut Machine, value: &Word<sig::Unsigned>) {
 
 
 fn execute(state: &mut Machine, instruction: &Instruction) {
-    // Epá não há maneira mais fácil de fazer isto?
-    fn mk_ref<'a>(state: &'a Machine, operand: &'a Operand) -> &'a Word<sig::Unsigned> {
+    // Epá não há maneira mais fácil de fazer isto? nome_curto = nome_gigante?
+    fn mk_ref<'a>(state: &'a Machine, operand: &'a Operand) -> &'a UWord {
         operand_to_ref(state, operand)
     }
-    fn mk_mref<'a>(state: &'a mut Machine, operand: &'a Operand) -> &'a mut Word<sig::Unsigned> {
+    fn mk_mref<'a>(state: &'a mut Machine, operand: &'a Operand) -> &'a mut UWord {
         operand_to_mut_ref(state, operand)
     }
 
