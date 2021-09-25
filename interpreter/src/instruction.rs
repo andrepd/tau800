@@ -3,7 +3,7 @@ use crate::prelude::*;
 #[derive(Debug)]
 pub enum Register {
     A,
-    F,
+    // F,
     BH,
     BL,
     CH,
@@ -15,21 +15,27 @@ pub enum Register {
 #[derive(Debug)]
 /// An object referencing an operand at a time different from the call
 pub struct Timed<T> {
-    op: T,
+    pub op: T,
     /// Relative time of operation (w.r.t. call)
-    time: Word<sig::Signed>,
+    pub time: Word<sig::Signed>,
 }
 
 #[derive(Debug)]
 pub enum Operand {
     /// Named register
     Reg(Timed<Register>),
-    /// Literal value
+    /// Literal one-word value
     Imm(Word<sig::Unsigned>),
-    /// Absolute address (byte order: hi, lo)
+    /*/// Literal two-word value
+    Iml(LongWord<sig::Unsigned>),*/
+    /// Absolute address (byte order: lo hi)
     Abs(Timed<Address>),
-    /// Indirect access (address is value at that address, hi lo order)
+    /// Absolute address + X register
+    Abx(Timed<Address>),
+    /// Indirect access (address is value at that address, lo hi order)
     Ind(Timed<Address>),
+    /*/// Indirect access (address is value at that register, lo hi order)
+    Inr(Timed<Register>),*/
 }
 
 // You can match on structs in Rust. If you want to check for, for example, ImmReg,
@@ -40,29 +46,50 @@ pub enum Operand {
 //          _ => ...
 //      }
 pub struct Operands {
-    src: Operand,
-    dest: Operand,
+    pub src: Operand,
+    pub dst: Operand,
 }
 
-type Offset = Word<sig::Signed>;
+pub type Offset = Word<sig::Signed>;
 
 pub enum Instruction {
     Mov(Operands),
+    Psh(Operand),
+    Pop(Operand),
 
     Add(Operands),
     Sub(Operands),
     Mul(Operands),
+    Mus(Operands),
+    Div(Operands),
+    Dis(Operands),
+    Mod(Operands),
+    Mos(Operands),
+    
+    And(Operands),
+    Or (Operands),
+    Xor(Operands),
+    Not(Operand),
 
-    Cmp(Operands),
+    Lsl(Operand),
+    Lsr(Operand),
 
-    Jmp(Operand),
+    Cmp(Operand),
+    Bit(Operand),
 
-    Beq(Offset),
+    Jmp(Address),
+
+    Bcc(Offset),
+    Bcs(Offset),
     Bne(Offset),
+    Beq(Offset),
     Bpl(Offset),
     Bmi(Offset),
 
-    Cal(Operand),
+    Clc,
+    Sec,
+
+    Cal(Address),
     Ret,
 
     Nop,
@@ -74,7 +101,7 @@ fn read_timed_register(m: &mut Machine) -> Timed<Register> {
 
     let op = match m.read_pc().value() {
         0x0 => A,
-        0x1 => F,
+        // 0x1 => F,
         0x2 => BH,
         0x3 => BL,
         0x4 => CH,
@@ -118,40 +145,83 @@ impl Operand {
 impl Operands {
     fn decode(m: &mut Machine, mode: Word<sig::Unsigned>) -> Self {
         use Operand::*;
-
         match mode.value() {
             0x0 => Operands {
                 src: Reg(read_timed_register(m)),
-                dest: Reg(read_timed_register(m)),
+                dst: Reg(read_timed_register(m)),
             },
             0x1 => Operands {
                 src: Imm(read_word(m)),
-                dest: Reg(read_timed_register(m)),
+                dst: Reg(read_timed_register(m)),
             },
             0x2 => Operands {
                 src: Abs(read_timed_address(m)),
-                dest: Reg(read_timed_register(m)),
+                dst: Reg(read_timed_register(m)),
             },
             0x3 => Operands {
                 src: Ind(read_timed_address(m)),
-                dest: Reg(read_timed_register(m)),
+                dst: Reg(read_timed_register(m)),
             },
             0x4 => Operands {
                 src: Reg(read_timed_register(m)),
-                dest: Abs(read_timed_address(m)),
+                dst: Abs(read_timed_address(m)),
             },
             0x5 => Operands {
                 src: Reg(read_timed_register(m)),
-                dest: Ind(read_timed_address(m)),
+                dst: Ind(read_timed_address(m)),
             },
             0x6 => Operands {
                 src: Imm(read_word(m)),
-                dest: Abs(read_timed_address(m)),
+                dst: Abs(read_timed_address(m)),
             },
             0x7 => Operands {
                 src: Imm(read_word(m)),
-                dest: Ind(read_timed_address(m)),
+                dst: Ind(read_timed_address(m)),
             },
+            _ => unreachable!(),
+        }
+    }
+}
+
+impl Instruction {
+    pub fn decode(m: &mut Machine) -> Self {
+        let opcode = m.read_pc();
+        let mode   = m.read_pc();
+        match opcode.value() {
+            0x00 => match mode.value() {
+                0x00 => Instruction::Nop,
+                0x01 => Instruction::Clc,
+                0x02 => Instruction::Sec,
+                0xff => Instruction::Ret,
+                _ => unreachable!(),
+            },
+            0x01 => Instruction::Mov(Operands::decode(m, mode)),
+            0x02 => Instruction::Psh(Operand::decode(m, mode)),
+            0x03 => Instruction::Pop(Operand::decode(m, mode)),
+            0x04 => Instruction::Add(Operands::decode(m, mode)),
+            0x05 => Instruction::Sub(Operands::decode(m, mode)),
+            0x06 => Instruction::Mul(Operands::decode(m, mode)),
+            0x07 => Instruction::Mus(Operands::decode(m, mode)),
+            0x08 => Instruction::Div(Operands::decode(m, mode)),
+            0x09 => Instruction::Dis(Operands::decode(m, mode)),
+            0x0a => Instruction::Mod(Operands::decode(m, mode)),
+            0x0b => Instruction::Mos(Operands::decode(m, mode)),
+            0x0c => Instruction::And(Operands::decode(m, mode)),
+            0x0d => Instruction::Or (Operands::decode(m, mode)),
+            0x0e => Instruction::Xor(Operands::decode(m, mode)),
+            0x0f => Instruction::Not(Operand::decode(m, mode)),
+            0x10 => Instruction::Lsl(Operand::decode(m, mode)),
+            0x11 => Instruction::Lsr(Operand::decode(m, mode)),
+            0x12 => Instruction::Cmp(Operand::decode(m, mode)),
+            0x13 => Instruction::Bit(Operand::decode(m, mode)),
+            0x14 => Instruction::Jmp(unimplemented!()),
+            0x15 => Instruction::Bcc(unimplemented!()),
+            0x16 => Instruction::Bcs(unimplemented!()),
+            0x17 => Instruction::Bne(unimplemented!()),
+            0x18 => Instruction::Beq(unimplemented!()),
+            0x19 => Instruction::Bpl(unimplemented!()),
+            0x1a => Instruction::Bmi(unimplemented!()),
+            0x1d => Instruction::Cal(unimplemented!()),
             _ => unreachable!(),
         }
     }

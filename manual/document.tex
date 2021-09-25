@@ -351,6 +351,11 @@ The following is a quick-reference list of instructions.
 	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}. 
 }
 
+\instruction{NOT dst}{%
+	Set word at \ttt{dst} to bitwise-not of \ttt{dst}. \\
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}. 
+}
+
 \instruction{LSL dst}{%
 	Shift bits in \ttt{dst} to the left. \\ 
 	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on overflow.  

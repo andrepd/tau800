@@ -1,29 +1,17 @@
 use crate::prelude::*;
 use flagset::flags;
 
-const RAM_SIZE: usize = 1 << (2 * WORD_SIZE);
-
-pub struct Ram([Word<sig::Unsigned>; RAM_SIZE]);
-
-impl std::ops::Index<usize> for Ram {
-    type Output = Word<sig::Unsigned>;
-
-    fn index(&self, index: usize) -> &Self::Output {
-        &self.0[index]
-    }
-}
-
-impl Default for Ram {
-    fn default() -> Self {
-        Self([Word::<sig::Unsigned>::zero(); RAM_SIZE])
-    }
-}
+// CPU
 
 flags! {
     pub enum Flag: u8 {
-        // TODO: Actual flags (max 6)
-        A,
-        B,
+        /// Negative: set if value is negative
+        N,
+        /// Overflow: set if signed arithmetic overflows
+        V,
+        /// Zero: set if value is zero
+        Z, 
+        /// Carry: set if unsigned overflows the register
         C,
     }
 }
@@ -86,5 +74,39 @@ impl Default for Cpu {
             sp: Default::default(),
             pc: Default::default(),
         }
+    }
+}
+
+// RAM
+
+const RAM_SIZE: usize = 1 << (2 * WORD_SIZE);
+
+pub struct Ram([Word<sig::Unsigned>; RAM_SIZE]);
+
+impl std::ops::Index<usize> for Ram {
+    type Output = Word<sig::Unsigned>;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.0[index]
+    }
+}
+
+impl std::ops::Index<Address> for Ram {
+    type Output = Word<sig::Unsigned>;
+
+    fn index(&self, index: Address) -> &Self::Output {
+        &self.0[index.value() as usize]
+    }
+}
+
+impl std::ops::IndexMut<Address> for Ram {
+    fn index_mut(&mut self, index: Address) -> &mut Self::Output {
+        &mut self.0[index.value() as usize]
+    }
+}
+
+impl Default for Ram {
+    fn default() -> Self {
+        Self([Word::<sig::Unsigned>::zero(); RAM_SIZE])
     }
 }

@@ -1,15 +1,15 @@
 use std::marker::PhantomData;
 
-use crate::prelude::Address;
+use crate::prelude::{Address, div_rem};
 
 /// The number of bits in a word.
 /// (In reality words are represented by at least an `u8`, but checks are in place
 ///  to prevent "overflows".)
 pub const WORD_SIZE: usize = 6;
 
-const MAX_UNSIGNED_VALUE: u8 = (1 << WORD_SIZE) as u8 - 1;
-const MAX_SIGNED_VALUE: u8 = (1 << (WORD_SIZE - 1)) as u8 - 1;
-const SIGN_BIT: u8 = (1 << WORD_SIZE) as u8;
+pub const MAX_UNSIGNED_VALUE: u8 = (1 << WORD_SIZE) as u8 - 1;
+pub const MAX_SIGNED_VALUE: u8 = (1 << (WORD_SIZE - 1)) as u8 - 1;
+pub const SIGN_BIT: u8 = (1 << WORD_SIZE) as u8;
 
 pub mod sig {
     pub trait Signature {}
@@ -184,12 +184,44 @@ impl From<LongWord<sig::Unsigned>> for u16 {
     }
 }
 
+impl Into<usize> for LongWord<sig::Unsigned> {
+    fn into(self) -> usize {
+        self.value() as usize
+    }
+}
+
 impl Default for LongWord<sig::Unsigned> {
     fn default() -> Self {
         Self {
             high: Default::default(),
             low: Default::default(),
         }
+    }
+}
+
+impl std::ops::Add<Word<sig::Unsigned>> for LongWord<sig::Unsigned> {
+    type Output = Self; 
+    
+    fn add(self, other: Word<sig::Unsigned>) -> Self {
+        let sum = u8::from(self.low) + u8::from(other);
+        let (div, rem) = div_rem(sum, MAX_UNSIGNED_VALUE);
+        let low  = Word::<sig::Unsigned>::from(rem);
+        let high = Word::<sig::Unsigned>::from(u8::from(self.high) + div);
+        Self { high, low }
+    }
+}
+
+impl std::ops::Add<Word<sig::Signed>> for LongWord<sig::Unsigned> {
+    type Output = Self; 
+    
+    fn add(self, other: Word<sig::Signed>) -> Self {
+        /*let sum = u8::from(self.low) as i8 + i8::from(other);
+        let (div, rem) = div_rem(sum, MAX_UNSIGNED_VALUE as i8);
+        let (div, rem) = (div as u8, rem as u8);
+        let low  = Word::<sig::Unsigned>::from(rem as u8);
+        let high = Word::<sig::Unsigned>::from(u8::from(self.high) + div);
+        Self { high, low }*/
+        unimplemented!()  // Calma isto estava tudo mal
     }
 }
 

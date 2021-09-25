@@ -1,8 +1,8 @@
 use crate::prelude::*;
 
 pub struct Machine {
-    ram: Ram,
-    cpu: Cpu,
+    pub ram: Ram,
+    pub cpu: Cpu,
 }
 
 impl Machine {
