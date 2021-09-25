@@ -44,8 +44,9 @@ The Electron side expects, upon poll, an object with the following properties:
 
 ```
 {
-	"number_register_bits": {
-		
-	}
+	numbers: [ <"hours">, <"digits"> ],
+	registers: [ [array of boolean values] for each register index ],
+	stack: <value from 0 to 6 indicating how full the stack is>,
+	history: [ <last 6 commands as strings> ]
 }
 ```
