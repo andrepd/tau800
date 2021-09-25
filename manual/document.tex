@@ -211,7 +211,8 @@ These registers are used readable and writable via move and arithmetic-logic ins
 %\begin{itemize}
 %\item[A]
 %\end{itemize}
-Then, the CPU has one flag register \ttt{F}, with the following bits: \verb|SZ--NC|, respectively sign, zero, negative, and carry flags. 
+%Then, the CPU has one flag register \ttt{F}, with the following bits: \verb|N--PZC|, respectively negative, parity, zero, and carry flags. 
+Then, the CPU has one flag register \ttt{F}, with the following bits: \verb|N---ZC|, respectively negative, zero, and carry flags. 
 These are set and cleared by arithmetic and logical instructions, 
 and can be queried by the conditional branch instructions. 
 The flag register cannot be written to, but it can be read and copied to memory or another register. 
@@ -257,11 +258,11 @@ The following addressing modes are available:
 	Indexed   & \ttt{\%llhh,X} & the memory address $\ttt{ll}+2^6×\ttt{hh}+\textrm{contents of \ttt{X}}$ \\ \hline
 	Indirect  & \hspace{-0.2em}\ttt{(\%llhh)} & the address stored at memory address $\ttt{ll}+2^6×\ttt{hh}$  \\ \hline
 %	Indirect  & \hspace{-0.2em}\ttt{(\%b)}\,\ttt{(\%c)} & the address stored at memory address $\ttt{bh}$ (resp c)\\ \hline
-	Indirect  & \hspace{-0.2em}\ttt{(\%r)} & the address stored at memory address $\ttt{rl}+2^6×\ttt{rh}$\footnotemark \\ \hline
+	Indirect  & \hspace{-0.2em}\ttt{(\%r)}\footnotemark & the address stored at memory address $\ttt{rl}+2^6×\ttt{rh}$ \\ \hline
 \end{tabular}
 \end{center}
 
-\footnotetext{Where \ttt{r} is \ttt{b} or \ttt{c}}
+\footnotetext{Where \ttt{r} is \ttt{b} or \ttt{c}.}
 
 \subsection*{List of instructions}
 
@@ -273,11 +274,14 @@ The following is a quick-reference list of instructions.
 	\hspace{0.03\textwidth}
 	\begin{minipage}[t]{0.75\textwidth} #2 \end{minipage}
 %	\medskip
+	\vspace*{-0.5\smallskipamount}
 }
 
+\noindent
+\textit{\small Note: unless otherwise noted, instructions that 「set the \ttt{Z} flag」 set it if the result is zero, and clear it otherwise, and instructions that 「set the \ttt{N} flag」 set it to the value of the most significant bit of the result (i.e.\ set if negative, clear otherwise)}. 
 \subsubsection*{Memory}
 
-\instruction{MOV src dst}{Set word at \texttt{dst} to contents of \texttt{src}.}
+\instruction{MOV src dst}{Set word at \texttt{dst} to contents of \texttt{src}. \\ Flags: set \ttt{Z}, \ttt{N}.}
 
 \instruction{PSH src}{Push \ttt{src} onto the stack and increment \ttt{sp}.}
 
@@ -287,80 +291,88 @@ The following is a quick-reference list of instructions.
 
 \instruction{ADD src dst}{%
 	Set word at \texttt{dst} to $\texttt{src}+\texttt{dst}+\ttt{C}$. \\ 
-	Flags: set \ttt{C} on overflow. 
+	Flags: set \ttt{Z}, \ttt{N}, set \ttt{C} on overflow. 
 }
 
-\todo{O que acontece em SUB se C estiver set?}
 \instruction{SUB src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}-\texttt{dst}$. \\ 
-	Flags: set \ttt{C} on underflow, set \ttt{N} on negative result, set \ttt{Z} on zero result. 
+	Set word at \texttt{dst} to $\texttt{src}-\texttt{dst}-\overline{\ttt{C}}$. \\ 
+	Flags: set \ttt{Z}, \ttt{N}, set \ttt{C} on underflow. 
 }
 
 \instruction{MUL src dst}{%
 	Set word at \texttt{dst} to $\texttt{src}×\texttt{dst}$, where operands are unsigned values. \\ 
-	Flags: set \ttt{C} on overflow.
+	Flags: set \ttt{Z}, \ttt{N}, set \ttt{C} on overflow.
 }
 
 \instruction{MUS src dst}{%
 	Set word at \texttt{dst} to $\texttt{src}×\texttt{dst}$, where operands are signed values. \\ 
-	Flags: set \ttt{C} on overflow.
+	Flags: set \ttt{Z}, \ttt{N}, set \ttt{C} on overflow.
 }
 
+%\todo{Como fazer handle de divisoes por zero?}
 \instruction{DIV src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}\div\texttt{dst}$, where operands are unsigned values.  
+	Set word at \texttt{dst} to $\texttt{src}\div\texttt{dst}$, where operands are unsigned values. \\
+	Flags: set \ttt{Z}. 
 }
 
 \instruction{DIS src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}\div\texttt{dst}$, where operands are signed values. 
+	Set word at \texttt{dst} to $\texttt{src}\div\texttt{dst}$, where operands are signed values. \\
+	Flags: set \ttt{Z}. 
 }
 
 \renewcommand\mod%
 	{\mathrel{\mathrm{mod}}}
 
 \instruction{MOD src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}\mod\texttt{dst}$, where operands are unsigned values. 
+	Set word at \texttt{dst} to $\texttt{src}\mod\texttt{dst}$, where operands are unsigned values. \\
+	Flags: set \ttt{Z}. 
 }
 
 \instruction{MOS src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}\mod\texttt{dst}$, where operands are signed values. 
+	Set word at \texttt{dst} to $\texttt{src}\mod\texttt{dst}$, where operands are signed values.\\
+	Flags: set \ttt{Z}.  
 }
 
 
 \instruction{AND src dst}{%
-	Set word at \ttt{dst} to bitwise-and of \ttt{src} and \ttt{dst}.
+	Set word at \ttt{dst} to bitwise-and of \ttt{src} and \ttt{dst}. \\
+	Flags: set \ttt{Z}, \ttt{N}. 
 }
 
 \instruction{OR~ src dst}{%
-	Set word at \ttt{dst} to bitwise-or of \ttt{src} and \ttt{dst}.
+	Set word at \ttt{dst} to bitwise-or of \ttt{src} and \ttt{dst}. \\
+	Flags: set \ttt{Z}, \ttt{N}. 
 }
 
 \instruction{XOR src dst}{%
-	Set word at \ttt{dst} to bitwise-xor of \ttt{src} and \ttt{dst}.
+	Set word at \ttt{dst} to bitwise-xor of \ttt{src} and \ttt{dst}. \\
+	Flags: set \ttt{Z}, \ttt{N}. 
 }
 
 \instruction{LSL dst}{%
 	Shift bits in \ttt{dst} to the left. \\ 
-	Flags: set \ttt{C} on overflow.  
+	Flags: set \ttt{Z}, \ttt{N}, set \ttt{C} on overflow.  
 }
 
 \instruction{LSR dst}{%
-	Shift bits in \ttt{dst} to the right. 
+	Shift bits in \ttt{dst} to the right. \\ 
+	Flags: set \ttt{Z}, \ttt{N}. 
 }
 
 
 
 \subsubsection*{Comparison}
 
-\instruction{CMP src dst}{If $\texttt{src}>\texttt{dst}$ set carry flag. If $\texttt{src}=\texttt{dst}$ set zero flag.}
+\instruction{CMP src dst}{Flags: set \ttt{C} to $\texttt{src}>\texttt{dst}$, set \ttt{Z} to $\texttt{src}=\texttt{dst}$.}
 
-%\instruction{TST src dst}{If $\texttt{src}>\texttt{dst}$ set carry flag. If $\texttt{src}=\texttt{dst}$ set zero flag.}
+\instruction{BIT src dst}{Flags: set \ttt{Z} to $\neg(\texttt{src}\land\texttt{dst})$. Set \ttt{N} to msb of $\ttt{src}\land\ttt{dst}$.}
 
 
 
 
 \subsubsection*{Jump}
 
-\instruction{JMP dst}{Jump execution to \texttt{dst}.}
+\instruction{JMP addr}{Jump execution to \texttt{addr} (two-word address).}
 
 \subsubsection*{Branching}
 
@@ -375,6 +387,12 @@ The following is a quick-reference list of instructions.
 \instruction{BPL off}{Branch to $\ttt{pc}+\ttt{off}$ if \ttt{N} clear (signed offset).}
 
 \instruction{BMI off}{Branch to $\ttt{pc}+\ttt{off}$ if \ttt{N} set (signed offset).}
+
+\subsubsection*{Control}
+
+\instruction{CLC}{Clear carry flag}
+
+\instruction{SEC}{Set carry flag}
 
 \subsubsection*{Subroutines}
 
