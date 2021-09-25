@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "webpack && electron ."
   },
   "author": "Miguel Murça, André Duarte",
   "license": "UNLICENSED",
   "devDependencies": {
-    "electron": "^14.0.1"
+    "electron": "^14.0.1",
+    "webpack": "^5.53.0",
+    "webpack-cli": "^4.8.0"
   },
   "description": ""
 }

@@ -594,7 +594,7 @@
 }
 
 .side-material-container .register-material-container .register-group {
-  width: 26vw;
+  width: 30vw;
   height: auto;
   min-height: 0;
   gap: .5em;
@@ -636,15 +636,16 @@
   -webkit-box-align: start;
       -ms-flex-align: start;
           align-items: flex-start;
-  gap: 1px;
+  gap: 2px;
 }
 
 .side-material-container .register-material-container .register-group .register .label {
   font-family: 'eurostyle';
   color: #ffedf0;
   font-size: 180%;
+  text-align: right;
   width: 1.2em;
-  margin-right: .5ex;
+  margin-right: 0.8ex;
   -webkit-transform: translateY(-2px);
           transform: translateY(-2px);
 }
@@ -655,7 +656,7 @@
   ratio: 1;
 }
 
-.side-material-container .register-material-container .register-group .register .index-8 {
+.side-material-container .register-material-container .register-group .register .index-6 {
   padding-left: 2ex;
 }
 
