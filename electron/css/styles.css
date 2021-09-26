@@ -1,12 +1,21 @@
 @font-face {
   font-family: 'vtfmono';
   src: url("../assets/VTFMono.ttf") format("truetype");
-  src: url("../assets/VTFMono.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'vtfmono-digits-centered';
+  src: url("../assets/VTFMono_DigitsCentered.ttf") format("truetype");
 }
 
 @font-face {
   font-family: 'eurostyle';
   src: url("../assets/EuroStyle.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: 'eurostyle-extended';
+  src: url("../assets/EurostileExtended.ttf") format("truetype");
 }
 
 .viewport {
@@ -75,6 +84,10 @@
   display: -webkit-inline-box;
   display: -ms-inline-flexbox;
   display: inline-flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
@@ -84,9 +97,18 @@
 }
 
 .center-material .clock .number {
-  font-family: 'vtfmono';
+  font-family: 'vtfmono-digits-centered';
   line-height: 30%;
   font-size: \min(42vw, 52vh);
+  width: 2em;
+}
+
+.center-material .clock .left > .number {
+  text-align: right;
+}
+
+.center-material .clock .right > .number {
+  text-align: left;
 }
 
 .center-material .clock .separator {
@@ -666,6 +688,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
+  overflow: hidden;
 }
 
 .command-display-container .command-display {
@@ -673,7 +696,7 @@
   width: -moz-max-content;
   width: max-content;
   height: auto;
-  font-family: 'vtfmono';
+  font-family: 'eurostyle-extended';
   color: #e5e5e5;
   position: absolute;
   left: 50%;
@@ -681,20 +704,38 @@
           transform: translateX(-50%);
 }
 
-.command-display-container .command-display.top {
+.command-display-container .command-display.index-1 {
+  bottom: 14%;
+  font-size: 12vh;
+}
+
+.command-display-container .command-display.index-2 {
   bottom: 13%;
-  font-size: 18vh;
+  font-size: 8vh;
+  opacity: 30%;
 }
 
-.command-display-container .command-display.mid {
-  bottom: 7%;
-  font-size: 15vh;
-  opacity: 50%;
-}
-
-.command-display-container .command-display.bottom {
-  bottom: 3%;
-  font-size: 11vh;
+.command-display-container .command-display.index-3 {
+  bottom: 12%;
+  font-size: 6vh;
   opacity: 10%;
+}
+
+.command-display-container .command-display.index-4 {
+  bottom: 11%;
+  font-size: 5vh;
+  opacity: 9%;
+}
+
+.command-display-container .command-display.index-5 {
+  bottom: 8%;
+  font-size: 4vh;
+  opacity: 7%;
+}
+
+.command-display-container .command-display.index-6 {
+  bottom: 5%;
+  font-size: 3vh;
+  opacity: 7%;
 }
 /*# sourceMappingURL=styles.css.map */

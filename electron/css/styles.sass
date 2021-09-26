@@ -7,11 +7,18 @@ $white: #ffffff
 @font-face
     font-family: 'vtfmono'
     src: url('../assets/VTFMono.ttf') format('truetype')
-    src: url('../assets/VTFMono.woff') format('woff')
+
+@font-face 
+    font-family: 'vtfmono-digits-centered'
+    src: url('../assets/VTFMono_DigitsCentered.ttf') format('truetype')
 
 @font-face
     font-family: 'eurostyle'
     src: url('../assets/EuroStyle.ttf') format('truetype')
+
+@font-face
+    font-family: 'eurostyle-extended'
+    src: url('../assets/EurostileExtended.ttf') format('truetype')
 
 .viewport
     width: 100vw
@@ -61,13 +68,21 @@ $white: #ffffff
 
     .clock
         display: inline-flex
+        flex-direction: row
         justify-content: center
         align-items: center
 
         .number
-            font-family: 'vtfmono'
+            font-family: 'vtfmono-digits-centered'
             line-height: 30%
             font-size: \min(42vw, 52vh)
+            width: 2em
+
+        .left > .number
+            text-align: right
+            
+        .right > .number
+            text-align: left
 
         .separator
             width: 1vw
@@ -497,27 +512,43 @@ $white: #ffffff
     left: 0
     width: 100vw
     height: 100vh
+    overflow: hidden
 
     .command-display
         width: max-content
         height: auto
 
-        font-family: 'vtfmono'
+        font-family: 'eurostyle-extended'
         color: #e5e5e5
         position: absolute
         left: 50%
         transform: translateX(-50%)
 
-        &.top
-            bottom: 13%
-            font-size: 18vh
+        &.index-1
+            bottom: 14%
+            font-size: 12vh
 
-        &.mid
-            bottom: 7%
-            font-size: 15vh
-            opacity: 50%
+        &.index-2
+            bottom: 13%
+            font-size: 8vh
+            opacity: 30%
         
-        &.bottom
-            bottom: 3%
-            font-size: 11vh
+        &.index-3
+            bottom: 12%
+            font-size: 6vh
             opacity: 10%
+
+        &.index-4
+            bottom: 11%
+            font-size: 5vh
+            opacity: 9%
+
+        &.index-5
+            bottom: 8%
+            font-size: 4vh
+            opacity: 7%
+
+        &.index-6
+            bottom: 5%
+            font-size: 3vh
+            opacity: 7%

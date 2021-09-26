@@ -1,7 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld(
-    'electron',
-    {
+    'electron', {
+        registerTauUpdate: (callback) => ipcRenderer.on('tauUpdate', callback)
     }
 )

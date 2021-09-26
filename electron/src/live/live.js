@@ -1,19 +1,16 @@
 const renderer = require('./renderer')
-const { sleep } = require('./../sleep')
+const { REGISTERS } = require('./registers')
+
+function onUpdate(event, update) {
+    renderer.write_clock(update.numbers[0], update.numbers[1])
+    update.registers.forEach((value, index) => {
+        renderer.write_register(REGISTERS[index], value)
+    })
+    renderer.write_stack(update.stack)
+    renderer.report_command_history(update.history)
+}
 
 window.addEventListener('DOMContentLoaded', () => {
     renderer.initialize()
-    main()
+    window.electron.registerTauUpdate(onUpdate)
 })
-
-async function main() {
-    let timer = 0
-    while (true) {
-        renderer.write_clock(
-            String(Math.floor(timer/60)).padStart(2, '0'),
-            String(timer%60).padStart(2, '0'))
-
-        timer++
-        await sleep(1000)
-    }
-}
