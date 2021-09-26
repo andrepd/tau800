@@ -26,56 +26,49 @@ fn poll(mut cx: FunctionContext) -> JsResult<JsObject> {
     // Dummy example: return random values
     let time_sampler = Uniform::new(0, 60);
     let numbers = JsArray::new(&mut cx, 2);
-    numbers.set(
-        &mut cx,
-        0,
-        cx.number(time_sampler.sample(&mut thread_rng())),
-    );
-    numbers.set(
-        &mut cx,
-        1,
-        cx.number(time_sampler.sample(&mut thread_rng())),
-    );
+    let js_number = cx.number(time_sampler.sample(&mut thread_rng()));
+    numbers.set(&mut cx, 0, js_number)?;
+    let js_number = cx.number(time_sampler.sample(&mut thread_rng()));
+    numbers.set(&mut cx, 1, js_number)?;
 
     let boolean_sampler = rand::distributions::Bernoulli::new(0.5).unwrap();
     let registers = {
-        let values = REGISTERS.iter().map(|_| {
-            let values = (0..6)
-                .map(|_| boolean_sampler.sample(&mut thread_rng()))
-                .map(|rs_bool| cx.boolean(rs_bool));
-            let array = JsArray::new(&mut cx, values.len() as u32);
-            for (i, value) in values.enumerate() {
-                array.set(&mut cx, i as u32, value);
+        let registers = JsArray::new(&mut cx, 8);
+        for i in 0..8 {
+            let register = JsArray::new(&mut cx, 6);
+
+            for j in 0..6 {
+                let value = boolean_sampler.sample(&mut thread_rng());
+                let value = cx.boolean(value);
+                register.set(&mut cx, j, value)?;
             }
-            array
-        });
-        let array = JsArray::new(&mut cx, values.len() as u32);
-        for (i, value) in values.enumerate() {
-            array.set(&mut cx, i as u32, value);
+
+            registers.set(&mut cx, i, register)?;
         }
-        array
+        registers
     };
 
     let stack = Uniform::new(0, 7).sample(&mut thread_rng());
     let stack = cx.number(stack);
 
     let history = {
-        let values = ["aaaaaaa", "bbbbb", "cccccc", "dd", "eeee", "ffffffff"]
-            .into_iter()
-            .map(|rs_str| cx.string(rs_str));
-        let array = JsArray::new(&mut cx, values.len() as u32);
+        let values = ["aaaaaaa", "bbbbb", "cccccc", "dd", "eeee", "ffffffff"].iter();
+        let history = JsArray::new(&mut cx, values.len() as u32);
+
         for (i, value) in values.enumerate() {
-            array.set(&mut cx, i as u32, value);
+            let value = cx.string(value);
+            history.set(&mut cx, i as u32, value)?;
         }
-        array
+
+        history
     };
 
     let response_object = JsObject::new(&mut cx);
 
-    response_object.set(&mut cx, "numbers", numbers);
-    response_object.set(&mut cx, "registers", registers);
-    response_object.set(&mut cx, "stack", stack);
-    response_object.set(&mut cx, "history", history);
+    response_object.set(&mut cx, "numbers", numbers)?;
+    response_object.set(&mut cx, "registers", registers)?;
+    response_object.set(&mut cx, "stack", stack)?;
+    response_object.set(&mut cx, "history", history)?;
 
     Ok(response_object)
 }
