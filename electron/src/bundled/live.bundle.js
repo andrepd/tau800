@@ -15,7 +15,7 @@
   \**************************/
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("const renderer = __webpack_require__(/*! ./renderer */ \"./src/live/renderer.js\")\nconst { REGISTERS } = __webpack_require__(/*! ./registers */ \"./src/live/registers.js\")\n\nfunction onUpdate(event, update) {\n    renderer.write_clock(update.numbers[0], update.numbers[1])\n    update.registers.forEach((value, index) => {\n        console.log(index)\n        console.log(REGISTERS[index])\n    })\n    renderer.write_stack(update.stack)\n    renderer.report_command_history(update.history)\n}\n\nwindow.addEventListener('DOMContentLoaded', () => {\n    renderer.initialize()\n    window.electron.registerTauUpdate(onUpdate)\n})\n\n\n//# sourceURL=webpack://anachronic/./src/live/live.js?");
+eval("const renderer = __webpack_require__(/*! ./renderer */ \"./src/live/renderer.js\")\nconst { REGISTERS } = __webpack_require__(/*! ./registers */ \"./src/live/registers.js\")\n\nfunction onUpdate(event, update) {\n    renderer.write_clock(update.numbers[0], update.numbers[1])\n    update.registers.forEach((value, index) => {\n        renderer.write_register(REGISTERS[index], value)\n    })\n    renderer.write_stack(update.stack)\n    renderer.report_command_history(update.history)\n}\n\nwindow.addEventListener('DOMContentLoaded', () => {\n    renderer.initialize()\n    window.electron.registerTauUpdate(onUpdate)\n})\n\n\n//# sourceURL=webpack://anachronic/./src/live/live.js?");
 
 /***/ }),
 

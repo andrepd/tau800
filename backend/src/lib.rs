@@ -33,8 +33,8 @@ fn poll(mut cx: FunctionContext) -> JsResult<JsObject> {
 
     let boolean_sampler = rand::distributions::Bernoulli::new(0.5).unwrap();
     let registers = {
-        let registers = JsArray::new(&mut cx, 8);
-        for i in 0..8 {
+        let registers = JsArray::new(&mut cx, 9);
+        for i in 0..9 {
             let register = JsArray::new(&mut cx, 6);
 
             for j in 0..6 {

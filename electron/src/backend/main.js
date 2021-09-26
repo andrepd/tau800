@@ -26,7 +26,7 @@ async function updateLoop() {
 	while (true) {
 		poll_response = backend.poll()
 		win.webContents.send('tauUpdate', poll_response)
-		await sleep(500)
+		await sleep(250)
 	}
 }
 
