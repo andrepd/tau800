@@ -48,7 +48,7 @@
 
 \usepackage[backgroundcolor=yellow!50,textsize=tiny]{todonotes}
 
-
+\usepackage{rotating}
 
 % ----- %
 % Style %
@@ -91,10 +91,11 @@
 % Document %
 % -------- %
 
-\newcommand\machinename%
-%	{SNX-800B Type 5}
-%	{STR-800B \textsf{\textit{Super}}}
-	{\textsf{TAU-800B \textit{Super}}}
+\makeatletter
+\def\@machinename@short{{\textsf{TAU-800B} \textit{Super}}}
+\def\@machinename@long{{\textsf{Time Arithmetic Unit} (Revision 800B, \textit{Super} edition)}}
+\def\machinename{\@ifstar\@machinename@long\@machinename@short}
+\makeatother
 
 \newcommand\companyname%
 %	{Aperture Science\,\copyright}
@@ -138,7 +139,7 @@
 
 \begin{footnotesize}
 	\noindent
-  This is a quick-start guide to your Time Arithmetic Unit (revision 800-B, \textit{Super} edition) time-assisted computing machine.
+  This is a quick-start guide to your \machinename*{} time-assisted computing machine.
 	Please ensure you have thoroughly read and understood the User Manual and the Warranty Disclaimer before attempting to utilize the machine.
 	\companyname{} is not responsible for any damages resulting from improper use of the time jump facilities of this machine.
 	\vfill
@@ -165,21 +166,47 @@
 \vspace*{-20pt}\rule{\textwidth}{0.8pt}
 
 \noindent
-Congratulations of becoming the proud owner of a \machinename{}, the latest technology in time-based computing. The following document serves as an introduction to the architecture and operation modes of this time-assisted arithmetic computing unit, as well as to any other extensions offered by \companyname{} compatible with the \machinename{} that were acquired as part of your commercial agreement.
+Congratulations of becoming the proud owner of a \machinename*{}, the latest technology in time-based computing. The following document serves as an introduction to the architecture and operation modes of this time-assisted arithmetic computing unit, as well as to any other extensions offered by \companyname{} compatible with the \machinename{} that were acquired as part of your commercial agreement.
 
-For more information regarding available computing extension hardware compatible with your computing unit contact your local \companyname{} sales representative. Missing documentation of acquired computing extension hardware and advanced time operation modes of the computing unit can be obtained upon written request with proof of purchase to \companyname{} Main Shenzen Headquarters.
-\todo{Jikan=japão, mas Shenzen=china?}
+For more information regarding available computing extension hardware compatible with your computing unit contact your local \companyname{} sales representative. Missing documentation of acquired computing extension hardware and advanced time operation modes of the computing unit can be obtained upon written request with proof of purchase to \companyname{} Hanshin Main Headquarters.
 
 Please note that this document \underline{does not} preclude the consultation of the complete reference manual, which should have been provided to you alongside this document and the computing unit. If the complete reference manual was not provided to you upon purchase, please contact your local sales representative.
 
 \companyname{} is not liable for damages incurred in the misuse of the equipment to the extent of but not limited to the operation modes described in this document.
 
 \clearpage
-\section{The Machine Language}
+\section{Self-consistent Novikov-Turing Assisted Computing}
+
+The \machinename{} provides new computing advances by exploiting the well-known Novikov-Turing speedup, schematized in figure \ref{fig:timeline} for convenience.
+These modes of operation are seamlessly exposed via the assembly language (see section \ref{sec:assembly}). Please refer to the complete reference manual for examples of implementation of some of the known temporal computing speedups.
+
+\begin{figure}[bh]
+	\setlength{\fboxsep}{20pt}
+	\centerline{%
+		\fbox{%
+			\includegraphics{assets/timeline.png}%
+		}%
+	}
+	\caption{The Turing-Novikov effect at play in the \protect\machinename{} modes of operation. The Novikov stability module (full reference manual, sec. 4, fig. 10, schematic 1\,a)), ensures self-consistency in the computing process.}
+	\label{fig:timeline}
+\end{figure}
+
+\begin{sidewaysfigure}
+	\setlength{\fboxsep}{20pt}
+	\centerline{%
+		\fbox{%
+		\includegraphics{assets/architecture.png}%
+		}
+	}
+	\caption{High-level overview of causal-consistent hardware architecture. }
+\end{sidewaysfigure}
+
+\clearpage
+\section{The Machine Language} \label{sec:assembly}
 \vspace*{-20pt}\rule{\textwidth}{0.8pt}
 
 \noindent
-The following is a quick-reference guide to \machinename{} assembly language. Please use ONLY the officially licensed assembler programs by \companyname{} (ensure you have been supplied with all 9 (nine) floppy diskettes for installation of the assembler).
+The following is a quick-reference guide to \machinename{} assembly language. Please use ONLY the officially licensed assembler programs by \companyname{}.\footnote{If you have not been supplied with all 9 (nine) floppy diskettes for installation of the assembler, please contact your local sales representative.}
 
 %The CPU word size is 8 bits.
 
@@ -280,7 +307,7 @@ The following is a quick-reference list of instructions.
 }
 
 \noindent
-\textit{\small Note: unless otherwise noted, instructions that 「set the \ttt{Z} flag」 set it if the result is zero, and clear it otherwise, instructions that 「set the \ttt{N} flag」 set it to the value of the most significant bit of the result (i.e.\ set if negative, clear otherwise); and instructions that  set the \ttt{V} flag」  set it to the value of the second most significant bit of the result (i.e.\ set if signed arithmetic overflows, clear otherwise).}. 
+\textit{\small Note: unless otherwise noted, instructions that 「set the \ttt{Z} flag」 set it if the result is zero, and clear it otherwise, instructions that 「set the \ttt{N} flag」 set it to the value of the most significant bit of the result (i.e.\ set if negative, clear otherwise); and instructions that 「set the \ttt{V} flag」  set it to the value of the second most significant bit of the result (i.e.\ set if signed arithmetic overflows, clear otherwise).}. 
 \subsubsection*{Memory}
 
 \instruction{MOV src dst}{Set word at \texttt{dst} to contents of \texttt{src}. \\ Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.}

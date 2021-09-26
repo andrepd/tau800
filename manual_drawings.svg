@@ -1,0 +1,636 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1 (1:1.1+202106031931+af4d65493e)"
+   sodipodi:docname="manual_drawings.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.9"
+     inkscape:cx="391.11111"
+     inkscape:cy="485"
+     inkscape:window-width="1366"
+     inkscape:window-height="703"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     inkscape:snap-object-midpoints="true"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:snap-bbox="false"
+     inkscape:bbox-nodes="false"
+     inkscape:snap-smooth-nodes="true" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 104.00083,53.434479 V 118.42048"
+       id="path881"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <circle
+       style="fill:#000000;stroke-width:0.3;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="path1191"
+       cx="104.00083"
+       cy="88.257988"
+       r="1.1357349"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82222px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:FreeMono;letter-spacing:0px;stroke-width:0.264583"
+       x="107.08714"
+       y="88.848267"
+       id="text10141"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200"><tspan
+         sodipodi:role="line"
+         id="tspan10139"
+         style="font-size:2.82222px;stroke-width:0.264583"
+         x="107.08714"
+         y="88.848267">present moment</tspan></text>
+    <circle
+       style="fill:#000000;stroke-width:0.3;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="circle16878"
+       cx="104.00083"
+       cy="53.434479"
+       r="1.1357349"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82222px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:FreeMono;letter-spacing:0px;stroke-width:0.264583"
+       x="107.08714"
+       y="53.860767"
+       id="text16882"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200"><tspan
+         sodipodi:role="line"
+         id="tspan16880"
+         style="font-size:2.82222px;stroke-width:0.264583"
+         x="107.08714"
+         y="53.860767">acquisition of TAU-800B Super unit</tspan></text>
+    <circle
+       style="fill:#000000;stroke-width:0.3;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="circle22899"
+       cx="104.00083"
+       cy="105.19131"
+       r="1.1357349"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82222px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:FreeMono;letter-spacing:0px;stroke-width:0.264583"
+       x="107.08714"
+       y="105.85558"
+       id="text22903"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200"><tspan
+         sodipodi:role="line"
+         id="tspan22901"
+         style="font-size:2.82222px;stroke-width:0.264583"
+         x="107.08714"
+         y="105.85558">addressing of past state of register</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.6;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none"
+       id="path24797"
+       sodipodi:type="arc"
+       sodipodi:cx="100.82584"
+       sodipodi:cy="83.664856"
+       sodipodi:rx="21.419024"
+       sodipodi:ry="21.419024"
+       sodipodi:start="1.5707963"
+       sodipodi:end="4.712389"
+       sodipodi:open="true"
+       sodipodi:arc-type="arc"
+       d="m 100.82584,105.08388 a 21.419024,21.419024 0 0 1 -18.549415,-10.709512 21.419024,21.419024 0 0 1 0,-21.419024 21.419024,21.419024 0 0 1 18.549415,-10.709512"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <path
+       style="fill:#000000;stroke:#000000;stroke-width:0.322501px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 100.10948,61.559375 1.27141,0.734046 -1.27141,0.734047 z"
+       id="path25260"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <circle
+       style="fill:#000000;stroke-width:0.3;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="circle25440"
+       cx="103.99791"
+       cy="62.293434"
+       r="1.1357349"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82222px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:FreeMono;letter-spacing:0px;stroke-width:0.264583"
+       x="107.08714"
+       y="62.882294"
+       id="text25534"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200"><tspan
+         sodipodi:role="line"
+         id="tspan25532"
+         style="font-size:2.82222px;stroke-width:0.264583"
+         x="107.08714"
+         y="62.882294">Turing-Novikov retroactive computation</tspan></text>
+    <circle
+       style="fill:#000000;stroke-width:0.3;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="circle46072"
+       cx="104.00083"
+       cy="78.920074"
+       r="1.1357349"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82222px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:FreeMono;letter-spacing:0px;stroke-width:0.264583"
+       x="107.08714"
+       y="79.538139"
+       id="text46076"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200"><tspan
+         sodipodi:role="line"
+         id="tspan46074"
+         style="font-size:2.82222px;stroke-width:0.264583"
+         x="107.08714"
+         y="79.538139">copy of result register to future register</tspan></text>
+    <circle
+       style="fill:#000000;stroke-width:0.3;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="circle48256"
+       cx="104.00083"
+       cy="118.42048"
+       r="1.1357349"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.6;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none"
+       id="path48258"
+       sodipodi:type="arc"
+       sodipodi:cx="100.82584"
+       sodipodi:cy="70.628441"
+       sodipodi:rx="8.2949514"
+       sodipodi:ry="8.2949514"
+       sodipodi:start="1.5707963"
+       sodipodi:end="3.9269908"
+       sodipodi:open="true"
+       sodipodi:arc-type="arc"
+       d="m 100.82584,78.923392 a 8.2949514,8.2949514 0 0 1 -7.663532,-5.12061 8.2949514,8.2949514 0 0 1 1.798119,-9.039757"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <path
+       style="fill:#000000;stroke:#000000;stroke-width:0.322501px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 100.10948,78.186028 1.27141,0.734046 -1.27141,0.734047 z"
+       id="path48566"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <path
+       style="fill:#000000;stroke:#000000;stroke-width:0.322501px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 100.10951,117.60508 1.27141,0.73405 -1.27141,0.73405 z"
+       id="path48566-3"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 88.012473,48.594573 V 59.2115"
+       id="path48603"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <path
+       style="fill:#000000;stroke:#000000;stroke-width:0.253358px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 88.589142,59.177916 -0.576668,0.998822 -0.576668,-0.998822 z"
+       id="path48685"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82222px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:FreeMono;letter-spacing:0px;stroke-width:0.264583"
+       x="71.380875"
+       y="51.868473"
+       id="text48689"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200"><tspan
+         sodipodi:role="line"
+         id="tspan48687"
+         style="font-size:2.82222px;stroke-width:0.264583"
+         x="71.380875"
+         y="51.868473">positive</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:2.82222px;stroke-width:0.264583"
+         x="71.380875"
+         y="55.396248"
+         id="tspan52319">time-line</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.6;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none"
+       id="path51830"
+       sodipodi:type="arc"
+       sodipodi:cx="100.82584"
+       sodipodi:cy="98.674271"
+       sodipodi:rx="19.664856"
+       sodipodi:ry="19.664856"
+       sodipodi:start="1.5707963"
+       sodipodi:end="4.4752634"
+       sodipodi:open="true"
+       sodipodi:arc-type="arc"
+       d="M 100.82584,118.33913 A 19.664856,19.664856 0 0 1 81.299042,101.00033 19.664856,19.664856 0 0 1 96.20638,79.559692"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82222px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:FreeMono;letter-spacing:0px;stroke-width:0.264583"
+       x="107.08714"
+       y="119.03854"
+       id="text55505"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/timeline.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200"><tspan
+         sodipodi:role="line"
+         id="tspan55503"
+         style="font-size:2.82222px;stroke-width:0.264583"
+         x="107.08714"
+         y="119.03854">readout of computation</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 90.551206,174.21896 -6.121232,10.60228 h 12.242464 z"
+       id="path57193"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;line-height:1;font-family:FreeMono;-inkscape-font-specification:FreeMono;text-align:center;letter-spacing:0px;text-anchor:middle;stroke-width:0.142109"
+       x="90.539833"
+       y="167.26445"
+       id="text59095"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200"><tspan
+         sodipodi:role="line"
+         id="tspan59093"
+         style="font-size:3.175px;text-align:center;text-anchor:middle;stroke-width:0.142109"
+         x="90.539833"
+         y="167.26445">Novikov</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:3.175px;text-align:center;text-anchor:middle;stroke-width:0.142109"
+         x="90.539833"
+         y="170.43945"
+         id="tspan61281">consistency module</tspan></text>
+    <ellipse
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="path71041"
+       cx="90.551208"
+       cy="179.4451"
+       rx="5.473855"
+       ry="5.3761401"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <ellipse
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="ellipse71145"
+       cx="44.12672"
+       cy="212.23436"
+       rx="5.473855"
+       ry="5.3761401"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect71169"
+       width="11.632098"
+       height="5.3964415"
+       x="127.77038"
+       y="184.19264"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect71251"
+       width="11.632098"
+       height="5.3964415"
+       x="127.77038"
+       y="190.54263"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect71253"
+       width="11.632098"
+       height="5.3964415"
+       x="127.77038"
+       y="196.89262"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect71255"
+       width="11.632098"
+       height="5.3964415"
+       x="127.77038"
+       y="203.2426"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect71345"
+       width="11.632098"
+       height="5.3964415"
+       x="127.77038"
+       y="209.59259"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;line-height:1;font-family:FreeMono;-inkscape-font-specification:FreeMono;text-align:center;letter-spacing:0px;text-anchor:middle;stroke-width:0.142109"
+       x="44.115349"
+       y="222.82405"
+       id="text75065"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200"><tspan
+         sodipodi:role="line"
+         style="font-size:3.175px;text-align:center;text-anchor:middle;stroke-width:0.142109"
+         x="44.115349"
+         y="222.82405"
+         id="tspan75063">causal computation</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:3.175px;text-align:center;text-anchor:middle;stroke-width:0.142109"
+         x="44.115349"
+         y="225.99905"
+         id="tspan76471">unit</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 44.126721,205.79989 V 179.67577 H 79.712039"
+       id="path79028"
+       sodipodi:nodetypes="ccc"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82223px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:FreeMono;letter-spacing:0px;stroke-width:0.264583"
+       x="11.8943"
+       y="190.87663"
+       id="text96794"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200"><tspan
+         sodipodi:role="line"
+         id="tspan96792"
+         style="stroke-width:0.264583"
+         x="11.8943"
+         y="190.87663">causal-consistency</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="11.8943"
+         y="194.40442"
+         id="tspan96796">communication bus</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 43.415479,200.18935 V 183.37578"
+       id="path97559"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:FreeMono;letter-spacing:0px;stroke-width:0.264583"
+       x="133.60899"
+       y="220.19193"
+       id="text101997"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200"><tspan
+         sodipodi:role="line"
+         id="tspan101995"
+         style="font-size:3.175px;text-align:center;text-anchor:middle;stroke-width:0.264583"
+         x="133.60899"
+         y="220.19193">hybrid-causality</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:3.175px;text-align:center;text-anchor:middle;stroke-width:0.264583"
+         x="133.60899"
+         y="224.16068"
+         id="tspan108869">registers</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 50.658907,212.23436 H 124.59913"
+       id="path114450"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 101.31673,179.4451 h 7.4264 v 31.7665 h 15.856"
+       id="path114624"
+       sodipodi:nodetypes="cccc"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <circle
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="ellipse114941"
+       cx="117.21489"
+       cy="211.70331"
+       r="2.1369648"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect115067"
+       width="25.065798"
+       height="12.532899"
+       x="61.853233"
+       y="192.67168"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82222px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:FreeMono;letter-spacing:0px;stroke-width:0.264583"
+       x="74.424232"
+       y="197.7923"
+       id="text116743"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200"><tspan
+         sodipodi:role="line"
+         id="tspan116741"
+         style="font-size:2.82222px;text-align:center;text-anchor:middle;stroke-width:0.264583"
+         x="74.424232"
+         y="197.7923">non-volatile</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:2.82222px;text-align:center;text-anchor:middle;stroke-width:0.264583"
+         x="74.424232"
+         y="201.32007"
+         id="tspan118791">memory</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 50.658905,211.2116 H 74.38613 v -4.4829"
+       id="path123546"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 90.551203,162.7835 v -5.79748"
+       id="path130879"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 90.551203,154.77994 -1.325319,2.29551 h 2.650638 z"
+       id="path130961"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 54.463589,168.63245 -1.325319,2.29551 h 2.650638 z"
+       id="path130961-6"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <text
+       xml:space="preserve"
+       style="font-size:5.64444px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:FreeMono;letter-spacing:0px;stroke-width:0.264583"
+       x="97.934158"
+       y="155.0284"
+       id="text136237"><tspan
+         sodipodi:role="line"
+         id="tspan136235"
+         style="stroke-width:0.264583"
+         x="97.934158"
+         y="155.0284" /></text>
+    <text
+       xml:space="preserve"
+       style="font-size:5.64444px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:FreeMono;letter-spacing:0px;stroke-width:0.264583"
+       x="117.96735"
+       y="152.29964"
+       id="text144211"><tspan
+         sodipodi:role="line"
+         id="tspan144209"
+         style="stroke-width:0.264583" /></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:FreeMono;letter-spacing:0px;stroke-width:0.264583"
+       x="94.795479"
+       y="156.77136"
+       id="text151563"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200"><tspan
+         sodipodi:role="line"
+         id="tspan151561"
+         style="font-size:3.175px;stroke-width:0.264583"
+         x="94.795479"
+         y="156.77136">secondary power supply</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:FreeMono;letter-spacing:0px;stroke-width:0.264583"
+       x="36.301804"
+       y="165.29584"
+       id="text151563-7"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200"><tspan
+         sodipodi:role="line"
+         id="tspan151561-5"
+         style="font-size:3.175px;stroke-width:0.264583"
+         x="36.301804"
+         y="165.29584">primary power supply</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 48.609503,206.92507 5.854086,-10.13958 v -25.74547"
+       id="path155133"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <path
+       id="rect158020"
+       style="fill:none;stroke:#000000;stroke-width:0.3;stroke-linecap:square;stroke-dasharray:0.3, 0.9"
+       d="m 115.32568,206.53687 v -27.85392 h 36.12493 v 50.82929 h -36.12493 v -12.33699"
+       sodipodi:nodetypes="cccccc"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200" />
+    <text
+       xml:space="preserve"
+       style="font-size:5.64444px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:FreeMono;letter-spacing:0px;stroke-width:0.264583"
+       x="96.945496"
+       y="231.75854"
+       id="text164247"><tspan
+         sodipodi:role="line"
+         id="tspan164245"
+         style="stroke-width:0.264583"
+         x="96.945496"
+         y="231.75854" /></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;line-height:1.25;font-family:FreeMono;-inkscape-font-specification:FreeMono;letter-spacing:0px;stroke-width:0.264583"
+       x="85.108459"
+       y="229.31569"
+       id="text169083"
+       inkscape:export-filename="/home/miguelmurca/Documents/Art/PDC2021/repo/manual/assets/architecture.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200"><tspan
+         sodipodi:role="line"
+         id="tspan169081"
+         style="stroke-width:0.264583"
+         x="85.108459"
+         y="229.31569">volatile memory</tspan></text>
+  </g>
+</svg>
