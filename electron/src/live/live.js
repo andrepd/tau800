@@ -1,10 +1,10 @@
 const renderer = require('./renderer')
-const { ipcMain } = require('electron')
+const { REGISTERS } = require('./registers')
 
-function onUpdate(update) {
+function onUpdate(event, update) {
     renderer.write_clock(update.numbers[0], update.numbers[1])
-    update.registers.forEach((values, index) => {
-        renderer.write_register(REGISTERS[index], values)
+    update.registers.forEach((value, index) => {
+        renderer.write_register(REGISTERS[index], value)
     })
     renderer.write_stack(update.stack)
     renderer.report_command_history(update.history)
@@ -12,5 +12,5 @@ function onUpdate(update) {
 
 window.addEventListener('DOMContentLoaded', () => {
     renderer.initialize()
-    ipcMain.addListener('tau_update', onUpdate)
+    window.electron.registerTauUpdate(onUpdate)
 })

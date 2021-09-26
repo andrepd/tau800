@@ -7,4 +7,5 @@ module.exports = {
     filename: 'live.bundle.js',
   },
   mode: 'development',
+  target: 'electron-renderer',
 };

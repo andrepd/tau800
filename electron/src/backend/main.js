@@ -1,5 +1,7 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow } = require('electron')
 const path = require('path')
+const { sleep } = require('./../sleep')
+const backend = require('anachronic')
 
 let win;
 
@@ -15,6 +17,17 @@ function createWindow() {
 	})
 
 	win.loadFile('main.html')
+
+	win.webContents.on('did-finish-load', () => updateLoop())
+}
+
+async function updateLoop() {
+	let poll_response
+	while (true) {
+		poll_response = backend.poll()
+		win.webContents.send('tauUpdate', poll_response)
+		await sleep(500)
+	}
 }
 
 app.whenReady().then(createWindow)

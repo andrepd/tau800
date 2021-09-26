@@ -30,4 +30,5 @@ module.exports = {
     REGISTER_X,
     REGISTER_SP,
     REGISTER_PC,
+    REGISTERS,
 }
