@@ -240,170 +240,172 @@ impl Operands {
 
 impl Instruction {
     pub fn decode(m: &mut Machine) -> Self {
+        use Instruction::*;
         let opcode = m.read_pc();
         let mode   = m.read_pc();
         match opcode.value() {
             0x00 => match mode.value() {
-                0x00 => Instruction::Nop,
-                0x01 => Instruction::Clc,
-                0x02 => Instruction::Sec,
-                0xff => Instruction::Ret,
+                0x00 => Nop,
+                0x01 => Clc,
+                0x02 => Sec,
+                0xff => Ret,
                 _ => unreachable!(),
             },
-            0x01 => Instruction::Mov(Operands::decode(m, mode)),
-            0x02 => Instruction::Psh(Operand::decode(m, mode)),
-            0x03 => Instruction::Pop(Operand::decode(m, mode)),
-            0x04 => Instruction::Add(Operands::decode(m, mode)),
-            0x05 => Instruction::Sub(Operands::decode(m, mode)),
-            0x06 => Instruction::Mul(Operands::decode(m, mode)),
-            0x07 => Instruction::Mus(Operands::decode(m, mode)),
-            0x08 => Instruction::Div(Operands::decode(m, mode)),
-            0x09 => Instruction::Dis(Operands::decode(m, mode)),
-            0x0a => Instruction::Mod(Operands::decode(m, mode)),
-            0x0b => Instruction::Mos(Operands::decode(m, mode)),
-            0x0c => Instruction::And(Operands::decode(m, mode)),
-            0x0d => Instruction::Or (Operands::decode(m, mode)),
-            0x0e => Instruction::Xor(Operands::decode(m, mode)),
-            0x0f => Instruction::Not(Operand::decode(m, mode)),
-            0x10 => Instruction::Lsl(Operand::decode(m, mode)),
-            0x11 => Instruction::Lsr(Operand::decode(m, mode)),
-            0x12 => Instruction::Cmp(Operand::decode(m, mode)),
-            0x13 => Instruction::Bit(Operand::decode(m, mode)),
-            0x14 => Instruction::Jmp(unimplemented!()),
-            0x15 => Instruction::Bcc(unimplemented!()),
-            0x16 => Instruction::Bcs(unimplemented!()),
-            0x17 => Instruction::Bne(unimplemented!()),
-            0x18 => Instruction::Beq(unimplemented!()),
-            0x19 => Instruction::Bpl(unimplemented!()),
-            0x1a => Instruction::Bmi(unimplemented!()),
-            0x1d => Instruction::Cal(unimplemented!()),
+            0x01 => Mov(Operands::decode(m, mode)),
+            0x02 => Psh(Operand::decode(m, mode)),
+            0x03 => Pop(Operand::decode(m, mode)),
+            0x04 => Add(Operands::decode(m, mode)),
+            0x05 => Sub(Operands::decode(m, mode)),
+            0x06 => Mul(Operands::decode(m, mode)),
+            0x07 => Mus(Operands::decode(m, mode)),
+            0x08 => Div(Operands::decode(m, mode)),
+            0x09 => Dis(Operands::decode(m, mode)),
+            0x0a => Mod(Operands::decode(m, mode)),
+            0x0b => Mos(Operands::decode(m, mode)),
+            0x0c => And(Operands::decode(m, mode)),
+            0x0d => Or (Operands::decode(m, mode)),
+            0x0e => Xor(Operands::decode(m, mode)),
+            0x0f => Not(Operand::decode(m, mode)),
+            0x10 => Lsl(Operand::decode(m, mode)),
+            0x11 => Lsr(Operand::decode(m, mode)),
+            0x12 => Cmp(Operand::decode(m, mode)),
+            0x13 => Bit(Operand::decode(m, mode)),
+            0x14 => Jmp(unimplemented!()),
+            0x15 => Bcc(unimplemented!()),
+            0x16 => Bcs(unimplemented!()),
+            0x17 => Bne(unimplemented!()),
+            0x18 => Beq(unimplemented!()),
+            0x19 => Bpl(unimplemented!()),
+            0x1a => Bmi(unimplemented!()),
+            0x1d => Cal(unimplemented!()),
             _ => unreachable!(),
         }
     }
 
     pub fn encode(m: &mut Machine, instruction: &Instruction) -> () {
+        use Instruction::*;
         match instruction {
-            Instruction::Nop => { 
+            Nop => { 
                 m.write_pc(UWord::from(0x00));
                 m.write_pc(UWord::from(0x00));
             },
-            Instruction::Clc => { 
+            Clc => { 
                 m.write_pc(UWord::from(0x00));
                 m.write_pc(UWord::from(0x01));
             },
-            Instruction::Sec => { 
+            Sec => { 
                 m.write_pc(UWord::from(0x00));
                 m.write_pc(UWord::from(0x02));
             },
-            Instruction::Ret => { 
+            Ret => { 
                 m.write_pc(UWord::from(0x00));
                 m.write_pc(UWord::from(0xff));
             },
-            Instruction::Mov(ops) => {
+            Mov(ops) => {
                 m.write_pc(UWord::from(0x01));
                 Operands::encode(m, ops);
             },
-            Instruction::Psh(op) => {
+            Psh(op) => {
                 m.write_pc(UWord::from(0x02));
                 Operand::encode(m, op);
             }
-            Instruction::Pop(op) => {
+            Pop(op) => {
                 m.write_pc(UWord::from(0x03));
                 Operand::encode(m, op);
             }
-            Instruction::Add(ops) => {
+            Add(ops) => {
                 m.write_pc(UWord::from(0x04));
                 Operands::encode(m, ops);
             },
-            Instruction::Sub(ops) => {
+            Sub(ops) => {
                 m.write_pc(UWord::from(0x05));
                 Operands::encode(m, ops);
             },
-            Instruction::Mul(ops) => {
+            Mul(ops) => {
                 m.write_pc(UWord::from(0x06));
                 Operands::encode(m, ops);
             },
-            Instruction::Mus(ops) => {
+            Mus(ops) => {
                 m.write_pc(UWord::from(0x07));
                 Operands::encode(m, ops);
             },
-            Instruction::Div(ops) => {
+            Div(ops) => {
                 m.write_pc(UWord::from(0x08));
                 Operands::encode(m, ops);
             },
-            Instruction::Dis(ops) => {
+            Dis(ops) => {
                 m.write_pc(UWord::from(0x09));
                 Operands::encode(m, ops);
             },
-            Instruction::Mod(ops) => {
+            Mod(ops) => {
                 m.write_pc(UWord::from(0x0a));
                 Operands::encode(m, ops);
             },
-            Instruction::Mos(ops) => {
+            Mos(ops) => {
                 m.write_pc(UWord::from(0x0b));
                 Operands::encode(m, ops);
             },
-            Instruction::And(ops) => {
+            And(ops) => {
                 m.write_pc(UWord::from(0x0c));
                 Operands::encode(m, ops);
             },
-            Instruction::Or (ops) => {
+            Or (ops) => {
                 m.write_pc(UWord::from(0x0d));
                 Operands::encode(m, ops);
             },
-            Instruction::Xor(ops) => {
+            Xor(ops) => {
                 m.write_pc(UWord::from(0x0e));
                 Operands::encode(m, ops);
             },
-            Instruction::Not(op) => {
+            Not(op) => {
                 m.write_pc(UWord::from(0x0f));
                 Operand::encode(m, op);
             }
-            Instruction::Lsl(op) => {
+            Lsl(op) => {
                 m.write_pc(UWord::from(0x10));
                 Operand::encode(m, op);
             }
-            Instruction::Lsr(op) => {
+            Lsr(op) => {
                 m.write_pc(UWord::from(0x11));
                 Operand::encode(m, op);
             }
-            Instruction::Cmp(op) => {
+            Cmp(op) => {
                 m.write_pc(UWord::from(0x12));
                 Operand::encode(m, op);
             }
-            Instruction::Bit(op) => {
+            Bit(op) => {
                 m.write_pc(UWord::from(0x13));
                 Operand::encode(m, op);
             }
-            Instruction::Jmp(_) => {
+            Jmp(_) => {
                 m.write_pc(UWord::from(0x14));
                 unimplemented!();
             }
-            Instruction::Bcc(_) => {
+            Bcc(_) => {
                 m.write_pc(UWord::from(0x15));
                 unimplemented!();
             }
-            Instruction::Bcs(_) => {
+            Bcs(_) => {
                 m.write_pc(UWord::from(0x16));
                 unimplemented!();
             }
-            Instruction::Bne(_) => {
+            Bne(_) => {
                 m.write_pc(UWord::from(0x17));
                 unimplemented!();
             }
-            Instruction::Beq(_) => {
+            Beq(_) => {
                 m.write_pc(UWord::from(0x18));
                 unimplemented!();
             }
-            Instruction::Bpl(_) => {
+            Bpl(_) => {
                 m.write_pc(UWord::from(0x19));
                 unimplemented!();
             }
-            Instruction::Bmi(_) => {
+            Bmi(_) => {
                 m.write_pc(UWord::from(0x1a));
                 unimplemented!();
             }
-            Instruction::Cal(_) => {
+            Cal(_) => {
                 m.write_pc(UWord::from(0x1d));
                 unimplemented!();
             }
