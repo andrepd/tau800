@@ -85,7 +85,8 @@
 
 \makeatletter
 \let\@copyright@old\copyright
-\def\copyright{\makebox[.6ex][l]{\hspace{-.4ex}\textsuperscript{\@copyright@old}}}
+\def\@copyright@new{\makebox[.6ex][l]{\hspace{-.4ex}\textsuperscript{\@copyright@old}}}
+\def\copyright{\@ifstar\@copyright@old\@copyright@new}
 \makeatother
 
 % -------- %
@@ -98,9 +99,11 @@
 \def\machinename{\@ifstar\@machinename@long\@machinename@short}
 \makeatother
 
-\newcommand\companyname%
-%	{Aperture Science\,\copyright}
-	{Jikan Systems Corp.\copyright}
+\makeatletter
+\def\@companyname@english{Jikan Systems Corp.\copyright}
+\def\@companyname@japanese{時間システム Corp.\copyright}
+\def\companyname{\@ifstar\@companyname@japanese\@companyname@english}
+\makeatother
 	
 % Shortcut since we use monospace so much
 \let\ttt\texttt
@@ -130,7 +133,7 @@
 
 		\vfill
 
-		{\footnotesize \companyname \\ 時間システム Corp.\copyright}
+		{\footnotesize \companyname{} \\ \companyname*{}}
 	\end{adjustwidth*}
 \end{titlingpage}
 
@@ -523,5 +526,16 @@ representative. \emph{Typical} ratings are provided, for convenience, in figure
 		reference manual.}
 	\label{fig:novikov-power}
 \end{sidewaysfigure}
+
+\clearpage
+\thispagestyle{empty}
+\null\vfill
+{\bfseries
+\null\hfill\companyname{}\hfill\null
+
+\null\hfill\companyname*{}\hfill\null}
+\vfill\null
+
+\centerline{\ttfamily Do not distribute. \copyright*{} 1973}
 
 \end{document}
