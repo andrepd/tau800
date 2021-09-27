@@ -20,4 +20,11 @@ impl Machine {
         self.cpu.pc.try_increment().expect("Overflowed program counter.");
         word
     }
+
+    /// Write a word at PC and increment the PC.
+    pub fn write_pc(&mut self, word: UWord) -> () {
+        self.ram[self.cpu.pc.value() as usize] = word;
+        self.cpu.pc.try_increment().expect("Overflowed program counter.");
+        ()
+    }
 }
