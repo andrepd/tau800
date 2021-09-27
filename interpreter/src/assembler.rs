@@ -1,8 +1,7 @@
-use crate::prelude::*;
-use std::str::Lines;
 use crate::instruction::{Instruction, Operand, Operands, Register, Timed};
-
-
+use crate::prelude::*;
+use std::iter::Peekable;
+use std::str::{Chars, Lines};
 
 struct InstructionIterator<'i> {
     lines: Lines<'i>,
@@ -48,10 +47,148 @@ fn read_instruction(literal: &str) -> Instruction {
     }
 }
 
-//
+enum ReadError {
+    NoMoreChars,
+    UnexpectedChar,
+}
 
-// As cenas que fazem parse de um T retornam um par (T, resto da string)
-type Cont<'a, T> = (T, &'a str);
+type ReadResult<T> = Result<T, ReadError>;
+
+fn read_char<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<char> {
+    let next_char = chars.next();
+    if next_char.is_none() {
+        Err(ReadError::NoMoreChars)
+    } else {
+        Ok(next_char.unwrap())
+    }
+}
+
+fn match_char<'s>(to_match: char, chars: &mut Peekable<Chars<'s>>) -> ReadResult<()> {
+    let peek = chars.peek();
+    if peek.is_none() {
+        return Err(ReadError::NoMoreChars);
+    }
+    if *peek.unwrap() == to_match {
+        chars.next();
+        return Ok(());
+    } else {
+        return Err(ReadError::UnexpectedChar);
+    }
+}
+
+fn read_register<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<Register> {
+    let register = match read_char(chars)? {
+        'a' => Register::A,
+        'b' => match read_char(chars)? {
+            'h' => Register::BH,
+            'l' => Register::BL,
+            _ => unreachable!(),
+        },
+        'c' => match read_char(chars)? {
+            'h' => Register::CH,
+            'l' => Register::CL,
+            _ => unreachable!(),
+        },
+        'x' => Register::X,
+        's' => {
+            debug_assert!(read_char(chars)? == 'p');
+            Register::SP
+        }
+        _ => unreachable!(),
+    };
+    Ok(register)
+}
+
+fn read_hex_word<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<UWord> {
+    let mut read_hex_char = || {
+        let next = chars.peek();
+        if next.is_none() {
+            return Err(ReadError::NoMoreChars);
+        }
+        let next = next.unwrap();
+        if next.is_digit(16) {
+            Ok(chars.next().unwrap())
+        } else {
+            Err(ReadError::UnexpectedChar)
+        }
+    };
+
+    // (Sorry; all I'm doing here is converting a None to an Err,
+    //  and a Some to an Ok, and then unwrapping)
+    let low = read_hex_char()?;
+    let high = read_hex_char()?;
+
+    let low = low.to_digit(16).unwrap() as u8;
+    let high = (high.to_digit(16).unwrap() as u8) << 4;
+
+    let value = high + low;
+
+    Ok(UWord::from(value))
+}
+
+fn read_time<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<IWord> {
+    let negative = match_char('-', chars).map(|_| true)?;
+    let absolute_value = read_hex_word(chars)?.value() as i8;
+    Ok(IWord::from(if negative {
+        -absolute_value
+    } else {
+        absolute_value
+    }))
+}
+
+fn read_operand<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<Operand> {
+    let operand = match read_char(chars)? {
+        '#' => {
+            let word = read_hex_word(chars)?;
+            Operand::Imm(word)
+        }
+        '%' => {
+            let low = read_hex_word(chars)?;
+            let high = read_hex_word(chars)?;
+            let op = Address::from_words(high, low);
+
+            let next = chars.peek();
+            if next.is_some() && *next.unwrap() == ',' {
+                match_char(',', chars)?;
+                match_char('X', chars)?;
+
+                let time = read_time(chars)?;
+                Operand::Abx(Timed::new(op, time))
+            } else {
+                let time = read_time(chars)?;
+                Operand::Abs(Timed::new(op, time))
+            }
+        }
+        '(' => {
+            match read_char(chars)? {
+                '%' => {
+                    let low = read_hex_word(chars)?;
+                    let high = read_hex_word(chars)?;
+                    let op = Address::from_words(high, low);
+                    let time = read_time(chars)?;
+
+                    Operand::Ind(Timed::new(op, time))
+                },
+                _ => unimplemented!(),
+            }
+        }
+        _ => {
+            let register = read_register(chars)?;
+            let time = read_time(chars)?;
+            Operand::Reg(Timed::new(register, time))
+        }
+    };
+    Ok(operand)
+}
+
+fn read_operands<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<Operands> {
+    let src = read_operand(chars)?;
+    let dest = read_operand(chars)?;
+    Ok(Operands::new(src, dest))
+}
+
+/*// As cenas que fazem parse de um T retornam um par (T, resto da string)
+type Cont<T> = (T, &str)
 
 fn read_char(str: &str) -> Cont<char> {
     (str.chars().nth(0).unwrap(), &str[1..])
@@ -68,14 +205,11 @@ fn read_time(line: &str) -> Cont<IWord> {
 
 // Epá nem sei como indexar um char, por causa do unicode e tudo mais
 fn read_register(str: &str) -> Cont<Register> {
-    match str.chars().nth(0).unwrap() {  // le mao
-        'a' => (Register::A, &str[1..]),
-        'b' => { 
-            match str.chars().nth(1).unwrap() {
-                'h' => (Register::BH, &str[2..]),
-                'l' => (Register::BL, &str[2..]),
-                _ => unreachable!(),
-            }
+    match str[0] {
+        'a' => Register::A, &str[1..]
+        'b' => { match str[1]
+            'h' => Register::BH, &str[2..]
+            'l' => Register::BL, &str[2..]
         },
         'c' => { 
             match str.chars().nth(1).unwrap() {    
@@ -149,3 +283,4 @@ fn read_address(str: &str) -> Address {
 fn read_offset(str: &str) -> Address {
     todo!()
 }
+*/
