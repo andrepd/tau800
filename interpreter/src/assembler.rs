@@ -52,50 +52,13 @@ fn read_char(str: &str) -> Cont<char> {
     str[0], &str[1..]
 }
 
-fn read_operand(str: &str) -> Operand {
-    let c, str = read_char(str);
-    match c {
-        '#' => {
-            let word, str = read_hex_word(str);
-            Imm(word)
-        },
-        '%' => {
-            let low,  str = read_hex_word(str);
-            let high, str = read_hex_word(str);
-            let op = Address{high, low};
-            match str.get(0..2) {
-                Some (",X") => {
-                    let time, str = try_read_time(&str[2..]);
-                    Abx({op, time})
-                },
-                None => {
-                    let time, str = try_read_time(str);
-                    Abs({op, time})
-                }
-            }
-        },
-        '(' => {
-            let c, str = read_char(str);
-            match c {
-                '%' => {
-                    let low,  str = read_hex_word(str);
-                    let high, str = read_hex_word(str);
-                    let op = Address{high, low};
-                    let time, str = try_read_time(str);
-                    Ind({op, time})
-                },
-                _ => {
-                    panic!("Indirect register not implemented, please purchase Deluxe edition of this assembler.");
-                }
-            }
-            let word = read_hex_word(str);
-        },
-        _ => {
-            let op, str = read_register(str);
-            let time = try_read_time(str);
-            Reg({op, time})
-        }
-    }
+fn read_hex_word(word: &str) -> Cont<UWord> {
+    todo!()
+}
+
+// Aqui pus ele a aceitar uma slice do resto da linha?
+fn read_time(line: &str) -> Cont<IWord> {
+    todo!()
 }
 
 // Epá nem sei como indexar um char, por causa do unicode e tudo mais
@@ -115,17 +78,62 @@ fn read_register(str: &str) -> Cont<Register> {
     }
 }
 
-fn read_operands(word1: &str, word2: &str) -> Operands {
-    let src = read_operand(word1);
-    let dst = read_operand(word2);
+fn read_operand(str: &str) -> Operand {
+    let c, str = read_char(str);
+    match c {
+        '#' => {
+            let word, str = read_hex_word(str);
+            Imm(word)
+        },
+        '%' => {
+            let low,  str = read_hex_word(str);
+            let high, str = read_hex_word(str);
+            let op = Address{high, low};
+            match str.get(0..2) {
+                Some (",X") => {
+                    let time, str = read_time(&str[2..]);
+                    Abx({op, time})
+                },
+                None => {
+                    let time, str = read_time(str);
+                    Abs({op, time})
+                }
+            }
+        },
+        '(' => {
+            let c, str = read_char(str);
+            match c {
+                '%' => {
+                    let low,  str = read_hex_word(str);
+                    let high, str = read_hex_word(str);
+                    let op = Address{high, low};
+                    let time, str = read_time(str);
+                    Ind({op, time})
+                },
+                _ => {
+                    panic!("Indirect register not implemented, please purchase Deluxe edition of this assembler.");
+                }
+            }
+            let word = read_hex_word(str);
+        },
+        _ => {
+            let op, str = read_register(str);
+            let time = read_time(str);
+            Reg({op, time})
+        }
+    }
+}
+
+fn read_operands(str1: &str, str2: &str) -> Operands {
+    let src = read_operand(str1);
+    let dst = read_operand(str2);
     Operands{src, dst}
 }
 
-fn read_hex_word(word: &str) -> Cont<UWord> {
+fn read_address(str: &str) -> Address {
     todo!()
 }
 
-// Aqui pus ele a aceitar uma slice do resto da linha?
-fn try_read_time(line: &str) -> Cont<IWord> {
+fn read_offset(str: &str) -> Address {
     todo!()
 }
