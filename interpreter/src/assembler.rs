@@ -1,6 +1,6 @@
 use crate::prelude::*;
 use std::str::Lines;
-use crate::instruction::{Instruction, Operand, Operands, Register};
+use crate::instruction::{Instruction, Operand, Operands, Register, Timed};
 
 
 
@@ -54,7 +54,7 @@ fn read_instruction(literal: &str) -> Instruction {
 type Cont<'a, T> = (T, &'a str);
 
 fn read_char(str: &str) -> Cont<char> {
-    (str[0], &str[1..])
+    (str.chars().nth(0).unwrap(), &str[1..])
 }
 
 fn read_hex_word(word: &str) -> Cont<UWord> {
@@ -70,20 +70,28 @@ fn read_time(line: &str) -> Cont<IWord> {
 fn read_register(str: &str) -> Cont<Register> {
     match str.chars().nth(0).unwrap() {  // le mao
         'a' => (Register::A, &str[1..]),
-        'b' => { match str.chars().nth(1).unwrap() 
-            'h' => (Register::BH, &str[2..]),
-            'l' => (Register::BL, &str[2..]),
+        'b' => { 
+            match str.chars().nth(1).unwrap() {
+                'h' => (Register::BH, &str[2..]),
+                'l' => (Register::BL, &str[2..]),
+                _ => unreachable!(),
+            }
         },
-        'c' => { match str.chars().nth(1).unwrap()
-            'h' => (Register::CH, &str[2..]),
-            'l' => (Register::CL, &str[2..]),
+        'c' => { 
+            match str.chars().nth(1).unwrap() {    
+                'h' => (Register::CH, &str[2..]),
+                'l' => (Register::CL, &str[2..]),
+                _ => unreachable!(),
+            }
         },
         'x' => (Register::X, &str[1..]),
         's' => (Register::SP, &str[2..]),
+        _ => unreachable!(),
     }
 }
 
 fn read_operand(str: &str) -> Operand {
+    use Operand::*;
     let (c, str) = read_char(str);
     match c {
         '#' => {
@@ -94,14 +102,14 @@ fn read_operand(str: &str) -> Operand {
             let (low,  str) = read_hex_word(str);
             let (high, str) = read_hex_word(str);
             let op = Address{high, low};
-            match str.get(0..2) {
+            match str.get(0..2) {  // TODO tá-me a dar erro aqui e n sei pq
                 Some (",X") => {
                     let (time, str) = read_time(&str[2..]);
-                    Abx({op, time})
+                    Abx(Timed::<Address>{op, time})
                 },
                 None => {
                     let (time, str) = read_time(str);
-                    Abs({op, time})
+                    Abs(Timed::<Address>{op, time})
                 }
             }
         },
@@ -113,18 +121,17 @@ fn read_operand(str: &str) -> Operand {
                     let (high, str) = read_hex_word(str);
                     let op = Address{high, low};
                     let (time, str) = read_time(str);
-                    Ind({op, time})
+                    Ind(Timed::<Address>{op, time})
                 },
                 _ => {
                     panic!("Indirect register not implemented, please purchase Deluxe edition of this assembler.");
                 }
             }
-            let word = read_hex_word(str);
         },
         _ => {
             let (op, str) = read_register(str);
-            let time = read_time(str);
-            Reg({op, time})
+            let (time, str) = read_time(str);
+            Reg(Timed::<Register>{op, time})
         }
     }
 }
