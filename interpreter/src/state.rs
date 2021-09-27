@@ -100,6 +100,12 @@ impl std::ops::Index<Address> for Ram {
     }
 }
 
+impl std::ops::IndexMut<usize> for Ram {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.0[index]
+    }
+}
+
 impl std::ops::IndexMut<Address> for Ram {
     fn index_mut(&mut self, index: Address) -> &mut Self::Output {
         &mut self.0[index.value() as usize]

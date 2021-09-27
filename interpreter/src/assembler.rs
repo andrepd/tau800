@@ -4,8 +4,15 @@ use std::fs::File;
 use std::io::{self, prelude::*, BufReader};
 use crate::instruction::Instruction;
 
+struct InstructionIterator {
 
+}
 
+fn assemble(input: &mut BufReader<String>) -> InstructionIterator {
+    todo!()
+}
+
+/*
 // Quero que isto leia uma palavra da puta do iterator e o retorne, fds
 fn read_mnemonic<It: Iterator>(words: It) -> String 
     where <It as Iterator>::Item : &str
@@ -34,3 +41,4 @@ fn read_line(line: io::Result<String>) -> Instruction {
 fn assemble(input: &mut BufReader) -> Iterator<Instruction> {
     
 }
+ */

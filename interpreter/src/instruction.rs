@@ -221,14 +221,14 @@ impl Operands {
             Abx(_) => mode |= 0x4 << 3,
         };
         m.write_pc(UWord::from(mode));
-        match op.src {
+        match &op.src {
             Reg(x) => write_timed_register(m, &x),
             Imm(x) => write_word(m, &x),
             Abs(x) => write_timed_address(m, &x),
             Ind(x) => write_timed_address(m, &x),
             Abx(x) => write_timed_address(m, &x),
         };
-        match op.dst {
+        match &op.dst {
             Reg(x) => write_timed_register(m, &x),
             Imm(x) => write_word(m, &x),
             Abs(x) => write_timed_address(m, &x),
