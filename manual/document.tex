@@ -1,4 +1,4 @@
-\documentclass[a5paper,onecolumn,final,10pt]{memoir}
+\documentclass[a4paper,onecolumn,final,10pt]{memoir}
 
 % -------- %
 % Preamble %
@@ -8,6 +8,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[british]{babel}
 \usepackage{csquotes}
+\usepackage[a4paper]{geometry}
 
 \usepackage[whole]{bxcjkjatype}
 
@@ -55,8 +56,8 @@
 % ----- %
 
 % Margins
-\setlrmarginsandblock{1.5cm}{*}{*}
-\setulmarginsandblock{3cm}{*}{1.2}
+\setlrmarginsandblock{1.5in}{*}{*}
+\setulmarginsandblock{1.5in}{*}{*}
 \checkandfixthelayout
 
 % Chapter headers
@@ -92,7 +93,7 @@
 % -------- %
 
 \makeatletter
-\def\@machinename@short{{\textsf{TAU-800B} \textit{Super}}}
+\def\@machinename@short{{{\sffamily TAU-800B} {\itshape Super}}}
 \def\@machinename@long{{\textsf{Time Arithmetic Unit} (Revision 800B, \textit{Super} edition)}}
 \def\machinename{\@ifstar\@machinename@long\@machinename@short}
 \makeatother
@@ -139,12 +140,14 @@
 
 \begin{footnotesize}
 	\noindent
-  This is a quick-start guide to your \machinename*{} time-assisted computing machine.
+	This is a quick-start guide to your \machinename*{} time-assisted computing machine.
 	Please ensure you have thoroughly read and understood the User Manual and the Warranty Disclaimer before attempting to utilize the machine.
 	\companyname{} is not responsible for any damages resulting from improper use of the time jump facilities of this machine.
 	\vfill
 	\warningbox{%
-		\textbf{\textsf{Please ensure that the Novikov module has sufficient power throughout the operation of the machine. Failure to supply the minimum rated power may cause time inconsistency paradoxes.}} \\[2pt]
+		\textbf{\textsf{Please ensure that the Novikov module has sufficient power
+				throughout the operation of the machine. Failure to supply the minimum
+				rated power may cause time inconsistency paradoxes.}} \\[2pt]
 		In the unlikely case of forced inconsistency contact our hotline \\
 		\hfill\textsf{\textbf{1-800-NOTIME}}}
 \end{footnotesize}
@@ -167,19 +170,34 @@
 \vspace*{-20pt}\rule{\textwidth}{0.8pt}
 
 \noindent
-Congratulations of becoming the proud owner of a \machinename*{}, the latest technology in time-based computing. The following document serves as an introduction to the architecture and operation modes of this time-assisted arithmetic computing unit, as well as to any other extensions offered by \companyname{} compatible with the \machinename{} that were acquired as part of your commercial agreement.
+Congratulations of becoming the proud owner of a \machinename*{}, the latest technology
+in time-based computing. The following document serves as an introduction to the
+architecture and operation modes of this time-assisted arithmetic computing unit
+as well as to any other extensions offered by \companyname{} compatible with the
+\machinename{} that were acquired as part of your commercial agreement.
 
-For more information regarding available computing extension hardware compatible with your computing unit contact your local \companyname{} sales representative. Missing documentation of acquired computing extension hardware and advanced time operation modes of the computing unit can be obtained upon written request with proof of purchase to \companyname{} Hanshin Main Headquarters.
+For more information regarding available computing extension hardware compatible
+with your computing unit contact your local \companyname{} sales representative.
+Missing documentation of acquired computing extension hardware and advanced time
+operation modes of the computing unit can be obtained upon written request with
+proof of purchase to \companyname{} Hanshin Main Headquarters.
 
-Please note that this document \underline{does not} preclude the consultation of the complete reference manual, which should have been provided to you alongside this document and the computing unit. If the complete reference manual was not provided to you upon purchase, please contact your local sales representative.
+Please note that this document \underline{does not} preclude the consultation of
+the complete reference manual, which should have been provided to you alongside
+this document and the computing unit. If the complete reference manual was not provided
+to you upon purchase, please contact your local sales representative.
 
-\companyname{} is not liable for damages incurred in the misuse of the equipment to the extent of but not limited to the operation modes described in this document.
+\companyname{} is not liable for damages incurred in the misuse of the equipment
+to the extent of but not limited to the operation modes described in this document.
 
 \clearpage
 \section{Self-consistent Novikov-Turing Assisted Computing}
 
-The \machinename{} provides new computing advances by exploiting the well-known Novikov-Turing speedup, schematized in figure \ref{fig:timeline} for convenience.
-These modes of operation are seamlessly exposed via the assembly language (see section \ref{sec:assembly}). Please refer to the complete reference manual for examples of implementation of some of the known temporal computing speedups.
+The \machinename{} provides new computing advances by exploiting the well-known
+Novikov-Turing speedup, schematized in figure \ref{fig:timeline} for convenience.
+These modes of operation are seamlessly exposed via the assembly language (see section
+\ref{sec:assembly}). Please refer to the complete reference manual for examples
+of implementation of some of the known temporal computing speedups.
 
 \begin{figure}[bh]
 	\setlength{\fboxsep}{20pt}
@@ -188,18 +206,30 @@ These modes of operation are seamlessly exposed via the assembly language (see s
 			\includegraphics{assets/timeline.png}%
 		}%
 	}
-	\caption{The Turing-Novikov effect at play in the \protect\machinename{} modes of operation. The Novikov stability module (full reference manual, sec. 4, fig. 10, schematic 1\,a)), ensures self-consistency in the computing process.}
+	\caption{The Turing-Novikov effect at play in the \protect\machinename{} modes
+		of operation. The Novikov stability module (full reference manual, sec. 4,
+		fig. 10, schematic 1\,a)), ensures self-consistency in the computing process.}
 	\label{fig:timeline}
 \end{figure}
+
+The \machinename{} architecture was designed to reproduce as closely as possible
+(within technical limits) the theoretical model typically employed for causal-consistency
+calculations, so as to facilitate the transposition from theoretical programs with
+consistency speedups into operation. In figure \ref{fig:architecture}, a schematic
+of a high-level overview of the architecture is presented, where each component
+in the schematic broadly encompasses various physical elements of the machine.
+For a complete description of these physical elements, please refer to the Service
+and Schematics section of the complete reference manual.
 
 \begin{sidewaysfigure}
 	\setlength{\fboxsep}{20pt}
 	\centerline{%
 		\fbox{%
-		\includegraphics{assets/architecture.png}%
+			\includegraphics{assets/architecture.png}%
 		}
 	}
 	\caption{High-level overview of causal-consistent hardware architecture. }
+	\label{fig:architecture}
 \end{sidewaysfigure}
 
 \clearpage
@@ -207,7 +237,10 @@ These modes of operation are seamlessly exposed via the assembly language (see s
 \vspace*{-20pt}\rule{\textwidth}{0.8pt}
 
 \noindent
-The following is a quick-reference guide to \machinename{} assembly language. Please use ONLY the officially licensed assembler programs by \companyname{}.\footnote{If you have not been supplied with all 9 (nine) floppy diskettes for installation of the assembler, please contact your local sales representative.}
+The following is a quick-reference guide to \machinename{} assembly language. Please
+use ONLY the officially licensed assembler programs by \companyname{}.
+\footnote{If you have not been supplied with all 9 (nine) floppy diskettes for installation
+	of the assembler, please contact your local sales representative.}
 
 %The CPU word size is 8 bits.
 
@@ -223,37 +256,41 @@ Quick facts:
 \end{itemize}
 %
 \footnotetext{
-	Note: for jumps of over 80 clock cycles an upgraded SPS-3-6000 power supply with at least 6\,kW of peak power output must be purchased. \textbf{Serious damage may occur if you attempt to use these operations without sufficient power!}}
+	Note: for jumps of over 80 clock cycles an upgraded SPS-3-6000 power supply
+	with at least 6\,kW of peak power output must be provided.
+	\textbf{Serious damage may occur if you attempt to use these operations without sufficient power!}
+	Please refer to section \ref{sec:power} and the complete reference manual for
+	more information.}
 
 \subsection*{CPU registers}
 
-The CPU has a total of 10 (ten) words of register memory. 
-Of these, 5 (five) words are general-purpose registers 
-and 5 (five) are special-purpose registers. 
+The CPU has a total of 10 (ten) words of register memory.
+Of these, 5 (five) words are general-purpose registers
+and 5 (five) are special-purpose registers.
 
-The general purpose registers are the following: \ttt{A}, \ttt{BH}, \ttt{BL}, \ttt{CH}, \ttt{CL}. 
-The latter two pairs of registers can be used to store 2-word values, high word and low word respectively. 
-These registers are used readable and writable via move and arithmetic-logic instructions. 
+The general purpose registers are the following: \ttt{A}, \ttt{BH}, \ttt{BL}, \ttt{CH}, \ttt{CL}.
+The latter two pairs of registers can be used to store 2-word values, high word and low word respectively.
+These registers are used readable and writable via move and arithmetic-logic instructions.
 
 %Then, the CPU has one flag register \ttt{F}, where each bit has the following meaning (left to right: \ttt{SZ--NC})
 %\begin{itemize}
 %\item[A]
 %\end{itemize}
-Then, the CPU has one flag register \ttt{F}, 
+Then, the CPU has one flag register \ttt{F},
 %with the following bits: \verb|N--PZC|, respectively negative, parity, zero, and carry flags. 
 %with the following bits: \verb|N---ZC|, respectively negative, zero, and carry flags. 
-with the following bits: \verb|NV--ZC|, respectively negative, overflow, zero, and carry flags. 
-These are set and cleared by arithmetic and logical instructions, 
-and can be queried by the conditional branch instructions. 
-The flag register cannot be written to, but it can be read and copied to memory or another register. 
+with the following bits: \verb|NV--ZC|, respectively negative, overflow, zero, and carry flags.
+These are set and cleared by arithmetic and logical instructions,
+and can be queried by the conditional branch instructions.
+The flag register cannot be written to, but it can be read and copied to memory or another register.
 \todo{Se calhar é melhor não se copiar e pronto}
 
-The \ttt{X} register is an index register: it can be read and written to like a general purpose register, 
+The \ttt{X} register is an index register: it can be read and written to like a general purpose register,
 %and it can be added as an offset to a location in memory 
-and it can be used in the indexed addressing mode to access a location obtained by adding the contents of the register to a base address. 
+and it can be used in the indexed addressing mode to access a location obtained by adding the contents of the register to a base address.
 
-The CPU also has a stack pointer, that points to one-past the top of the stack. 
-It can be read or written to as a general purpose register, but it is also altered by the \ttt{CAL}, \ttt{RET}, \ttt{PSH}, \ttt{POP} instructions. 
+The CPU also has a stack pointer, that points to one-past the top of the stack.
+It can be read or written to as a general purpose register, but it is also altered by the \ttt{CAL}, \ttt{RET}, \ttt{PSH}, \ttt{POP} instructions.
 
 Finally, the two-word program counter stores the address of the next instruction, and can be modified by jump, branching and subroutine instructions
 
@@ -262,6 +299,7 @@ In order to perform 12-bit arithmetic, you must process the two words manually.\
 
 \footnotetext{Advanced mathematical subroutines are available for purchase, please contact your regional sales representative.}
 
+\filbreak % Prefer a break here
 \subsection*{Addressing modes}
 
 The following addressing modes are available:
@@ -278,37 +316,37 @@ The following addressing modes are available:
 
 % Estas tabelas com linhas em todo o lado são péssimas xD mas faz parte da aesthetic, que achas?
 \begin{center}
-\begin{tabular}{|l|l|l|}
-	\hline
-	\textbf{Mode} & \textbf{Notation} & \textbf{Description} \\ \hline
-	Register  & \ttt{\%a} & a named register \\ \hline
-	Immediate & \ttt{\#ff} & represents a literal one-word value \\ \hline
-	Immediate & \ttt{\#fff} & represents a literal two-word value \\ \hline
-	Absolute  & \ttt{\%llhh} & the memory address $\ttt{ll}+2^6×\ttt{hh}$ \\ \hline
-	Indexed   & \ttt{\%llhh,X} & the memory address $\ttt{ll}+2^6×\ttt{hh}+\textrm{contents of \ttt{X}}$ \\ \hline
-	Indirect  & \hspace{-0.2em}\ttt{(\%llhh)} & the address stored at memory address $\ttt{ll}+2^6×\ttt{hh}$  \\ \hline
-%	Indirect  & \hspace{-0.2em}\ttt{(\%b)}\,\ttt{(\%c)} & the address stored at memory address $\ttt{bh}$ (resp c)\\ \hline
-	Indirect  & \hspace{-0.2em}\ttt{(\%r)}\footnotemark & the address stored at memory address $\ttt{rl}+2^6×\ttt{rh}$ \\ \hline
-\end{tabular}
+	\begin{tabular}{|l|l|l|}
+		\hline
+		\textbf{Mode} & \textbf{Notation}                       & \textbf{Description}                                                    \\ \hline
+		Register      & \ttt{\%a}                               & a named register                                                        \\ \hline
+		Immediate     & \ttt{\#ff}                              & represents a literal one-word value                                     \\ \hline
+		Immediate     & \ttt{\#fff}                             & represents a literal two-word value                                     \\ \hline
+		Absolute      & \ttt{\%llhh}                            & the memory address $\ttt{ll}+2^6×\ttt{hh}$                              \\ \hline
+		Indexed       & \ttt{\%llhh,X}                          & the memory address $\ttt{ll}+2^6×\ttt{hh}+\textrm{contents of \ttt{X}}$ \\ \hline
+		Indirect      & \hspace{-0.2em}\ttt{(\%llhh)}           & the address stored at memory address $\ttt{ll}+2^6×\ttt{hh}$            \\ \hline
+		%	Indirect  & \hspace{-0.2em}\ttt{(\%b)}\,\ttt{(\%c)} & the address stored at memory address $\ttt{bh}$ (resp c)\\ \hline
+		Indirect      & \hspace{-0.2em}\ttt{(\%r)}\footnotemark & the address stored at memory address $\ttt{rl}+2^6×\ttt{rh}$            \\ \hline
+	\end{tabular}
 \end{center}
 
 \footnotetext{Where \ttt{r} is \ttt{b} or \ttt{c}.}
 
 \subsection*{List of instructions}
 
-The following is a quick-reference list of instructions. 
+The following is a quick-reference list of instructions.
 
 \newcommand\instruction[2]{%
 	\noindent
 	\begin{minipage}[t]{0.22\textwidth} \texttt{#1} \end{minipage}
 	\hspace{0.03\textwidth}
 	\begin{minipage}[t]{0.75\textwidth} #2 \end{minipage}
-%	\medskip
+	%	\medskip
 	\vspace*{-0.5\smallskipamount}
 }
 
 \noindent
-\textit{\small Note: unless otherwise noted, instructions that 「set the \ttt{Z} flag」 set it if the result is zero, and clear it otherwise, instructions that 「set the \ttt{N} flag」 set it to the value of the most significant bit of the result (i.e.\ set if negative, clear otherwise); and instructions that 「set the \ttt{V} flag」  set it to the value of the second most significant bit of the result (i.e.\ set if signed arithmetic overflows, clear otherwise).}. 
+\textit{\small Note: unless otherwise noted, instructions that 「set the \ttt{Z} flag」 set it if the result is zero, and clear it otherwise, instructions that 「set the \ttt{N} flag」 set it to the value of the most significant bit of the result (i.e.\ set if negative, clear otherwise); and instructions that 「set the \ttt{V} flag」  set it to the value of the second most significant bit of the result (i.e.\ set if signed arithmetic overflows, clear otherwise).}.
 \subsubsection*{Memory}
 
 \instruction{MOV src dst}{Set word at \texttt{dst} to contents of \texttt{src}. \\ Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.}
@@ -320,78 +358,78 @@ The following is a quick-reference list of instructions.
 \subsubsection*{Arithmetic}
 
 \instruction{ADD src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}+\texttt{dst}+\ttt{C}$. \\ 
-	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on overflow. 
+	Set word at \texttt{dst} to $\texttt{src}+\texttt{dst}+\ttt{C}$. \\
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on overflow.
 }
 
 \instruction{SUB src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}-\texttt{dst}-\overline{\ttt{C}}$. \\ 
-	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on underflow. 
+	Set word at \texttt{dst} to $\texttt{src}-\texttt{dst}-\overline{\ttt{C}}$. \\
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on underflow.
 }
 
 \instruction{MUL src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}×\texttt{dst}$, where operands are unsigned values. \\ 
+	Set word at \texttt{dst} to $\texttt{src}×\texttt{dst}$, where operands are unsigned values. \\
 	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on overflow.
 }
 
 \instruction{MUS src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}×\texttt{dst}$, where operands are signed values. \\ 
+	Set word at \texttt{dst} to $\texttt{src}×\texttt{dst}$, where operands are signed values. \\
 	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on overflow.
 }
 
 %\todo{Como fazer handle de divisoes por zero?}
 \instruction{DIV src dst}{%
 	Set word at \texttt{dst} to $\texttt{src}\div\texttt{dst}$, where operands are unsigned values. \\
-	Flags: set \ttt{Z}. 
+	Flags: set \ttt{Z}.
 }
 
 \instruction{DIS src dst}{%
 	Set word at \texttt{dst} to $\texttt{src}\div\texttt{dst}$, where operands are signed values. \\
-	Flags: set \ttt{Z}. 
+	Flags: set \ttt{Z}.
 }
 
 \renewcommand\mod%
-	{\mathrel{\mathrm{mod}}}
+{\mathrel{\mathrm{mod}}}
 
 \instruction{MOD src dst}{%
 	Set word at \texttt{dst} to $\texttt{src}\mod\texttt{dst}$, where operands are unsigned values. \\
-	Flags: set \ttt{Z}. 
+	Flags: set \ttt{Z}.
 }
 
 \instruction{MOS src dst}{%
 	Set word at \texttt{dst} to $\texttt{src}\mod\texttt{dst}$, where operands are signed values.\\
-	Flags: set \ttt{Z}.  
+	Flags: set \ttt{Z}.
 }
 
 
 \instruction{AND src dst}{%
 	Set word at \ttt{dst} to bitwise-and of \ttt{src} and \ttt{dst}. \\
-	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}. 
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.
 }
 
 \instruction{OR~ src dst}{%
 	Set word at \ttt{dst} to bitwise-or of \ttt{src} and \ttt{dst}. \\
-	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}. 
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.
 }
 
 \instruction{XOR src dst}{%
 	Set word at \ttt{dst} to bitwise-xor of \ttt{src} and \ttt{dst}. \\
-	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}. 
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.
 }
 
 \instruction{NOT dst}{%
 	Set word at \ttt{dst} to bitwise-not of \ttt{dst}. \\
-	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}. 
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.
 }
 
 \instruction{LSL dst}{%
-	Shift bits in \ttt{dst} to the left. \\ 
-	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on overflow.  
+	Shift bits in \ttt{dst} to the left. \\
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on overflow.
 }
 
 \instruction{LSR dst}{%
-	Shift bits in \ttt{dst} to the right. \\ 
-	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}. 
+	Shift bits in \ttt{dst} to the right. \\
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.
 }
 
 
@@ -441,6 +479,49 @@ The following is a quick-reference list of instructions.
 \instruction{NOP}{No-op.}
 
 \clearpage
-\section{Power Consumptions}
+\section{Power Consumptions} \label{sec:power}
+
+Fundamental energetic lower bounds are imposed by the Novikov-Carnot-Landauer principle.
+Therefore, despite the high efficiency and stability of \companyname{} components,
+the \machinename{}'s power consumption is variable with temperature and operation
+mode. In figure \ref{fig:power}, we provide for convenience empirical {Power Consumption/Temperature}
+curves, obtained in standard conditions. However, \emph{for optimal performance, we recommend
+that you characterize your \protect\machinename{} unit, and adjust your power supply to
+provide power accordingly}.
+
+\begin{figure}[hbp]
+	\centerline{%
+		\pdfimageresolution=200
+		\includegraphics{assets/power.png}%
+	}
+	\caption{Experimental power consumptions for varying temperature per operating
+		mode of the \protect\machinename{} (Primary Power Supply). Data obtained
+		in standard conditions and interpolated to normal distribution.}
+	\label{fig:power}
+\end{figure}
+
+The Novikov module must be powered separately, typically with a buffer SPS-3-5000
+or SPS-3-6000 module between mains and the module. \textbf{To avoid catastrophic
+failure, the secondary power supply \emph{must} be able to provide constant minimum
+ratings throughout operation}. The SPS-3-* modules provide brown-out detection,
+and are therefore highly recommended. The exact required ratings can be found in
+the service manual provided separately with the Novikov components. If this manual
+was not provided to you, \underline{\textbf{do not}} operate the machine and contact your sales
+representative. \emph{Typical} ratings are provided, for convenience, in figure
+\ref{fig:novikov-power}.
+
+\begin{sidewaysfigure}[hb]
+	\centerline{%
+		\pdfimageresolution=200
+		\includegraphics{assets/novikov-power.png}%
+	}
+	\caption{\emph{Typical} power ratings (Secondary Power Supply) for varying temporal
+		offsets in the Novikov module. \textbf{These values are for comparison
+		\emph{only}}. You \underline{must} characterize and ensure correct
+		ratings for your Novikov module. The installation technician should have
+		characterized and provided the ratings for your machine in the complete
+		reference manual.}
+	\label{fig:novikov-power}
+\end{sidewaysfigure}
 
 \end{document}
