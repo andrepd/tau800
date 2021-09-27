@@ -1,5 +1,6 @@
 use crate::instruction::{Instruction, Operand, Operands, Register};
 use crate::prelude::*;
+use std::io::Read;
 use std::iter::Peekable;
 use std::str::{Chars, Lines};
 
@@ -47,6 +48,7 @@ fn read_instruction(literal: &str) -> Instruction {
 
 enum ReadError {
     NoMoreChars,
+    UnexpectedChar,
 }
 
 type ReadResult<T> = Result<T, ReadError>;
@@ -99,7 +101,30 @@ fn read_register<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<Register> {
 }
 
 fn read_hex_word<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<UWord> {
-    todo!()
+    let mut read_hex_char = || {
+        let next = chars.peek();
+        if next.is_none() {
+            return Err(ReadError::NoMoreChars);
+        }
+        let next = next.unwrap();
+        if next.is_digit(16) {
+            Ok(Some(chars.next().unwrap()))
+        } else {
+            Ok(None)
+        }
+    };
+
+    // (Sorry; all I'm doing here is converting a None to an Err,
+    //  and a Some to an Ok, and then unwrapping)
+    let high = read_hex_char()?.map_or(Err(ReadError::UnexpectedChar), |c| Ok(c))?;
+    let low = read_hex_char()?.map_or(Err(ReadError::UnexpectedChar), |c| Ok(c))?;
+
+    let high = (high.to_digit(16).unwrap() as u8) << 4;
+    let low = low.to_digit(16).unwrap() as u8;
+
+    let value = high + low;
+
+    Ok(UWord::from(value))
 }
 
 /*// As cenas que fazem parse de um T retornam um par (T, resto da string)
