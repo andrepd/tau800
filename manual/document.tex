@@ -324,7 +324,7 @@ The following addressing modes are available:
 		\textbf{Mode} & \textbf{Notation}                       & \textbf{Description}                                                    \\ \hline
 		Register      & \ttt{a}                               & a named register                                                        \\ \hline
 		Immediate     & \ttt{\#ff}                              & represents a literal one-word value                                     \\ \hline
-		Immediate     & \ttt{\#fff}                             & represents a literal two-word value                                     \\ \hline
+%		Immediate     & \ttt{\#fff}                             & represents a literal two-word value                                     \\ \hline
 		Absolute      & \ttt{\%llhh}                            & the memory address $\ttt{ll}+2^6×\ttt{hh}$                              \\ \hline
 		Indexed       & \ttt{\%llhh,X}                          & the memory address $\ttt{ll}+2^6×\ttt{hh}+\textrm{contents of \ttt{X}}$ \\ \hline
 		Indirect      & \hspace{-0.2em}\ttt{(\%llhh)}           & the address stored at memory address $\ttt{ll}+2^6×\ttt{hh}$            \\ \hline
@@ -335,9 +335,21 @@ The following addressing modes are available:
 
 \footnotetext{Where \ttt{r} is \ttt{b} or \ttt{c}.}
 
+\noindent
+Furthermore, the jump, call, and branch instructions require the following operands:
+
+\begin{center}
+	\begin{tabular}{|l|l|l|}
+		\hline
+		\textbf{Mode} & \textbf{Notation} & \textbf{Description}                             \\ \hline
+		Address       & \ttt{llhh}        & Absolute address                                 \\ \hline
+		Offset        & \ttt{ff}          & Signed offset written as a two's complement word \\ \hline
+	\end{tabular}
+\end{center}
+
 \subsubsection*{Temporal addressing}
 
-Any addressing mode detailed in the previous table may be suffixed with \ttt{@+dd} or \ttt{@-dd} for a temporal addressing of \ttt{dd}\footnote{A decimal number.} clock cycles into the future or into the past, respectively. 
+Any addressing mode detailed in the first table may be suffixed with \ttt{@+dd} or \ttt{@-dd} for a temporal addressing of \ttt{dd}\footnote{A decimal number.} clock cycles into the future or into the past, respectively. 
 The assembler will automatically compute the correct surge voltage to produce the desired time jump. 
 
 \smallskip
@@ -483,7 +495,7 @@ The following is a quick-reference list of instructions.
 
 \subsubsection*{Subroutines}
 
-\instruction{CAL dst}{Store current \texttt{pc} in stack, increment \texttt{sp}, and jump to \texttt{dst}.}
+\instruction{CAL addr}{Store current \texttt{pc} in stack, increment \texttt{sp}, and jump to \texttt{addr}.}
 
 \instruction{RET~~~~}{Read \texttt{pc} from stack, decrement \texttt{sp}, and jump.}
 
