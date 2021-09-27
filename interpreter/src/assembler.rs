@@ -1,5 +1,7 @@
-use std::str::Lines;
 use crate::instruction::{Instruction, Operand, Operands, Register};
+use crate::prelude::*;
+use std::iter::Peekable;
+use std::str::{Chars, Lines};
 
 struct InstructionIterator<'i> {
     lines: Lines<'i>,
@@ -43,9 +45,64 @@ fn read_instruction(literal: &str) -> Instruction {
     }
 }
 
-//
+enum ReadError {
+    NoMoreChars,
+}
 
-// As cenas que fazem parse de um T retornam um par (T, resto da string)
+type ReadResult<T> = Result<T, ReadError>;
+
+fn read_char<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<char> {
+    let next_char = chars.next();
+    if next_char.is_none() {
+        Err(ReadError::NoMoreChars)
+    } else {
+        Ok(next_char.unwrap())
+    }
+}
+
+fn match_str<'s>(to_match: &str, chars: &mut Peekable<Chars<'s>>) -> ReadResult<bool> {
+    for char in to_match.chars() {
+        let peek = chars.peek();
+        if peek.is_none() {
+            return Err(ReadError::NoMoreChars);
+        }
+        if *peek.unwrap() == char {
+            chars.next();
+        } else {
+            return Ok(false);
+        }
+    }
+    Ok(true)
+}
+
+fn read_register<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<Register> {
+    let register = match read_char(chars)? {
+        'a' => Register::A,
+        'b' => match read_char(chars)? {
+            'h' => Register::BH,
+            'l' => Register::BL,
+            _ => unreachable!(),
+        },
+        'c' => match read_char(chars)? {
+            'h' => Register::CH,
+            'l' => Register::CL,
+            _ => unreachable!(),
+        },
+        'x' => Register::X,
+        's' => {
+            debug_assert!(read_char(chars)? == 'p');
+            Register::SP
+        }
+        _ => unreachable!(),
+    };
+    Ok(register)
+}
+
+fn read_hex_word<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<UWord> {
+    todo!()
+}
+
+/*// As cenas que fazem parse de um T retornam um par (T, resto da string)
 type Cont<T> = (T, &str)
 
 fn read_char(str: &str) -> Cont<char> {
@@ -65,7 +122,7 @@ fn read_time(line: &str) -> Cont<IWord> {
 fn read_register(str: &str) -> Cont<Register> {
     match str[0] {
         'a' => Register::A, &str[1..]
-        'b' => { match str[1] 
+        'b' => { match str[1]
             'h' => Register::BH, &str[2..]
             'l' => Register::BL, &str[2..]
         },
@@ -137,3 +194,4 @@ fn read_address(str: &str) -> Address {
 fn read_offset(str: &str) -> Address {
     todo!()
 }
+*/
