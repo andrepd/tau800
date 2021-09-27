@@ -321,7 +321,7 @@ The following addressing modes are available:
 \begin{center}
 	\begin{tabular}{|l|l|l|}
 		\hline
-		\textbf{Mode} & \textbf{Notation}                       & \textbf{Description}                                                    \\ \hline
+		\textbf{Mode} & \textbf{Notation}                     & \textbf{Description}                                                    \\ \hline
 		Register      & \ttt{a}                               & a named register                                                        \\ \hline
 		Immediate     & \ttt{\#ff}                              & represents a literal one-word value                                     \\ \hline
 %		Immediate     & \ttt{\#fff}                             & represents a literal two-word value                                     \\ \hline
@@ -352,10 +352,12 @@ Furthermore, the jump, call, and branch instructions require the following opera
 Any addressing mode detailed in the first table may be suffixed with \ttt{@+dd} or \ttt{@-dd} for a temporal addressing of \ttt{dd}\footnote{A decimal number.} clock cycles into the future or into the past, respectively. 
 The assembler will automatically compute the correct surge voltage to produce the desired time jump. 
 
-\smallskip
-\warningbox{\textbf{DO NOT} attempt to over-clock or otherwise alter the clock frequency your TAU computing unit by tampering with the clock generator. Damaging the warranty breakaway sticker on your TAU computing unit will immediately VOID YOUR WARRANTY. \companyname{} is not held responsible for any accidents occurring during use of an improperly over-clocked machine.}
-
-
+\vspace{1em}
+\warningbox{\textbf{DO NOT} attempt to alter the operating clock frequency of the TAU computing
+	unit by tampering with the clock generator in the causal-consistency bus. Damaging the
+	warranty breakaway sticker on your TAU computing unit will \underline{immediately void your warranty}.
+	\companyname{} cannot be held responsible for accidents resulting from operating
+	the TAU computing unit at non-standard clocking speeds.}
 
 \subsection*{List of instructions}
 
@@ -511,8 +513,8 @@ Therefore, despite the high efficiency and stability of \companyname{} component
 the \machinename{}'s power consumption is variable with temperature and operation
 mode. In figure \ref{fig:power}, we provide for convenience empirical {Power Consumption/Temperature}
 curves, obtained in standard conditions. However, \emph{for optimal performance, we recommend
-that you characterize your \protect\machinename{} unit, and adjust your power supply to
-provide power accordingly}.
+	that you characterize your \protect\machinename{} unit, and adjust your power supply to
+	provide power accordingly}.
 
 \begin{figure}[hbp]
 	\centerline{%
@@ -527,8 +529,8 @@ provide power accordingly}.
 
 The Novikov module must be powered separately, typically with a buffer SPS-3-5000
 or SPS-3-6000 module between mains and the module. \textbf{To avoid catastrophic
-failure, the secondary power supply \emph{must} be able to provide constant minimum
-ratings throughout operation}. The SPS-3-* modules provide brown-out detection,
+	failure, the secondary power supply \emph{must} be able to provide constant minimum
+	ratings throughout operation}. The SPS-3-* modules provide brown-out detection,
 and are therefore highly recommended. The exact required ratings can be found in
 the service manual provided separately with the Novikov components. If this manual
 was not provided to you, \underline{\textbf{do not}} operate the machine and contact your sales
@@ -542,7 +544,7 @@ representative. \emph{Typical} ratings are provided, for convenience, in figure
 	}
 	\caption{\emph{Typical} power ratings (Secondary Power Supply) for varying temporal
 		offsets in the Novikov module. \textbf{These values are for comparison
-		\emph{only}}. You \underline{must} characterize and ensure correct
+			\emph{only}}. You \underline{must} characterize and ensure correct
 		ratings for your Novikov module. The installation technician should have
 		characterized and provided the ratings for your machine in the complete
 		reference manual.}
@@ -553,9 +555,9 @@ representative. \emph{Typical} ratings are provided, for convenience, in figure
 \thispagestyle{empty}
 \null\vfill
 {\bfseries
-\null\hfill\companyname{}\hfill\null
+	\null\hfill\companyname{}\hfill\null
 
-\null\hfill\companyname*{}\hfill\null}
+	\null\hfill\companyname*{}\hfill\null}
 \vfill\null
 
 \centerline{\ttfamily Do not distribute. \copyright*{} 1973}
