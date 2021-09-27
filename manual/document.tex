@@ -335,6 +335,16 @@ The following addressing modes are available:
 
 \footnotetext{Where \ttt{r} is \ttt{b} or \ttt{c}.}
 
+\subsubsection*{Temporal addressing}
+
+Any addressing mode detailed in the previous table may be suffixed with \ttt{@+dd} or \ttt{@-dd} for a temporal addressing of \ttt{dd}\footnote{A decimal number.} clock cycles into the future or into the past, respectively. 
+The assembler will automatically compute the correct surge voltage to produce the desired time jump. 
+
+\smallskip
+\warningbox{\textbf{DO NOT} attempt to over-clock or otherwise alter the clock frequency your TAU computing unit by tampering with the clock generator. Damaging the warranty breakaway sticker on your TAU computing unit will immediately VOID YOUR WARRANTY. \companyname{} is not held responsible for any accidents occurring during use of an improperly over-clocked machine.}
+
+
+
 \subsection*{List of instructions}
 
 The following is a quick-reference list of instructions.
