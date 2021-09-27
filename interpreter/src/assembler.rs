@@ -45,75 +45,87 @@ fn read_instruction(literal: &str) -> Instruction {
 
 //
 
-fn read_operand(word: &str) -> Operand {
-    match word[0] {
+// As cenas que fazem parse de um T retornam um par (T, resto da string)
+type Cont<T> = (T, &str)
+
+fn read_char(str: &str) -> Cont<char> {
+    str[0], &str[1..]
+}
+
+fn read_operand(str: &str) -> Operand {
+    let c, str = read_char(str);
+    match c {
         '#' => {
-            let word = read_hex_word(&word[1..3]);
+            let word, str = read_hex_word(str);
             Imm(word)
         },
         '%' => {
-            let low = read_hex_word(&word[1..3]);
-            let high = read_hex_word(&word[3..5]);
+            let low,  str = read_hex_word(str);
+            let high, str = read_hex_word(str);
             let op = Address{high, low};
-            match word.get(5..7) {
+            match str.get(0..2) {
                 Some (",X") => {
-                    let time = try_read_time(word[7..]);
+                    let time, str = try_read_time(&str[2..]);
                     Abx({op, time})
                 },
                 None => {
-                    let time = try_read_time(word[5..]);
+                    let time, str = try_read_time(str);
                     Abs({op, time})
                 }
             }
         },
         '(' => {
-            match word[1] {
+            let c, str = read_char(str);
+            match c {
                 '%' => {
-                    let low = read_hex_word(&word[2..4]);
-                    let high = read_hex_word(&word[4..6]);
-                    let time = try_read_time(word[7..]);
+                    let low,  str = read_hex_word(str);
+                    let high, str = read_hex_word(str);
+                    let op = Address{high, low};
+                    let time, str = try_read_time(str);
                     Ind({op, time})
                 },
                 _ => {
                     panic!("Indirect register not implemented, please purchase Deluxe edition of this assembler.");
                 }
             }
-            let word = read_hex_word(&word[1..3]);
+            let word = read_hex_word(str);
         },
         _ => {
-            let op = read_register(word[0]);
-            let time = try_read_time(word[1..]);
+            let op, str = read_register(str);
+            let time = try_read_time(str);
             Reg({op, time})
         }
     }
 }
 
 // Epá nem sei como indexar um char, por causa do unicode e tudo mais
-fn read_register(word: &str) -> Register {
-    match word[0] {
-        'a' => Register::A,
-        'b' => { match word[1] 
-            'h' => Register::BH,
-            'l' => Register::BL,
+fn read_register(str: &str) -> Cont<Register> {
+    match str[0] {
+        'a' => Register::A, &str[1..]
+        'b' => { match str[1] 
+            'h' => Register::BH, &str[2..]
+            'l' => Register::BL, &str[2..]
         },
-        'c' => { match word[1]
-            'h' => Register::CH,
-            'l' => Register::CL,
+        'c' => { match str[1]
+            'h' => Register::CH, &str[2..]
+            'l' => Register::CL, &str[2..]
         },
-        'x' => Register::X,
-        's' => Register::SP,
+        'x' => Register::X, &str[1..]
+        's' => Register::SP, &str[2..]
     }
 }
 
 fn read_operands(word1: &str, word2: &str) -> Operands {
-    todo!()
+    let src = read_operand(word1);
+    let dst = read_operand(word2);
+    Operands{src, dst}
 }
 
-fn read_hex_word(word: &str) -> UWord {
+fn read_hex_word(word: &str) -> Cont<UWord> {
     todo!()
 }
 
 // Aqui pus ele a aceitar uma slice do resto da linha?
-fn try_read_time(line: &str) -> IWord {
+fn try_read_time(line: &str) -> Cont<IWord> {
     todo!()
 }
