@@ -322,18 +322,28 @@ The following addressing modes are available:
 	\begin{tabular}{|l|l|l|}
 		\hline
 		\textbf{Mode} & \textbf{Notation}                       & \textbf{Description}                                                    \\ \hline
-		Register      & \ttt{\%a}                               & a named register                                                        \\ \hline
+		Register      & \ttt{a}                               & a named register                                                        \\ \hline
 		Immediate     & \ttt{\#ff}                              & represents a literal one-word value                                     \\ \hline
 		Immediate     & \ttt{\#fff}                             & represents a literal two-word value                                     \\ \hline
 		Absolute      & \ttt{\%llhh}                            & the memory address $\ttt{ll}+2^6×\ttt{hh}$                              \\ \hline
 		Indexed       & \ttt{\%llhh,X}                          & the memory address $\ttt{ll}+2^6×\ttt{hh}+\textrm{contents of \ttt{X}}$ \\ \hline
 		Indirect      & \hspace{-0.2em}\ttt{(\%llhh)}           & the address stored at memory address $\ttt{ll}+2^6×\ttt{hh}$            \\ \hline
 		%	Indirect  & \hspace{-0.2em}\ttt{(\%b)}\,\ttt{(\%c)} & the address stored at memory address $\ttt{bh}$ (resp c)\\ \hline
-		Indirect      & \hspace{-0.2em}\ttt{(\%r)}\footnotemark & the address stored at memory address $\ttt{rl}+2^6×\ttt{rh}$            \\ \hline
+		Indirect      & \hspace{-0.2em}\ttt{(r)}\footnotemark & the address stored at memory address $\ttt{rl}+2^6×\ttt{rh}$            \\ \hline
 	\end{tabular}
 \end{center}
 
 \footnotetext{Where \ttt{r} is \ttt{b} or \ttt{c}.}
+
+\subsubsection*{Temporal addressing}
+
+Any addressing mode detailed in the previous table may be suffixed with \ttt{@+dd} or \ttt{@-dd} for a temporal addressing of \ttt{dd}\footnote{A decimal number.} clock cycles into the future or into the past, respectively. 
+The assembler will automatically compute the correct surge voltage to produce the desired time jump. 
+
+\smallskip
+\warningbox{\textbf{DO NOT} attempt to over-clock or otherwise alter the clock frequency your TAU computing unit by tampering with the clock generator. Damaging the warranty breakaway sticker on your TAU computing unit will immediately VOID YOUR WARRANTY. \companyname{} is not held responsible for any accidents occurring during use of an improperly over-clocked machine.}
+
+
 
 \subsection*{List of instructions}
 
