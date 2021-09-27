@@ -16,14 +16,14 @@ impl Machine {
     /// Read the next value in ram, as indicated by the Program Counter (PC) in
     /// CPU, and increment the PC.
     pub fn read_pc(&mut self) -> UWord {
-        let word = self.ram[self.cpu.pc.value() as usize];
+        let word = self.ram[self.cpu.pc];
         self.cpu.pc.try_increment().expect("Overflowed program counter.");
         word
     }
 
     /// Write a word at PC and increment the PC.
     pub fn write_pc(&mut self, word: UWord) -> () {
-        self.ram[self.cpu.pc.value() as usize] = word;
+        self.ram[self.cpu.pc] = word;
         self.cpu.pc.try_increment().expect("Overflowed program counter.");
         ()
     }
