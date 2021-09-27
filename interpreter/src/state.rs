@@ -47,7 +47,7 @@ impl FlagWord {
     }
 }
 
-pub type Address = LongUWord;
+pub type Address = ULongWord;
 
 pub struct Cpu {
     pub a: UWord,
@@ -63,6 +63,7 @@ pub struct Cpu {
 
 impl Default for Cpu {
     fn default() -> Self {
+        let pc = Address{ high: UWord::from(0x00), low: UWord::from(0x80) };
         Self {
             a: Default::default(),
             flags: Default::default(),
@@ -72,7 +73,7 @@ impl Default for Cpu {
             cl: Default::default(),
             x: Default::default(),
             sp: Default::default(),
-            pc: Default::default(),
+            pc: pc,
         }
     }
 }
