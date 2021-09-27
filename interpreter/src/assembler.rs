@@ -1,44 +1,44 @@
-use crate::prelude::*;
-
-use std::fs::File;
-use std::io::{self, prelude::*, BufReader};
+use std::str::Lines;
 use crate::instruction::Instruction;
 
-struct InstructionIterator {
-
+struct InstructionIterator<'i> {
+    lines: Lines<'i>,
 }
 
-fn assemble(input: &mut BufReader<String>) -> InstructionIterator {
-    todo!()
-}
+impl<'i> Iterator for InstructionIterator<'i> {
+    type Item = Instruction;
 
-/*
-// Quero que isto leia uma palavra da puta do iterator e o retorne, fds
-fn read_mnemonic<It: Iterator>(words: It) -> String 
-    where <It as Iterator>::Item : &str
-{
-    words.next().unwrap()/*.to_lowercase();*/
-}
-
-fn read_operand()(words: It) -> 
-
-fn read_line(line: io::Result<String>) -> Instruction {
-    let line: String = line.unwrap();
-    let line = 
-        match line.split_once(";") {
-            Some ((prefix, suffix)) => String::from(prefix),
-            None => line,
-        };
-    let words = line.split_whitespace();
-
-    match read_mnemonic(words) with {
-        "mov" => {
-            let operands = read_operands(words);
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut line = "";
+        while line.is_empty() {
+            let iter_line = self.lines.next();
+            if iter_line.is_none() {
+                return None;
+            }
+            line = iter_line.unwrap();
+            line = match line.split_once(";") {
+                Some((prefix, _suffix)) => prefix,
+                None => line,
+            };
+            line = line.trim();
         }
+        Some(read_instruction(line))
     }
 }
 
-fn assemble(input: &mut BufReader) -> Iterator<Instruction> {
-    
+fn assemble<'i>(input: &'i str) -> InstructionIterator<'i> {
+    InstructionIterator {
+        lines: input.lines(),
+    }
 }
- */
+
+fn read_instruction(literal: &str) -> Instruction {
+    let mut words = literal.split_whitespace();
+    let mnemonic = words
+        .next()
+        .expect("No mnemonic, even though line is not empty.");
+
+    match mnemonic {
+        _ => unimplemented!(),
+    }
+}
