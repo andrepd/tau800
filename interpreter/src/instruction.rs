@@ -253,6 +253,25 @@ impl Operands {
     }
 }
 
+fn address_decode(m: &mut Machine) -> Address {
+    let low = m.read_pc();
+    let high = m.read_pc();
+    Address { low, high }
+}
+
+fn offset_decode(m: &mut Machine) -> Offset {
+    m.read_pc().cast_to_signed()
+}
+
+fn address_encode(m: &mut Machine, x: &Address) {
+    m.write_pc(x.low);
+    m.write_pc(x.high);
+}
+
+fn offset_encode(m: &mut Machine, x: &Offset) {
+    m.write_pc(x.cast_to_unsigned())
+}
+
 impl Instruction {
     pub fn decode(m: &mut Machine) -> Self {
         use Instruction::*;
@@ -263,7 +282,7 @@ impl Instruction {
                 0x00 => Nop,
                 0x01 => Clc,
                 0x02 => Sec,
-                0xff => Ret,
+                0x3f => Ret,
                 _ => unreachable!(),
             },
             0x01 => Mov(Operands::decode(m, mode)),
@@ -284,14 +303,14 @@ impl Instruction {
             0x11 => Lsr(Operand::decode(m, mode)),
             0x12 => Cmp(Operand::decode(m, mode)),
             0x13 => Bit(Operand::decode(m, mode)),
-            0x14 => Jmp(unimplemented!()),
-            0x15 => Bcc(unimplemented!()),
-            0x16 => Bcs(unimplemented!()),
-            0x17 => Bne(unimplemented!()),
-            0x18 => Beq(unimplemented!()),
-            0x19 => Bpl(unimplemented!()),
-            0x1a => Bmi(unimplemented!()),
-            0x1d => Cal(unimplemented!()),
+            0x14 => Jmp(address_decode(m)),
+            0x15 => Bcc(offset_decode(m)),
+            0x16 => Bcs(offset_decode(m)),
+            0x17 => Bne(offset_decode(m)),
+            0x18 => Beq(offset_decode(m)),
+            0x19 => Bpl(offset_decode(m)),
+            0x1a => Bmi(offset_decode(m)),
+            0x1d => Cal(address_decode(m)),
             _ => unreachable!(),
         }
     }
@@ -313,7 +332,7 @@ impl Instruction {
             }
             Ret => {
                 m.write_pc(UWord::from(0x00));
-                m.write_pc(UWord::from(0xff));
+                m.write_pc(UWord::from(0x3f));
             }
             Mov(ops) => {
                 m.write_pc(UWord::from(0x01));
@@ -387,37 +406,37 @@ impl Instruction {
                 m.write_pc(UWord::from(0x13));
                 Operand::encode(m, op);
             }
-            Jmp(_) => {
+            Jmp(x) => {
                 m.write_pc(UWord::from(0x14));
-                unimplemented!();
+                address_encode(m, x);
             }
-            Bcc(_) => {
+            Bcc(x) => {
                 m.write_pc(UWord::from(0x15));
-                unimplemented!();
+                offset_encode(m, x);
             }
-            Bcs(_) => {
+            Bcs(x) => {
                 m.write_pc(UWord::from(0x16));
-                unimplemented!();
+                offset_encode(m, x);
             }
-            Bne(_) => {
+            Bne(x) => {
                 m.write_pc(UWord::from(0x17));
-                unimplemented!();
+                offset_encode(m, x);
             }
-            Beq(_) => {
+            Beq(x) => {
                 m.write_pc(UWord::from(0x18));
-                unimplemented!();
+                offset_encode(m, x);
             }
-            Bpl(_) => {
+            Bpl(x) => {
                 m.write_pc(UWord::from(0x19));
-                unimplemented!();
+                offset_encode(m, x);
             }
-            Bmi(_) => {
+            Bmi(x) => {
                 m.write_pc(UWord::from(0x1a));
-                unimplemented!();
+                offset_encode(m, x);
             }
-            Cal(_) => {
+            Cal(x) => {
                 m.write_pc(UWord::from(0x1d));
-                unimplemented!();
+                address_encode(m, x);
             }
         }
     }

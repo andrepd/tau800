@@ -24,15 +24,15 @@ mov %000a,x cl
 mov %000a,x ch
 mul %000b,x cl   ; Lower bits of %000a × %000b
 muh %000b,x ch   ; Upper bits of %000a × %000b
-clc              ; Clear carry flag
+;clc              ; Clear carry flag
 add cl bl        ; Add lower bits
 add ch bh        ; Add upper bits + carry, so no need to jsr carry
-sub #01 x         ; sub sets NVZ flags
-bne -34          ; So we can branch immediately
+sub #01 x        ; sub sets NVZ flags
+bne -32          ; So we can branch immediately
 
-;move to display (assumi que são os dois words a começar em 0x40?)
-mov bl %0040
-mov bh %0140
+;move to display (assumi que são os dois words a começar em 0x30?)
+mov bl %0030
+mov bh %0130
 nop
 clc
 bcc -4
