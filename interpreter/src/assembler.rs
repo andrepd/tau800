@@ -185,27 +185,20 @@ impl<'k, 's> SlidingWindow<'k, 's> {
     }
 
     fn take_while<F: Fn(&char) -> bool>(&mut self, pred: F) -> &mut Self {
-        let mut next = Some(' '); // doesn't matter the char here
-        while next.is_some() && self.peek().is_some() && pred(self.peek().unwrap()) {
-            next = self.next()
+        while self.peek().is_some() && pred(self.peek().unwrap()) {
+            self.next();
         }
         self
     }
 }
 
 trait OptionalRead<T> {
-    fn optional(self) -> ReadResult<Option<T>>;
+    fn optional(self) -> Option<T>;
 }
 
 impl<T> OptionalRead<T> for ReadResult<T> {
-    fn optional(self) -> ReadResult<Option<T>> {
-        match self {
-            Ok(x) => Ok(Some(x)),
-            Err(err) => match err {
-                ReadError::NoMoreChars => Err(err),
-                ReadError::UnexpectedChar(_) => Ok(None),
-            },
-        }
+    fn optional(self) -> Option<T> {
+        self.map_or(None, |x| Some(x))
     }
 }
 
@@ -306,7 +299,7 @@ fn read_decimal(chars: &mut SlidingWindow) -> ReadResult<UWord> {
 }
 
 fn read_time(chars: &mut SlidingWindow) -> ReadResult<IWord> {
-    match match_char('@', chars).optional()? {
+    match match_char('@', chars).optional() {
         None => Ok(IWord::zero()),
         Some(_) => {
             let negative = match_char('-', chars).map(|_| true)?;
@@ -314,7 +307,7 @@ fn read_time(chars: &mut SlidingWindow) -> ReadResult<IWord> {
             Ok(IWord::from(if negative {
                 -absolute_value
             } else {
-                match_char('+', chars).optional()?;
+                match_char('+', chars).optional();
                 absolute_value
             }))
         }
@@ -322,12 +315,15 @@ fn read_time(chars: &mut SlidingWindow) -> ReadResult<IWord> {
 }
 
 fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
-    let operand = match read_char(chars)? {
+    let next = chars.peek().map_or(Err(ReadError::NoMoreChars), |x| Ok(x));
+    let operand = match next? {
         '#' => {
+            match_char('#', chars)?;
             let word = read_hex_word(chars)?;
             Operand::Imm(word)
         }
         '%' => {
+            match_char('%', chars)?;
             let low = read_hex_word(chars)?;
             let high = read_hex_word(chars)?;
             let op = Address::from_words(high, low);
@@ -345,6 +341,7 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
             }
         }
         '(' => {
+            match_char('(', chars)?;
             let operand = match read_char(chars)? {
                 '%' => {
                     let low = read_hex_word(chars)?;
@@ -363,13 +360,18 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
             match_char(')', chars)?;
             operand
         }
-        _ => return Err(ReadError::UnexpectedChar(chars.pos())),
+        _ => {
+            let register = read_register(chars)?;
+            let time = read_time(chars)?;
+            Operand::Reg(Timed::new(register, time))
+        }
     };
     Ok(operand)
 }
 
 fn read_operands(chars: &mut SlidingWindow) -> ReadResult<Operands> {
     let src = read_operand(chars)?;
+    eat_whitespace(chars);
     let dest = read_operand(chars)?;
     Ok(Operands::new(src, dest))
 }

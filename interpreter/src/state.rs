@@ -63,7 +63,7 @@ pub struct Cpu {
 
 impl Default for Cpu {
     fn default() -> Self {
-        let pc = Address{ high: UWord::from(0x00), low: UWord::from(0x80) };
+        let pc = Address{ high: UWord::from(0x02), low: UWord::from(0x00) };
         Self {
             a: Default::default(),
             flags: Default::default(),
