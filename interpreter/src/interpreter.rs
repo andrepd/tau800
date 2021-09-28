@@ -68,7 +68,7 @@ fn operand_to_mut_ref<'a>(state: &'a mut Machine, operand: &'a Operand) -> &'a m
 }
 
 fn set_flag_z(state: &mut Machine, value: &UWord) {
-    state.cpu.flags.write(Flag::Z, value.value() == 0)
+    state.cpu.flags.write(Flag::Z, dbg!(value.value()) == 0)  // Ele aqui diz que value é 0 mas a flag não está a ficar set...
 }
 
 fn set_flag_n(state: &mut Machine, value: &UWord) {
@@ -98,13 +98,17 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
     match instruction {
         // Memory
         Instruction::Mov(Operands { src, dst }) => {
-            *mk_mref(state, &dst) = *mk_ref(state, &src)
+            let word = *mk_ref(state, &src);
+            *mk_mref(state, &dst) = word;
+            set_flag_nvz(state, &word);
         }
         Instruction::Psh(x) => {
-            state.write_sp(*mk_ref(state, &x))
+            state.write_sp(*mk_ref(state, &x));
         }
         Instruction::Pop(x) => {
-            *mk_mref(state, &x) = state.read_sp()
+            let word = state.read_sp();
+            *mk_mref(state, &x) = word;
+            set_flag_nvz(state, &word);
         }
 
         // Arithmetic

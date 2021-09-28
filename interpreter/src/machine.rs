@@ -44,7 +44,7 @@ impl Machine {
 
 impl std::fmt::Display for Machine {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Cpu: a={:x} NVZC={}{}{}{} b={:x}{:x} c={:x}{:x} x={:x} sp={:x}{:x} pc={:x}{:x}\n", 
+        write!(f, "Cpu: a={:02x} NVZC={}{}{}{} b={:02x}{:02x} c={:02x}{:02x} x={:02x} sp={:02x}{:02x} pc={:02x}{:02x}\n", 
             self.cpu.a.value(), 
             (self.cpu.flags.read(crate::state::Flag::N) as u8),
             (self.cpu.flags.read(crate::state::Flag::V) as u8),
@@ -58,9 +58,14 @@ impl std::fmt::Display for Machine {
         ).unwrap();
         write!(f, "Mem:\n").unwrap();
         for i in 0..64 {
-            write!(f, "{:x} | ", i*64).unwrap();
+            write!(f, "{:4x} | ", i*64).unwrap();
             for j in 0..64 {
-                write!(f, "{:x} ", self.ram[i*64+j].value()).unwrap();
+                let val = self.ram[i*64+j].value();
+                if val != 0 {
+                    write!(f, "{:02x} ", val).unwrap()
+                } else {
+                    write!(f, "   ").unwrap()
+                }
             }
             write!(f, "\n").unwrap();
         }
