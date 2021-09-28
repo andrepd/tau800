@@ -90,13 +90,14 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
 
     match instruction {
         // Memory
-        Instruction::Mov(Operands { src, dst }) => *mk_mref(state, &dst) = *mk_ref(state, &src),
-        // Onde começa o stack? Para onde cresce? É preciso ver
+        Instruction::Mov(Operands { src, dst }) => {
+            *mk_mref(state, &dst) = *mk_ref(state, &src)
+        }
         Instruction::Psh(x) => {
-            unimplemented!()
+            m.write_sp(*mk_ref(x))
         }
         Instruction::Pop(x) => {
-            unimplemented!()
+            *mk_mref(x) = m.read_sp()
         }
 
         // Arithmetic
@@ -106,58 +107,103 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
                 + u8::from(state.cpu.flags.read(Flag::C));
             let (div, rem) = div_rem(result, MAX_UNSIGNED_VALUE);
             let carry = div > 0;
-            let word = Word::<sig::Unsigned>::from(rem);
+            let word = UWord::from(rem);
             *mk_mref(state, &dst) = word;
             state.cpu.flags.write(Flag::C, carry);
             set_flag_nvz(state, &word);
         }
         Instruction::Sub(Operands { src, dst }) => {
-            unimplemented!()
+            let result = 
+                MAX_UNSIGNED_VALUE
+                + mk_ref(state, &dst).value()
+                - mk_ref(state, &src).value()
+                - u8::from(!state.cpu.flags.read(Flag::C));
+            let (div, rem) = div_rem(result, MAX_UNSIGNED_VALUE);
+            let carry = !(div > 0);
+            let word = UWord::from(rem);
+            *mk_mref(state, &dst) = word;
+            state.cpu.flags.write(Flag::C, carry);
+            set_flag_nvz(state, &word);
         }
 
-        Instruction::Mul(_)
-        | Instruction::Mus(_)
-        | Instruction::Div(_)
-        | Instruction::Dis(_)
-        | Instruction::Mod(_)
-        | Instruction::Mos(_) => unimplemented!(),
+        Instruction::Mul(Operands { src, dst }) => {
+            let result = mk_ref(state, &dst).value() * mk_ref(state, &src).value();
+            /*let (_div, rem) = div_rem(result, MAX_UNSIGNED_VALUE);
+            let carry = !(div > 0);
+            let word = UWord::from(rem);*/
+            let word = UWord::from(result % MAX_UNSIGNED_VALUE);
+            *mk_mref(state, &dst) = word;
+            state.cpu.flags.write(Flag::C, carry);
+            set_flag_nvz(state, &word);
+        }
+        Instruction::Muh(Operands { src, dst }) => {
+            // Multiply normally
+            let result: u16 = mk_ref(state, &dst).value() as u16 * mk_ref(state, &src).value() as u16;
+            let word = UWord::from(result >> WORD_SIZE)
+            *mk_mref(state, &dst) = word;
+            state.cpu.flags.write(Flag::C, carry);
+            set_flag_nvz(state, &word);            
+        }
+        Instruction::Mus(Operands { src, dst }) => {
+            // First sign-extend to 12-bit two's complement integer
+            fn sign_extend(x: u8) -> u16 {
+                if x & 0b100_000 { 0b111_111_000_000 | x } else { x }
+            }
+            let result = sign_extend(mk_ref(state, &dst).value()) * sign_extend(mk_ref(state, &src).value());
+            let word = UWord::from(result >> WORD_SIZE);
+            *mk_mref(state, &dst) = word;
+            state.cpu.flags.write(Flag::C, carry);
+            set_flag_nvz(state, &word);
+        }
+        Instruction::Div(Operands { src, dst }) => {
+            let result = mk_ref(state, &dst).value() / mk_ref(state, &src).value;
+            let word = UWord::from(result);
+            *mk_ref(state, &dst) = word;
+            set_flag_z(state, &word);
+        }
+        Instruction::Mod(Operands { src, dst }) => {
+            let result = mk_ref(state, &dst).value() / mk_ref(state, &src).value;
+            let word = UWord::from(result);
+            *mk_ref(state, &dst) = word;
+            set_flag_z(state, &word);
+        }
 
         // Logic
         Instruction::And(Operands { src, dst }) => {
             let result = mk_ref(state, &src).value() & mk_ref(state, &dst).value();
-            let word = Word::<sig::Unsigned>::from(result & 0b00111111);
+            let word = UWord::from(result & 0b00111111);
             *mk_mref(state, &dst) = word;
             set_flag_nvz(state, &word);
         }
         Instruction::Or(Operands { src, dst }) => {
             let result = mk_ref(state, &src).value() | mk_ref(state, &dst).value();
-            let word = Word::<sig::Unsigned>::from(result & 0b00111111);
+            let word = UWord::from(result & 0b00111111);
             *mk_mref(state, &dst) = word;
             set_flag_nvz(state, &word);
         }
         Instruction::Xor(Operands { src, dst }) => {
             let result = mk_ref(state, &src).value() ^ mk_ref(state, &dst).value();
-            let word = Word::<sig::Unsigned>::from(result & 0b00111111);
+            let word = UWord::from(result & 0b00111111);
             *mk_mref(state, &dst) = word;
             set_flag_nvz(state, &word);
         }
         Instruction::Not(x) => {
             let result = !mk_ref(state, &x).value();
-            let word = Word::<sig::Unsigned>::from(result & 0b00111111);
+            let word = UWord::from(result & 0b00111111);
             *mk_mref(state, &x) = word;
             set_flag_nvz(state, &word);
         }
         Instruction::Lsl(x) => {
             let result = mk_ref(state, &x).value() << 1;
             let carry = (0b01000000 & result) != 0;
-            let word = Word::<sig::Unsigned>::from(result & 0b00111111);
+            let word = UWord::from(result & 0b00111111);
             *mk_mref(state, &x) = word;
             set_flag_nvz(state, &word);
             state.cpu.flags.write(Flag::C, carry);
         }
         Instruction::Lsr(x) => {
             let result = mk_ref(state, &x).value() >> 1;
-            let word = Word::<sig::Unsigned>::from(result & 0b00111111);
+            let word = UWord::from(result & 0b00111111);
             *mk_mref(state, &x) = word;
             set_flag_nvz(state, &word);
         }
@@ -167,13 +213,18 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
 
         // Jumping
         Instruction::Jmp(addr) => {
-            unimplemented!()
+            state.cpu.pc = addr
         }
         Instruction::Cal(addr) => {
-            unimplemented!()
+            let current_addr = state.cpu.pc;
+            m.write_sp(current_addr.low);
+            m.write_sp(current_addr.high);
+            state.cpu.pc = addr
         }
         Instruction::Ret => {
-            unimplemented!()
+            let high = m.read_sp();
+            let low = m.read_sp();
+            state.cpu.pc = Address { high, low }
         }
 
         // Branching
