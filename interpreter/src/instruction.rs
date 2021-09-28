@@ -9,7 +9,7 @@ pub enum Register {
     CH,
     CL,
     X,
-    SP,
+    // SP,
 }
 
 #[derive(Debug)]
@@ -72,11 +72,12 @@ pub enum Instruction {
     Add(Operands),
     Sub(Operands),
     Mul(Operands),
+    Muh(Operands),
     Mus(Operands),
     Div(Operands),
-    Dis(Operands),
+    /*Dis(Operands),*/
     Mod(Operands),
-    Mos(Operands),
+    /*Mos(Operands),*/
 
     And(Operands),
     Or(Operands),
@@ -119,7 +120,7 @@ fn read_timed_register(m: &mut Machine) -> Timed<Register> {
         0x4 => CH,
         0x5 => CL,
         0x6 => X,
-        0x7 => SP,
+        // 0x7 => SP,
         _ => unreachable!(),
     };
 
@@ -136,7 +137,7 @@ fn write_timed_register(m: &mut Machine, x: &Timed<Register>) -> () {
         CH => m.write_pc(UWord::from(0x3)),
         CL => m.write_pc(UWord::from(0x4)),
         X => m.write_pc(UWord::from(0x5)),
-        SP => m.write_pc(UWord::from(0x7)),
+        // SP => m.write_pc(UWord::from(0x7)),
     };
     m.write_pc(x.time.cast_to_unsigned());
 }
@@ -269,11 +270,10 @@ impl Instruction {
             0x04 => Add(Operands::decode(m, mode)),
             0x05 => Sub(Operands::decode(m, mode)),
             0x06 => Mul(Operands::decode(m, mode)),
+            0x20 => Muh(Operands::decode(m, mode)),
             0x07 => Mus(Operands::decode(m, mode)),
             0x08 => Div(Operands::decode(m, mode)),
-            0x09 => Dis(Operands::decode(m, mode)),
             0x0a => Mod(Operands::decode(m, mode)),
-            0x0b => Mos(Operands::decode(m, mode)),
             0x0c => And(Operands::decode(m, mode)),
             0x0d => Or(Operands::decode(m, mode)),
             0x0e => Xor(Operands::decode(m, mode)),
@@ -337,6 +337,10 @@ impl Instruction {
                 m.write_pc(UWord::from(0x06));
                 Operands::encode(m, ops);
             }
+            Muh(ops) => {
+                m.write_pc(UWord::from(0x20));
+                Operands::encode(m, ops);
+            }
             Mus(ops) => {
                 m.write_pc(UWord::from(0x07));
                 Operands::encode(m, ops);
@@ -345,16 +349,8 @@ impl Instruction {
                 m.write_pc(UWord::from(0x08));
                 Operands::encode(m, ops);
             }
-            Dis(ops) => {
-                m.write_pc(UWord::from(0x09));
-                Operands::encode(m, ops);
-            }
             Mod(ops) => {
                 m.write_pc(UWord::from(0x0a));
-                Operands::encode(m, ops);
-            }
-            Mos(ops) => {
-                m.write_pc(UWord::from(0x0b));
                 Operands::encode(m, ops);
             }
             And(ops) => {

@@ -57,7 +57,7 @@ pub struct Cpu {
     pub ch: UWord,
     pub cl: UWord,
     pub x: UWord,
-    pub sp: UWord,
+    pub sp: Address,
     pub pc: Address,
 }
 

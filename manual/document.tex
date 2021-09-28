@@ -386,48 +386,53 @@ The following is a quick-reference list of instructions.
 \subsubsection*{Arithmetic}
 
 \instruction{ADD src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}+\texttt{dst}+\ttt{C}$. \\
+	Set word at \texttt{dst} to $\texttt{dst}+\texttt{src}+\ttt{C}$. \\
 	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on overflow.
 }
 
 \instruction{SUB src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}-\texttt{dst}-\overline{\ttt{C}}$. \\
+	Set word at \texttt{dst} to $\texttt{dst}-\texttt{src}-\overline{\ttt{C}}$. \\
 	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on underflow.
 }
 
 \instruction{MUL src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}×\texttt{dst}$, where operands are unsigned values. \\
-	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on overflow.
+	Set word at \texttt{dst} to the lower bits of $\texttt{dst}×\texttt{src}$. \\
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.
+}
+
+\instruction{MUH src dst}{%
+	Set word at \texttt{dst} to the upper bits of $\texttt{dst}×\texttt{src}$, where operands are unsigned values. \\
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.
 }
 
 \instruction{MUS src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}×\texttt{dst}$, where operands are signed values. \\
-	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on overflow.
+	Set word at \texttt{dst} to the upper bits of $\texttt{dst}×\texttt{src}$, where operands are signed values. \\
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.
 }
 
 %\todo{Como fazer handle de divisoes por zero?}
 \instruction{DIV src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}\div\texttt{dst}$, where operands are unsigned values. \\
+	Set word at \texttt{dst} to $\texttt{dst}\div\texttt{src}$, where operands are unsigned values. \\
 	Flags: set \ttt{Z}.
 }
 
-\instruction{DIS src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}\div\texttt{dst}$, where operands are signed values. \\
-	Flags: set \ttt{Z}.
-}
+%\instruction{DIS src dst}{%
+%	Set word at \texttt{dst} to $\texttt{src}\div\texttt{dst}$, where operands are signed values. \\
+%	Flags: set \ttt{Z}.
+%}
 
 \renewcommand\mod%
 {\mathrel{\mathrm{mod}}}
 
 \instruction{MOD src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}\mod\texttt{dst}$, where operands are unsigned values. \\
+	Set word at \texttt{dst} to $\texttt{dst}\mod\texttt{src}$, where operands are unsigned values. \\
 	Flags: set \ttt{Z}.
 }
 
-\instruction{MOS src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}\mod\texttt{dst}$, where operands are signed values.\\
-	Flags: set \ttt{Z}.
-}
+%\instruction{MOS src dst}{%
+%	Set word at \texttt{dst} to $\texttt{src}\mod\texttt{dst}$, where operands are signed values.\\
+%	Flags: set \ttt{Z}.
+%}
 
 
 \instruction{AND src dst}{%
@@ -505,6 +510,53 @@ The following is a quick-reference list of instructions.
 \subsubsection*{Miscellaneous}
 
 \instruction{NOP}{No-op.}
+
+
+
+\subsection*{Memory map}
+
+Upon power-on, the system boots from memory location \ttt{\$80}. 
+In order to write addresses \ttt{\$80}–\ttt{\$3f}, you have to reprogram the EPROM; please refer to technical procedure \S 8.2 in the User's Manual. 
+
+The initial stack location is \ttt{\$7f}, and the stack grows downwards. It is the user's responsibility to avoid overflows and corruption of protected memory locations!
+
+Memory locations \ttt{\$10}–\ttt{\$6f} control the unit's IO devices and peripherals. 
+For more details, please refer to the manual of your specific device or peripheral. 
+
+\smallskip
+\warningbox{Use \underline{only} Approved Genuine Devices\textregistered from \companyname{}, its partners, and approved vendors. \companyname{} is not responsible for any damage sustained while an unapproved device or peripheral is connected to your unit.}
+
+The memory-map is summarised in \autoref{fig:memmap}. 
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+		\matrix (mem) [
+			matrix of nodes,
+			nodes={
+				draw,
+				anchor=center,
+				minimum width=6em,
+				minimum height=2em,
+				font={\ttfamily},
+			},
+		] { Reserved & Mapped IO & Stack & EPROM & RAM \\ };
+		
+		\draw (mem-1-1.south west) -- +(0,-0.5) node[below,font=\ttfamily] {\$00};
+		\draw (mem-1-2.south west) -- +(0,-0.5) node[below,font=\ttfamily] {\$10};
+		\draw (mem-1-3.south west) -- +(0,-0.5) node[below,font=\ttfamily] {\$70};
+		\draw (mem-1-4.south west) -- +(0,-0.5) node[below,font=\ttfamily] {\$80};
+		\draw (mem-1-5.south west) -- +(0,-0.5) node[below,font=\ttfamily] {\$3f};
+		
+		\draw[white,thick,dashed] (mem-1-5.north east) -- (mem-1-5.south east);
+	\end{tikzpicture}
+%	\caption{Memory map of \verb|\machinename|.}
+%	\caption{Memory map of \machinename.}
+	\caption{Memory map of .}
+	\label{fig:memmap}
+\end{figure}
+
+
 
 \clearpage
 \section{Power Consumptions} \label{sec:power}

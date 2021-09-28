@@ -40,7 +40,9 @@ fn read_instruction(literal: &str) -> Instruction {
         .next()
         .expect("No mnemonic, even though line is not empty.");
 
-    match mnemonic {
+    use Instruction::*;
+    match mnemonic/*.as_str()*/ {
+        "mov" => Mov(read_operands(words.next().unwrap(), words.next().unwrap())),
         _ => unimplemented!(),
     }
 }
@@ -189,7 +191,7 @@ fn read_operands<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<Operands> {
 type Cont<T> = (T, &str)
 
 fn read_char(str: &str) -> Cont<char> {
-    str[0], &str[1..]
+    (str.chars().nth(0).unwrap(), &str[1..])
 }
 
 fn read_hex_word(word: &str) -> Cont<UWord> {
@@ -209,57 +211,61 @@ fn read_register(str: &str) -> Cont<Register> {
             'h' => Register::BH, &str[2..]
             'l' => Register::BL, &str[2..]
         },
-        'c' => { match str[1]
-            'h' => Register::CH, &str[2..]
-            'l' => Register::CL, &str[2..]
+        'c' => { 
+            match str.chars().nth(1).unwrap() {    
+                'h' => (Register::CH, &str[2..]),
+                'l' => (Register::CL, &str[2..]),
+                _ => unreachable!(),
+            }
         },
-        'x' => Register::X, &str[1..]
-        's' => Register::SP, &str[2..]
+        'x' => (Register::X, &str[1..]),
+        's' => (Register::SP, &str[2..]),
+        _ => unreachable!(),
     }
 }
 
 fn read_operand(str: &str) -> Operand {
-    let c, str = read_char(str);
+    use Operand::*;
+    let (c, str) = read_char(str);
     match c {
         '#' => {
-            let word, str = read_hex_word(str);
+            let (word, str) = read_hex_word(str);
             Imm(word)
         },
         '%' => {
-            let low,  str = read_hex_word(str);
-            let high, str = read_hex_word(str);
+            let (low,  str) = read_hex_word(str);
+            let (high, str) = read_hex_word(str);
             let op = Address{high, low};
-            match str.get(0..2) {
+            match str.get(0..2) {  // TODO tá-me a dar erro aqui e n sei pq
                 Some (",X") => {
-                    let time, str = read_time(&str[2..]);
-                    Abx({op, time})
+                    let (time, str) = read_time(&str[2..]);
+                    Abx(Timed::<Address>{op, time})
                 },
                 None => {
-                    let time, str = read_time(str);
-                    Abs({op, time})
+                    let (time, str) = read_time(str);
+                    Abs(Timed::<Address>{op, time})
                 }
             }
         },
         '(' => {
-            let c, str = read_char(str);
+            let (c, str) = read_char(str);
             match c {
                 '%' => {
-                    let low,  str = read_hex_word(str);
-                    let high, str = read_hex_word(str);
+                    let (low,  str) = read_hex_word(str);
+                    let (high, str) = read_hex_word(str);
                     let op = Address{high, low};
-                    let time, str = read_time(str);
-                    Ind({op, time})
+                    let (time, str) = read_time(str);
+                    Ind(Timed::<Address>{op, time})
                 },
                 _ => {
                     panic!("Indirect register not implemented, please purchase Deluxe edition of this assembler.");
                 }
             }
-            let word = read_hex_word(str);
         },
         _ => {
-            let op, str = read_register(str);
-            let time = read_time(str);
-            Reg({op, time})
+            let (op, str) = read_register(str);
+            let (time, str) = read_time(str);
+            Reg(Timed::<Register>{op, time})
         }
     }
 }
