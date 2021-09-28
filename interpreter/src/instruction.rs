@@ -9,7 +9,7 @@ pub enum Register {
     CH,
     CL,
     X,
-    SP,
+    // SP,
 }
 
 #[derive(Debug)]
@@ -120,7 +120,7 @@ fn read_timed_register(m: &mut Machine) -> Timed<Register> {
         0x4 => CH,
         0x5 => CL,
         0x6 => X,
-        0x7 => SP,
+        // 0x7 => SP,
         _ => unreachable!(),
     };
 
@@ -137,7 +137,7 @@ fn write_timed_register(m: &mut Machine, x: &Timed<Register>) -> () {
         CH => m.write_pc(UWord::from(0x3)),
         CL => m.write_pc(UWord::from(0x4)),
         X => m.write_pc(UWord::from(0x5)),
-        SP => m.write_pc(UWord::from(0x7)),
+        // SP => m.write_pc(UWord::from(0x7)),
     };
     m.write_pc(x.time.cast_to_unsigned());
 }
