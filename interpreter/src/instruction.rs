@@ -134,11 +134,12 @@ fn write_timed_register(m: &mut Machine, x: &Timed<Register>) -> () {
     use Register::*;
     match x.op {
         A => m.write_pc(UWord::from(0x0)),
-        BH => m.write_pc(UWord::from(0x1)),
-        BL => m.write_pc(UWord::from(0x2)),
-        CH => m.write_pc(UWord::from(0x3)),
-        CL => m.write_pc(UWord::from(0x4)),
-        X => m.write_pc(UWord::from(0x5)),
+        // F => m.write_pc(UWord::from(0x1)),
+        BH => m.write_pc(UWord::from(0x2)),
+        BL => m.write_pc(UWord::from(0x3)),
+        CH => m.write_pc(UWord::from(0x4)),
+        CL => m.write_pc(UWord::from(0x5)),
+        X => m.write_pc(UWord::from(0x6)),
         // SP => m.write_pc(UWord::from(0x7)),
     };
     m.write_pc(x.time.cast_to_unsigned());
