@@ -1,5 +1,6 @@
 use crate::instruction::{Instruction, Operand, Operands, Register, Timed};
 use crate::prelude::*;
+use std::f32::INFINITY;
 use std::iter::Peekable;
 use std::str::{CharIndices, Chars, Lines};
 
@@ -39,18 +40,77 @@ fn assemble<'i>(input: &'i str) -> LineIterator<'i> {
 
 fn read_instruction(literal: &str, line_idx: usize) -> Instruction {
     let mut iter = WindowSource::new(literal).window();
-    
-    let mnemonic = { iter.take_while(|c| !c.is_whitespace()); iter.collect() };
 
-    let operands = match read_operands(&mut iter) {
-        Ok(operands) => operands,
-        Err(err) => match err {
+    let mnemonic = {
+        iter.take_while(|c| !c.is_whitespace());
+        iter.collect().expect("Could not find a mnemonic.")
+    };
+    eat_whitespace(&mut iter);
+
+    let panic_read_err = |err| -> ! {
+        match err {
             ReadError::NoMoreChars => panic!("Unexpected EOF"),
             ReadError::UnexpectedChar(col) => {
                 panic!("Unexpected character at {}:{}", line_idx, col)
             }
-        },
+        }
     };
+
+    let mut read_operands = || match read_operands(&mut iter) {
+        Ok(operands) => operands,
+        Err(err) => panic_read_err(err),
+    };
+
+    let mut read_single_operand = || match read_operand(&mut iter) {
+        Ok(operand) => operand,
+        Err(err) => panic_read_err(err),
+    };
+
+    let mut read_unwrapped_address = || match read_address(&mut iter) {
+        Ok(addr) => addr,
+        Err(err) => panic_read_err(err),
+    };
+
+    let mut read_unwrapped_offset = || match read_hex_word(&mut iter) {
+        Ok(word) => word.cast_to_signed(),
+        Err(err) => panic_read_err(err),
+    };
+
+    let instruction = match mnemonic {
+        "mov" => Instruction::Mov(read_operands()),
+        "psh" => Instruction::Psh(read_single_operand()),
+        "pop" => Instruction::Pop(read_single_operand()),
+        "add" => Instruction::Add(read_operands()),
+        "sub" => Instruction::Sub(read_operands()),
+        "mul" => Instruction::Mul(read_operands()),
+        "muh" => Instruction::Muh(read_operands()),
+        "mus" => Instruction::Mus(read_operands()),
+        "div" => Instruction::Div(read_operands()),
+        "mod" => Instruction::Mod(read_operands()),
+        "and" => Instruction::And(read_operands()),
+        "or" => Instruction::Or(read_operands()),
+        "xor" => Instruction::Xor(read_operands()),
+        "not" => Instruction::Not(read_single_operand()),
+        "lsl" => Instruction::Lsl(read_single_operand()),
+        "lsr" => Instruction::Lsr(read_single_operand()),
+        "cmp" => Instruction::Cmp(read_single_operand()),
+        "bit" => Instruction::Bit(read_single_operand()),
+        "jmp" => Instruction::Jmp(read_unwrapped_address()),
+        "bcc" => Instruction::Bcc(read_unwrapped_offset()),
+        "bcs" => Instruction::Bcs(read_unwrapped_offset()),
+        "bne" => Instruction::Bne(read_unwrapped_offset()),
+        "beq" => Instruction::Beq(read_unwrapped_offset()),
+        "bpl" => Instruction::Bpl(read_unwrapped_offset()),
+        "bmi" => Instruction::Bmi(read_unwrapped_offset()),
+        "clc" => Instruction::Clc,
+        "sec" => Instruction::Sec,
+        "cal" => Instruction::Cal(read_unwrapped_address()),
+        "ret" => Instruction::Ret,
+        "nop" => Instruction::Nop,
+        _ => panic!("Invalid mnemonic {}", mnemonic),
+    };
+
+    todo!()
 }
 
 #[derive(Debug)]
@@ -200,7 +260,7 @@ fn read_register(chars: &mut SlidingWindow) -> ReadResult<Register> {
         'x' => Register::X,
         's' => {
             debug_assert!(read_char(chars)? == 'p');
-            unimplemented!("SP is not readable")
+            unimplemented!("SP is not addressable")
             //Register::SP
         }
         _ => unreachable!(),
@@ -231,6 +291,12 @@ fn read_hex_word(chars: &mut SlidingWindow) -> ReadResult<UWord> {
     let value = high + low;
 
     Ok(UWord::from(value))
+}
+
+fn read_address(chars: &mut SlidingWindow) -> ReadResult<Address> {
+    let low = read_hex_word(chars)?;
+    let high = read_hex_word(chars)?;
+    Ok(Address::from_words(high, low))
 }
 
 fn read_decimal(chars: &mut SlidingWindow) -> ReadResult<UWord> {
@@ -295,16 +361,16 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
 
                     Operand::Ind(Timed::new(op, time))
                 }
-                _ => unimplemented!(),
+                _ => {
+                    let register = read_register(chars)?;
+                    let time = read_time(chars)?;
+                    Operand::Reg(Timed::new(register, time))
+                }
             };
             match_char(')', chars)?;
             operand
         }
-        _ => {
-            let register = read_register(chars)?;
-            let time = read_time(chars)?;
-            Operand::Reg(Timed::new(register, time))
-        }
+        _ => return Err(ReadError::UnexpectedChar(chars.pos())),
     };
     Ok(operand)
 }
