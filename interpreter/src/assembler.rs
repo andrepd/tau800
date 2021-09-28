@@ -231,7 +231,7 @@ fn eat_whitespace<'r, 'k, 's>(
 }
 
 fn read_register(chars: &mut SlidingWindow) -> ReadResult<Register> {
-    let register = match read_char(chars)? {
+    let register = match dbg!(read_char(chars)?) {
         'a' => Register::A,
         'b' => match read_char(chars)? {
             'h' => Register::BH,
@@ -354,11 +354,11 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
 
                     Operand::Ind(Timed::new(op, time))
                 }
-                _ => {
+                _ => unreachable!() /*{
                     let register = read_register(chars)?;
                     let time = read_time(chars)?;
                     Operand::Reg(Timed::new(register, time))
-                }
+                }*/
             };
             match_char(')', chars)?;
             operand

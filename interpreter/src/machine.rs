@@ -56,11 +56,18 @@ impl std::fmt::Display for Machine {
             self.cpu.sp.high.value(), self.cpu.sp.low.value(),
             self.cpu.pc.high.value(), self.cpu.pc.low.value(),
         ).unwrap();
-        write!(f, "Mem:\n").unwrap();
+        /*write!(f, "Mem:\n").unwrap();*/
+        write!(f, "Mem: ").unwrap();
+        for j in 0..64 { write!(f, "{:02x} ", j).unwrap() };
+        write!(f, "\n");
         for i in 0..64 {
-            write!(f, "{:4x} | ", i*64).unwrap();
+            /*write!(f, "{:4x} | ", i*64).unwrap();*/
+            write!(f, "{:02x} | ", i).unwrap();
             for j in 0..64 {
-                let val = self.ram[i*64+j].value();
+                if self.cpu.pc.value() == i*64+j {
+                    write!(f, "\x08^").unwrap()
+                }
+                let val = self.ram[(i*64+j) as usize].value();
                 if val != 0 {
                     write!(f, "{:02x} ", val).unwrap()
                 } else {
@@ -68,7 +75,7 @@ impl std::fmt::Display for Machine {
                 }
             }
             write!(f, "\n").unwrap();
-        }
+        };
         Ok(())
     }
 }

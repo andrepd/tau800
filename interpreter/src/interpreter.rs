@@ -68,7 +68,7 @@ fn operand_to_mut_ref<'a>(state: &'a mut Machine, operand: &'a Operand) -> &'a m
 }
 
 fn set_flag_z(state: &mut Machine, value: &UWord) {
-    state.cpu.flags.write(Flag::Z, dbg!(value.value()) == 0)  // Ele aqui diz que value é 0 mas a flag não está a ficar set...
+    state.cpu.flags.write(Flag::Z, /*dbg!*/(value.value()) == 0)  // TODO: Ele aqui diz que value é 0 mas a flag não está a ficar set...
 }
 
 fn set_flag_n(state: &mut Machine, value: &UWord) {
@@ -95,7 +95,7 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
     let mk_ref = operand_to_ref;
     let mk_mref = operand_to_mut_ref;
 
-    match instruction {
+    match dbg!(instruction) {
         // Memory
         Instruction::Mov(Operands { src, dst }) => {
             let word = *mk_ref(state, &src);
