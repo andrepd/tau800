@@ -26,7 +26,7 @@ impl<'i> Iterator for LineIterator<'i> {
             };
             line = line.trim();
         }
-        Some(read_instruction(line, self.line_idx))
+        Some(read_instruction(dbg!(line), self.line_idx))
     }
 }
 
@@ -69,12 +69,12 @@ fn read_instruction(literal: &str, line_idx: usize) -> Instruction {
         "cmp" => Instruction::Cmp(read_operand(&mut iter).or_panic(line_idx)),
         "bit" => Instruction::Bit(read_operand(&mut iter).or_panic(line_idx)),
         "jmp" => Instruction::Jmp(read_address(&mut iter).or_panic(line_idx)),
-        "bcc" => Instruction::Bcc(read_hex_word(&mut iter).or_panic(line_idx).cast_to_signed()),
-        "bcs" => Instruction::Bcs(read_hex_word(&mut iter).or_panic(line_idx).cast_to_signed()),
-        "bne" => Instruction::Bne(read_hex_word(&mut iter).or_panic(line_idx).cast_to_signed()),
-        "beq" => Instruction::Beq(read_hex_word(&mut iter).or_panic(line_idx).cast_to_signed()),
-        "bpl" => Instruction::Bpl(read_hex_word(&mut iter).or_panic(line_idx).cast_to_signed()),
-        "bmi" => Instruction::Bmi(read_hex_word(&mut iter).or_panic(line_idx).cast_to_signed()),
+        "bcc" => Instruction::Bcc(read_decimal(&mut iter).or_panic(line_idx)),
+        "bcs" => Instruction::Bcs(read_decimal(&mut iter).or_panic(line_idx)),
+        "bne" => Instruction::Bne(read_decimal(&mut iter).or_panic(line_idx)),
+        "beq" => Instruction::Beq(read_decimal(&mut iter).or_panic(line_idx)),
+        "bpl" => Instruction::Bpl(read_decimal(&mut iter).or_panic(line_idx)),
+        "bmi" => Instruction::Bmi(read_decimal(&mut iter).or_panic(line_idx)),
         "clc" => Instruction::Clc,
         "sec" => Instruction::Sec,
         "cal" => Instruction::Cal(read_address(&mut iter).or_panic(line_idx)),
@@ -268,11 +268,13 @@ fn read_hex_word(chars: &mut SlidingWindow) -> ReadResult<UWord> {
         }
     };
 
-    let low = read_hex_char()?;
+    // É high-word/low-word, mas não high char low char!
+    // e.g. $abcd = 0xab + 2^6 × 0xcd
     let high = read_hex_char()?;
+    let low = read_hex_char()?;
 
-    let low = low.to_digit(16).unwrap() as u8;
     let high = (high.to_digit(16).unwrap() as u8) << 4;
+    let low = low.to_digit(16).unwrap() as u8;
 
     let value = high + low;
 
@@ -285,17 +287,18 @@ fn read_address(chars: &mut SlidingWindow) -> ReadResult<Address> {
     Ok(Address::from_words(high, low))
 }
 
-fn read_decimal(chars: &mut SlidingWindow) -> ReadResult<UWord> {
+// Can be signed
+fn read_decimal(chars: &mut SlidingWindow) -> ReadResult<IWord> {
     let mut subwindow = chars.window_from_here();
     let value = subwindow
-        .take_while(|c| c.is_digit(10))
+        .take_while(|c| c.is_digit(10) || *c == '+' || *c == '-')
         .collect()
         .map_or(Err(ReadError::NoMoreChars), |s| Ok(s))?;
     if value.is_empty() {
         return Err(ReadError::UnexpectedChar(chars.pos()));
     }
-    let value = value.parse::<u8>().unwrap();
-    Ok(Word::from(value))
+    let value = dbg!(value.trim()).parse::<i8>().unwrap();
+    Ok(IWord::from(value))
 }
 
 fn read_time(chars: &mut SlidingWindow) -> ReadResult<IWord> {
@@ -331,7 +334,7 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
             let next = chars.peek();
             if next.is_some() && *next.unwrap() == ',' {
                 match_char(',', chars)?;
-                match_char('X', chars)?;
+                match_char('x', chars)?;
 
                 let time = read_time(chars)?;
                 Operand::Abx(Timed::new(op, time))

@@ -114,14 +114,14 @@ impl Word<sig::Signed> {
 impl From<i8> for Word<sig::Signed> {
     fn from(value: i8) -> Self {
         let negative = value < 0;
-        let value = value.abs() as u8;
+        let abs = value.abs() as u8;
 
-        debug_assert!(value <= MAX_SIGNED_VALUE);
+        debug_assert!(abs <= MAX_SIGNED_VALUE, "Value {} doesn't have absolute value <= {}", value, MAX_SIGNED_VALUE);
 
         let value = if negative {
-            ((!value & MAX_UNSIGNED_VALUE) + 1) & MAX_UNSIGNED_VALUE
+            ((!abs & MAX_UNSIGNED_VALUE) + 1) & MAX_UNSIGNED_VALUE
         } else {
-            value
+            abs
         };
 
         Word {
