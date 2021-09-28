@@ -82,7 +82,7 @@ fn set_flag_v(state: &mut Machine, op1: u8, op2: u8, result: u8) {
 }
 
 fn set_flag_v_dummy(state: &mut Machine, value: &UWord) {
-    state.cpi.flags.write(Flag::V, value.value() & 0b010000 != 0)
+    state.cpu.flags.write(Flag::V, value.value() & 0b010000 != 0)
 }
 
 fn set_flag_nvz(state: &mut Machine, value: &UWord) {
