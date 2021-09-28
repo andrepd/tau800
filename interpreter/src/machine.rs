@@ -27,4 +27,17 @@ impl Machine {
         self.cpu.pc.try_increment().expect("Overflowed program counter.");
         ()
     }
+
+    /// Read a word from stack and increment the sp. 
+    pub fn read_sp(&mut self) -> UWord {
+        let word = self.ram[self.cpu.sp];
+        self.cpu.sp = self.cpu.sp + IWord::from(+1);  // Ugly af
+        word
+    }
+
+    /// Write a word to stack and decrement the sp. 
+    pub fn write_sp(&mut self, word: UWord) -> () {
+        self.ram[self.cpu.sp] = word;
+        self.cpu.sp = self.cpu.sp + IWord::from(-1);  // Ugly af
+    }
 }
