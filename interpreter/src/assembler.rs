@@ -1,19 +1,21 @@
 use crate::instruction::{Instruction, Operand, Operands, Register, Timed};
 use crate::prelude::*;
 use std::iter::Peekable;
-use std::str::{Chars, Lines};
+use std::str::{CharIndices, Chars, Lines};
 
-struct InstructionIterator<'i> {
+struct LineIterator<'i> {
     lines: Lines<'i>,
+    line_idx: usize,
 }
 
-impl<'i> Iterator for InstructionIterator<'i> {
+impl<'i> Iterator for LineIterator<'i> {
     type Item = Instruction;
 
     fn next(&mut self) -> Option<Self::Item> {
         let mut line = "";
         while line.is_empty() {
             let iter_line = self.lines.next();
+            self.line_idx += 1;
             if iter_line.is_none() {
                 return None;
             }
@@ -24,37 +26,139 @@ impl<'i> Iterator for InstructionIterator<'i> {
             };
             line = line.trim();
         }
-        Some(read_instruction(line))
+        Some(read_instruction(line, self.line_idx))
     }
 }
 
-fn assemble<'i>(input: &'i str) -> InstructionIterator<'i> {
-    InstructionIterator {
+fn assemble<'i>(input: &'i str) -> LineIterator<'i> {
+    LineIterator {
         lines: input.lines(),
+        line_idx: 0,
     }
 }
 
-fn read_instruction(literal: &str) -> Instruction {
-    let mut words = literal.split_whitespace();
-    let mnemonic = words
-        .next()
-        .expect("No mnemonic, even though line is not empty.");
+fn read_instruction(literal: &str, line_idx: usize) -> Instruction {
+    let mut iter = WindowSource::new(literal).window();
+    
+    let mnemonic = { iter.take_while(|c| !c.is_whitespace()); iter.collect() };
 
-    use Instruction::*;
-    match mnemonic/*.as_str()*/ {
-        "mov" => Mov(read_operands(words.next().unwrap(), words.next().unwrap())),
-        _ => unimplemented!(),
-    }
+    let operands = match read_operands(&mut iter) {
+        Ok(operands) => operands,
+        Err(err) => match err {
+            ReadError::NoMoreChars => panic!("Unexpected EOF"),
+            ReadError::UnexpectedChar(col) => {
+                panic!("Unexpected character at {}:{}", line_idx, col)
+            }
+        },
+    };
 }
 
+#[derive(Debug)]
 enum ReadError {
     NoMoreChars,
-    UnexpectedChar,
+    UnexpectedChar(usize),
 }
 
 type ReadResult<T> = Result<T, ReadError>;
 
-fn read_char<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<char> {
+struct WindowSource<'s> {
+    source: &'s str,
+    chars: Peekable<CharIndices<'s>>,
+}
+
+struct SlidingWindow<'k, 's: 'k> {
+    parent: &'k mut WindowSource<'s>,
+    start: usize,
+    last: usize,
+}
+
+impl<'s> WindowSource<'s> {
+    fn new(source: &'s str) -> Self {
+        WindowSource {
+            source,
+            chars: source.char_indices().peekable(),
+        }
+    }
+
+    fn window(&mut self) -> SlidingWindow<'_, 's> {
+        SlidingWindow {
+            parent: self,
+            start: 0,
+            last: 0,
+        }
+    }
+}
+
+impl<'k, 's> SlidingWindow<'k, 's> {
+    fn window_from_here(&mut self) -> SlidingWindow<'_, 's> {
+        SlidingWindow {
+            parent: self.parent,
+            start: self.start,
+            last: self.start,
+        }
+    }
+
+    fn oob(&self, idx: usize) -> bool {
+        idx >= self.parent.source.len()
+    }
+
+    fn pos(&self) -> usize {
+        self.last
+    }
+
+    fn next(&mut self) -> Option<char> {
+        if let Some((next_idx, next_chr)) = self.parent.chars.next() {
+            self.last = next_idx;
+            Some(next_chr)
+        } else {
+            None
+        }
+    }
+
+    fn peek(&self) -> Option<&char> {
+        self.parent.chars.peek().map(|(_, c)| c)
+    }
+
+    fn forget(&mut self) -> () {
+        self.start = self.last + 1;
+    }
+
+    fn collect(&mut self) -> Option<&'s str> {
+        if self.oob(self.start) {
+            return None;
+        }
+        let slice = &self.parent.source[self.start..=self.last];
+        self.start = self.last + 1;
+        self.last = self.start;
+        Some(slice)
+    }
+
+    fn take_while<F: Fn(&char) -> bool>(mut self, pred: F) -> Self {
+        let mut next = Some(' '); // doesn't matter the char here
+        while next.is_some() && self.peek().is_some() && pred(self.peek().unwrap()) {
+            next = self.next()
+        }
+        self
+    }
+}
+
+trait OptionalRead<T> {
+    fn optional(self) -> ReadResult<Option<T>>;
+}
+
+impl<T> OptionalRead<T> for ReadResult<T> {
+    fn optional(self) -> ReadResult<Option<T>> {
+        match self {
+            Ok(x) => Ok(Some(x)),
+            Err(err) => match err {
+                ReadError::NoMoreChars => Err(err),
+                ReadError::UnexpectedChar(_) => Ok(None),
+            },
+        }
+    }
+}
+
+fn read_char(chars: &mut SlidingWindow) -> ReadResult<char> {
     let next_char = chars.next();
     if next_char.is_none() {
         Err(ReadError::NoMoreChars)
@@ -63,7 +167,7 @@ fn read_char<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<char> {
     }
 }
 
-fn match_char<'s>(to_match: char, chars: &mut Peekable<Chars<'s>>) -> ReadResult<()> {
+fn match_char(to_match: char, chars: &mut SlidingWindow) -> ReadResult<()> {
     let peek = chars.peek();
     if peek.is_none() {
         return Err(ReadError::NoMoreChars);
@@ -72,11 +176,15 @@ fn match_char<'s>(to_match: char, chars: &mut Peekable<Chars<'s>>) -> ReadResult
         chars.next();
         return Ok(());
     } else {
-        return Err(ReadError::UnexpectedChar);
+        return Err(ReadError::UnexpectedChar(chars.pos()));
     }
 }
 
-fn read_register<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<Register> {
+fn eat_whitespace<'k, 's>(chars: &mut SlidingWindow<'k, 's>) -> SlidingWindow<'k, 's> {
+    chars.take_while(|c| c.is_whitespace())
+}
+
+fn read_register(chars: &mut SlidingWindow) -> ReadResult<Register> {
     let register = match read_char(chars)? {
         'a' => Register::A,
         'b' => match read_char(chars)? {
@@ -92,14 +200,15 @@ fn read_register<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<Register> {
         'x' => Register::X,
         's' => {
             debug_assert!(read_char(chars)? == 'p');
-            Register::SP
+            unimplemented!("SP is not readable")
+            //Register::SP
         }
         _ => unreachable!(),
     };
     Ok(register)
 }
 
-fn read_hex_word<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<UWord> {
+fn read_hex_word(chars: &mut SlidingWindow) -> ReadResult<UWord> {
     let mut read_hex_char = || {
         let next = chars.peek();
         if next.is_none() {
@@ -109,12 +218,10 @@ fn read_hex_word<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<UWord> {
         if next.is_digit(16) {
             Ok(chars.next().unwrap())
         } else {
-            Err(ReadError::UnexpectedChar)
+            Err(ReadError::UnexpectedChar(chars.pos()))
         }
     };
 
-    // (Sorry; all I'm doing here is converting a None to an Err,
-    //  and a Some to an Ok, and then unwrapping)
     let low = read_hex_char()?;
     let high = read_hex_char()?;
 
@@ -126,17 +233,36 @@ fn read_hex_word<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<UWord> {
     Ok(UWord::from(value))
 }
 
-fn read_time<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<IWord> {
-    let negative = match_char('-', chars).map(|_| true)?;
-    let absolute_value = read_hex_word(chars)?.value() as i8;
-    Ok(IWord::from(if negative {
-        -absolute_value
-    } else {
-        absolute_value
-    }))
+fn read_decimal(chars: &mut SlidingWindow) -> ReadResult<UWord> {
+    let subwindow = chars.window_from_here();
+    let value = subwindow
+        .take_while(|c| c.is_digit(10))
+        .collect()
+        .map_or(Err(ReadError::NoMoreChars), |s| Ok(s))?;
+    if value.is_empty() {
+        return Err(ReadError::UnexpectedChar(chars.pos()));
+    }
+    let value = value.parse::<u8>().unwrap();
+    Ok(Word::from(value))
 }
 
-fn read_operand<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<Operand> {
+fn read_time(chars: &mut SlidingWindow) -> ReadResult<IWord> {
+    match match_char('@', chars).optional()? {
+        None => Ok(IWord::zero()),
+        Some(_) => {
+            let negative = match_char('-', chars).map(|_| true)?;
+            let absolute_value = read_decimal(chars)?.value() as i8;
+            Ok(IWord::from(if negative {
+                -absolute_value
+            } else {
+                match_char('+', chars).optional()?;
+                absolute_value
+            }))
+        }
+    }
+}
+
+fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
     let operand = match read_char(chars)? {
         '#' => {
             let word = read_hex_word(chars)?;
@@ -160,7 +286,7 @@ fn read_operand<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<Operand> {
             }
         }
         '(' => {
-            match read_char(chars)? {
+            let operand = match read_char(chars)? {
                 '%' => {
                     let low = read_hex_word(chars)?;
                     let high = read_hex_word(chars)?;
@@ -168,9 +294,11 @@ fn read_operand<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<Operand> {
                     let time = read_time(chars)?;
 
                     Operand::Ind(Timed::new(op, time))
-                },
+                }
                 _ => unimplemented!(),
-            }
+            };
+            match_char(')', chars)?;
+            operand
         }
         _ => {
             let register = read_register(chars)?;
@@ -181,106 +309,8 @@ fn read_operand<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<Operand> {
     Ok(operand)
 }
 
-fn read_operands<'s>(chars: &mut Peekable<Chars<'s>>) -> ReadResult<Operands> {
+fn read_operands(chars: &mut SlidingWindow) -> ReadResult<Operands> {
     let src = read_operand(chars)?;
     let dest = read_operand(chars)?;
     Ok(Operands::new(src, dest))
 }
-
-/*// As cenas que fazem parse de um T retornam um par (T, resto da string)
-type Cont<T> = (T, &str)
-
-fn read_char(str: &str) -> Cont<char> {
-    (str.chars().nth(0).unwrap(), &str[1..])
-}
-
-fn read_hex_word(word: &str) -> Cont<UWord> {
-    todo!()
-}
-
-// Aqui pus ele a aceitar uma slice do resto da linha?
-fn read_time(line: &str) -> Cont<IWord> {
-    todo!()
-}
-
-// Epá nem sei como indexar um char, por causa do unicode e tudo mais
-fn read_register(str: &str) -> Cont<Register> {
-    match str[0] {
-        'a' => Register::A, &str[1..]
-        'b' => { match str[1]
-            'h' => Register::BH, &str[2..]
-            'l' => Register::BL, &str[2..]
-        },
-        'c' => { 
-            match str.chars().nth(1).unwrap() {    
-                'h' => (Register::CH, &str[2..]),
-                'l' => (Register::CL, &str[2..]),
-                _ => unreachable!(),
-            }
-        },
-        'x' => (Register::X, &str[1..]),
-        's' => (Register::SP, &str[2..]),
-        _ => unreachable!(),
-    }
-}
-
-fn read_operand(str: &str) -> Operand {
-    use Operand::*;
-    let (c, str) = read_char(str);
-    match c {
-        '#' => {
-            let (word, str) = read_hex_word(str);
-            Imm(word)
-        },
-        '%' => {
-            let (low,  str) = read_hex_word(str);
-            let (high, str) = read_hex_word(str);
-            let op = Address{high, low};
-            match str.get(0..2) {  // TODO tá-me a dar erro aqui e n sei pq
-                Some (",X") => {
-                    let (time, str) = read_time(&str[2..]);
-                    Abx(Timed::<Address>{op, time})
-                },
-                None => {
-                    let (time, str) = read_time(str);
-                    Abs(Timed::<Address>{op, time})
-                }
-            }
-        },
-        '(' => {
-            let (c, str) = read_char(str);
-            match c {
-                '%' => {
-                    let (low,  str) = read_hex_word(str);
-                    let (high, str) = read_hex_word(str);
-                    let op = Address{high, low};
-                    let (time, str) = read_time(str);
-                    Ind(Timed::<Address>{op, time})
-                },
-                _ => {
-                    panic!("Indirect register not implemented, please purchase Deluxe edition of this assembler.");
-                }
-            }
-        },
-        _ => {
-            let (op, str) = read_register(str);
-            let (time, str) = read_time(str);
-            Reg(Timed::<Register>{op, time})
-        }
-    }
-}
-
-fn read_operands(str1: &str, str2: &str) -> Operands {
-    let src = read_operand(str1);
-    let dst = read_operand(str2);
-    Operands{src, dst}
-}
-
-fn read_address(str: &str) -> Address {
-    todo!()
-}
-
-fn read_offset(str: &str) -> Address {
-    todo!()
-}
-*/
