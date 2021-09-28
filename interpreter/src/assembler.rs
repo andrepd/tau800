@@ -297,7 +297,7 @@ fn read_decimal(chars: &mut SlidingWindow) -> ReadResult<IWord> {
     if value.is_empty() {
         return Err(ReadError::UnexpectedChar(chars.pos()));
     }
-    let value = dbg!(value.trim()).parse::<i8>().unwrap();
+    let value = value.trim().parse::<i8>().unwrap();
     Ok(IWord::from(value))
 }
 
