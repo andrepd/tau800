@@ -82,7 +82,7 @@ impl Word<sig::Unsigned> {
 
 impl From<u8> for Word<sig::Unsigned> {
     fn from(value: u8) -> Self {
-        debug_assert!(value <= MAX_UNSIGNED_VALUE);
+        debug_assert!(value <= MAX_UNSIGNED_VALUE, "Value ${:x} is > ${:x}", value, MAX_UNSIGNED_VALUE);
         Word {
             value,
             phantom: PhantomData::default(),
