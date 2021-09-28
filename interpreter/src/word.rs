@@ -183,6 +183,14 @@ impl LongWord<sig::Unsigned> {
     }
 }
 
+impl From<u16> for LongWord<sig::Unsigned> {
+    fn from(x: u16) -> Self {
+        debug_assert!(x < 1 << (2*WORD_SIZE));
+        let (high, low) = div_rem(x, MAX_UNSIGNED_VALUE as u16);
+        LongWord { high: u8::into(high as u8), low: u8::into(low as u8) }
+    }
+}
+
 impl From<LongWord<sig::Unsigned>> for u16 {
     fn from(word: LongWord<sig::Unsigned>) -> Self {
         word.value()
