@@ -158,7 +158,7 @@ fn write_word(m: &mut Machine, x: &UWord) -> () {
 fn read_timed_address(m: &mut Machine) -> Timed<Address> {
     let low = m.read_pc();
     let high = m.read_pc();
-    let op = Address::from_words(high, low);
+    let op = Address { low, high };
     let time = m.read_pc().cast_to_signed();
     Timed { op, time }
 }
@@ -257,7 +257,7 @@ impl Operands {
 fn address_decode(m: &mut Machine) -> Address {
     let low = m.read_pc();
     let high = m.read_pc();
-    Address::from_words(high, low)
+    Address { low, high }
 }
 
 fn offset_decode(m: &mut Machine) -> Offset {

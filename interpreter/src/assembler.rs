@@ -284,7 +284,7 @@ fn read_hex_word(chars: &mut SlidingWindow) -> ReadResult<UWord> {
 fn read_address(chars: &mut SlidingWindow) -> ReadResult<Address> {
     let low = read_hex_word(chars)?;
     let high = read_hex_word(chars)?;
-    Ok(Address::from_words(high, low))
+    Ok(Address { low, high })
 }
 
 // Can be signed
@@ -329,7 +329,7 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
             match_char('%', chars)?;
             let low = read_hex_word(chars)?;
             let high = read_hex_word(chars)?;
-            let op = Address::from_words(high, low);
+            let op = Address { low, high };
 
             let next = chars.peek();
             if next.is_some() && *next.unwrap() == ',' {
@@ -349,7 +349,7 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
                 '%' => {
                     let low = read_hex_word(chars)?;
                     let high = read_hex_word(chars)?;
-                    let op = Address::from_words(high, low);
+                    let op = Address { low, high };
                     let time = read_time(chars)?;
 
                     Operand::Ind(Timed::new(op, time))
