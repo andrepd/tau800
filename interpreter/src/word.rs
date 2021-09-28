@@ -82,7 +82,7 @@ impl Word<sig::Unsigned> {
 
 impl From<u8> for Word<sig::Unsigned> {
     fn from(value: u8) -> Self {
-        debug_assert!(value <= MAX_UNSIGNED_VALUE);
+        debug_assert!(value <= MAX_UNSIGNED_VALUE, "Value ${:x} is > ${:x}", value, MAX_UNSIGNED_VALUE);
         Word {
             value,
             phantom: PhantomData::default(),
@@ -180,6 +180,14 @@ pub type ULongWord = LongWord<sig::Unsigned>;
 impl LongWord<sig::Unsigned> {
     pub fn value(self) -> u16 {
         (u8::from(self.low) as u16) + ((u8::from(self.high) as u16) << WORD_SIZE)
+    }
+}
+
+impl From<u16> for LongWord<sig::Unsigned> {
+    fn from(x: u16) -> Self {
+        debug_assert!(x < 1 << (2*WORD_SIZE));
+        let (high, low) = div_rem(x, MAX_UNSIGNED_VALUE as u16);
+        LongWord { high: u8::into(high as u8), low: u8::into(low as u8) }
     }
 }
 

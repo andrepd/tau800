@@ -7,6 +7,7 @@ mod machine;
 mod instruction;
 mod interpreter;
 mod assembler;
+// mod universe;
 
 fn main() -> std::io::Result<()> {
     let mut buffer = String::new();
@@ -19,8 +20,10 @@ fn main() -> std::io::Result<()> {
     }
     state.cpu = state::Cpu::default();
 
-    loop {
-        eprint!("{}", state);
+    /*loop*/ for _ in 0..100 {
+        eprint!("{}\n", state);
         interpreter::step(&mut state);
-    }
+    };
+
+    Ok(())  // Sintaxe linda
 }

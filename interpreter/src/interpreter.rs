@@ -72,16 +72,22 @@ fn set_flag_z(state: &mut Machine, value: &UWord) {
 }
 
 fn set_flag_n(state: &mut Machine, value: &UWord) {
-    state.cpu.flags.write(Flag::Z, value.value() < 0)
+    /*state.cpu.flags.write(Flag::N, value.value() < 0)*/
+    state.cpu.flags.write(Flag::N, value.value() & 0b100000 != 0)
 }
 
-fn set_flag_v(state: &mut Machine, value: &UWord) {
-    unimplemented!(); // Pá ainda não tenho bem a certeza como se implementa isto
+fn set_flag_v(state: &mut Machine, op1: u8, op2: u8, result: u8) {
+    // Signed overflow of operands have same sign and that sign is different from value
+    state.cpu.flags.write(Flag::V, (op1 ^ result) & (op2 ^ result) & 0b100000 != 0)
+}
+
+fn set_flag_v_dummy(state: &mut Machine, value: &UWord) {
+    state.cpu.flags.write(Flag::V, value.value() & 0b010000 != 0)
 }
 
 fn set_flag_nvz(state: &mut Machine, value: &UWord) {
     set_flag_n(state, value);
-    set_flag_v(state, value);
+    set_flag_v_dummy(state, value);
     set_flag_z(state, value);
 }
 
@@ -103,8 +109,11 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
 
         // Arithmetic
         Instruction::Add(Operands { src, dst }) => {
-            let result = mk_ref(state, &src).value()
-                + mk_ref(state, &dst).value()
+            let src_orig = mk_ref(state, &src).value();
+            let dst_orig = mk_ref(state, &dst).value();
+            let result = 
+                src_orig 
+                + dst_orig 
                 + u8::from(state.cpu.flags.read(Flag::C));
             let (div, rem) = div_rem(result, MAX_UNSIGNED_VALUE);
             let carry = div > 0;
@@ -112,12 +121,15 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
             *mk_mref(state, &dst) = word;
             state.cpu.flags.write(Flag::C, carry);
             set_flag_nvz(state, &word);
+            set_flag_v(state, src_orig, dst_orig, rem);
         }
         Instruction::Sub(Operands { src, dst }) => {
+            let src_orig = mk_ref(state, &src).value();
+            let dst_orig = mk_ref(state, &dst).value();
             let result = 
                 MAX_UNSIGNED_VALUE
-                + mk_ref(state, &dst).value()
-                - mk_ref(state, &src).value()
+                + dst_orig
+                - src_orig
                 - u8::from(!state.cpu.flags.read(Flag::C));
             let (div, rem) = div_rem(result, MAX_UNSIGNED_VALUE);
             let carry = !(div > 0);
@@ -125,6 +137,7 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
             *mk_mref(state, &dst) = word;
             state.cpu.flags.write(Flag::C, carry);
             set_flag_nvz(state, &word);
+            set_flag_v(state, !src_orig, dst_orig, rem);
         }
 
         Instruction::Mul(Operands { src, dst }) => {
