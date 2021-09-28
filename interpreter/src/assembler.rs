@@ -1,8 +1,7 @@
 use crate::instruction::{Instruction, Operand, Operands, Register, Timed};
 use crate::prelude::*;
-use std::f32::INFINITY;
 use std::iter::Peekable;
-use std::str::{CharIndices, Chars, Lines};
+use std::str::{CharIndices, Lines};
 
 struct LineIterator<'i> {
     lines: Lines<'i>,
@@ -250,12 +249,12 @@ fn read_register(chars: &mut SlidingWindow) -> ReadResult<Register> {
         'b' => match read_char(chars)? {
             'h' => Register::BH,
             'l' => Register::BL,
-            _ => unreachable!(),
+            _ => return Err(ReadError::UnexpectedChar(chars.pos())),
         },
         'c' => match read_char(chars)? {
             'h' => Register::CH,
             'l' => Register::CL,
-            _ => unreachable!(),
+            _ => return Err(ReadError::UnexpectedChar(chars.pos())),
         },
         'x' => Register::X,
         's' => {
@@ -263,7 +262,7 @@ fn read_register(chars: &mut SlidingWindow) -> ReadResult<Register> {
             unimplemented!("SP is not addressable")
             //Register::SP
         }
-        _ => unreachable!(),
+        _ => return Err(ReadError::UnexpectedChar(chars.pos())),
     };
     Ok(register)
 }
