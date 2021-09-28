@@ -4,7 +4,7 @@
 ; it out à mão. Gastavamos mais tempo a implementar do que a fazer à mão.
 
 ;dados
-mov #03 %0001
+mov #02 %0001  ; len-1
 
 mov #03 %000a
 mov #04 %010a
@@ -27,8 +27,10 @@ muh %000b,x ch   ; Upper bits of %000a × %000b
 ;clc              ; Clear carry flag
 add cl bl        ; Add lower bits
 add ch bh        ; Add upper bits + carry, so no need to jsr carry
+sec              ; Set carry flag aka clear borrow flag
 sub #01 x        ; sub sets NVZ flags
-bne -32          ; So we can branch immediately
+beq +4           ; So we can branch immediately
+jmp 3b02         ; Calculado a mao lol
 
 ;move to display (assumi que são os dois words a começar em 0x30?)
 mov bl %0030
