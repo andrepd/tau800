@@ -254,8 +254,8 @@ impl Operands {
 }
 
 fn address_decode(m: &mut Machine) -> Address {
-    let high = m.read_pc();
     let low = m.read_pc();
+    let high = m.read_pc();
     Address::from_words(high, low)
 }
 
