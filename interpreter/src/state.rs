@@ -18,7 +18,7 @@ flags! {
 
 impl From<Flag> for u8 {
     fn from(flag: Flag) -> Self {
-        flag.into()
+        flag as u8
     }
 }
 
