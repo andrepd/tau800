@@ -29,7 +29,7 @@ add cl bl        ; Add lower bits
 add ch bh        ; Add upper bits + carry, so no need to jsr carry
 sec              ; Set carry flag aka clear borrow flag
 sub #01 x        ; sub sets NVZ flags
-beq +4           ; So we can branch immediately
+beq +3           ; So we can branch immediately
 jmp 3b02         ; Calculado a mao lol
 
 ;move to display (assumi que são os dois words a começar em 0x30?)
