@@ -134,11 +134,11 @@ fn write_timed_register(m: &mut Machine, x: &Timed<Register>) -> () {
     use Register::*;
     match x.op {
         A => m.write_pc(UWord::from(0x0)),
-        BH => m.write_pc(UWord::from(0x1)),
-        BL => m.write_pc(UWord::from(0x2)),
-        CH => m.write_pc(UWord::from(0x3)),
-        CL => m.write_pc(UWord::from(0x4)),
-        X => m.write_pc(UWord::from(0x5)),
+        BH => m.write_pc(UWord::from(0x2)),
+        BL => m.write_pc(UWord::from(0x3)),
+        CH => m.write_pc(UWord::from(0x4)),
+        CL => m.write_pc(UWord::from(0x5)),
+        X => m.write_pc(UWord::from(0x6)),
         // SP => m.write_pc(UWord::from(0x7)),
     };
     m.write_pc(x.time.cast_to_unsigned());
@@ -155,16 +155,16 @@ fn write_word(m: &mut Machine, x: &UWord) -> () {
 
 /// Read a timed address from the RAM.
 fn read_timed_address(m: &mut Machine) -> Timed<Address> {
-    let high = m.read_pc();
     let low = m.read_pc();
+    let high = m.read_pc();
     let op = Address::from_words(high, low);
     let time = m.read_pc().cast_to_signed();
     Timed { op, time }
 }
 
 fn write_timed_address(m: &mut Machine, x: &Timed<Address>) -> () {
-    m.write_pc(x.op.high);
     m.write_pc(x.op.low);
+    m.write_pc(x.op.high);
     m.write_pc(x.time.cast_to_unsigned());
 }
 
