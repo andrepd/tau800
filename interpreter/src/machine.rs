@@ -59,7 +59,7 @@ impl std::fmt::Display for Machine {
         /*write!(f, "Mem:\n").unwrap();*/
         write!(f, "Mem: ").unwrap();
         for j in 0..64 { write!(f, "{:02x} ", j).unwrap() };
-        write!(f, "\n");
+        write!(f, "\n").unwrap();
         for i in 0..64 {
             /*write!(f, "{:4x} | ", i*64).unwrap();*/
             write!(f, "{:02x} | ", i).unwrap();

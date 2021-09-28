@@ -134,6 +134,7 @@ fn write_timed_register(m: &mut Machine, x: &Timed<Register>) -> () {
     use Register::*;
     match x.op {
         A => m.write_pc(UWord::from(0x0)),
+        // F => m.write_pc(UWord::from(0x1)),
         BH => m.write_pc(UWord::from(0x2)),
         BL => m.write_pc(UWord::from(0x3)),
         CH => m.write_pc(UWord::from(0x4)),
@@ -256,7 +257,7 @@ impl Operands {
 fn address_decode(m: &mut Machine) -> Address {
     let low = m.read_pc();
     let high = m.read_pc();
-    Address { low, high }
+    Address::from_words(high, low)
 }
 
 fn offset_decode(m: &mut Machine) -> Offset {
