@@ -303,7 +303,7 @@ fn read_time(chars: &mut SlidingWindow) -> ReadResult<IWord> {
         None => Ok(IWord::zero()),
         Some(_) => {
             let negative = match_char('-', chars).map(|_| true)?;
-            let absolute_value = read_decimal(chars)?.value() as i8;
+            let absolute_value = read_hex_word(chars)?.value() as i8;
             Ok(IWord::from(if negative {
                 -absolute_value
             } else {

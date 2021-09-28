@@ -55,15 +55,15 @@ impl std::fmt::Display for Machine {
             self.cpu.x.value(),
             self.cpu.sp.high.value(), self.cpu.sp.low.value(),
             self.cpu.pc.high.value(), self.cpu.pc.low.value(),
-        );
-        write!(f, "Mem:\n");
+        ).unwrap();
+        write!(f, "Mem:\n").unwrap();
         for i in 0..64 {
-            write!(f, "{:x} | ", i*64);
+            write!(f, "{:x} | ", i*64).unwrap();
             for j in 0..64 {
-                write!(f, "{:x} ", self.ram[i*64+j].value());
+                write!(f, "{:x} ", self.ram[i*64+j].value()).unwrap();
             }
-            write!(f, "\n");
-        };
-        write!(f, "")  // Sem esta linha dá erro lel
+            write!(f, "\n").unwrap();
+        }
+        Ok(())
     }
 }
