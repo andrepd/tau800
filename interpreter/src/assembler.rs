@@ -38,72 +38,46 @@ pub fn assemble<'i>(input: &'i str) -> LineIterator<'i> {
 }
 
 fn read_instruction(literal: &str, line_idx: usize) -> Instruction {
-    let mut iter = WindowSource::new(literal).window();
+    let mut source = WindowSource::new(literal);
+    let mut iter = source.window();
 
     let mnemonic = {
-        iter.take_while(|c| !c.is_whitespace());
-        iter.collect().expect("Could not find a mnemonic.")
+        iter.take_while(|c| !c.is_whitespace())
+            .collect()
+            .expect("Could not find a mnemonic.")
     };
+
     eat_whitespace(&mut iter);
 
-    let panic_read_err = |err| -> ! {
-        match err {
-            ReadError::NoMoreChars => panic!("Unexpected EOF"),
-            ReadError::UnexpectedChar(col) => {
-                panic!("Unexpected character at {}:{}", line_idx, col)
-            }
-        }
-    };
-
-    let mut read_operands = || match read_operands(&mut iter) {
-        Ok(operands) => operands,
-        Err(err) => panic_read_err(err),
-    };
-
-    let mut read_single_operand = || match read_operand(&mut iter) {
-        Ok(operand) => operand,
-        Err(err) => panic_read_err(err),
-    };
-
-    let mut read_unwrapped_address = || match read_address(&mut iter) {
-        Ok(addr) => addr,
-        Err(err) => panic_read_err(err),
-    };
-
-    let mut read_unwrapped_offset = || match read_hex_word(&mut iter) {
-        Ok(word) => word.cast_to_signed(),
-        Err(err) => panic_read_err(err),
-    };
-
     let instruction = match mnemonic {
-        "mov" => Instruction::Mov(read_operands()),
-        "psh" => Instruction::Psh(read_single_operand()),
-        "pop" => Instruction::Pop(read_single_operand()),
-        "add" => Instruction::Add(read_operands()),
-        "sub" => Instruction::Sub(read_operands()),
-        "mul" => Instruction::Mul(read_operands()),
-        "muh" => Instruction::Muh(read_operands()),
-        "mus" => Instruction::Mus(read_operands()),
-        "div" => Instruction::Div(read_operands()),
-        "mod" => Instruction::Mod(read_operands()),
-        "and" => Instruction::And(read_operands()),
-        "or" => Instruction::Or(read_operands()),
-        "xor" => Instruction::Xor(read_operands()),
-        "not" => Instruction::Not(read_single_operand()),
-        "lsl" => Instruction::Lsl(read_single_operand()),
-        "lsr" => Instruction::Lsr(read_single_operand()),
-        "cmp" => Instruction::Cmp(read_single_operand()),
-        "bit" => Instruction::Bit(read_single_operand()),
-        "jmp" => Instruction::Jmp(read_unwrapped_address()),
-        "bcc" => Instruction::Bcc(read_unwrapped_offset()),
-        "bcs" => Instruction::Bcs(read_unwrapped_offset()),
-        "bne" => Instruction::Bne(read_unwrapped_offset()),
-        "beq" => Instruction::Beq(read_unwrapped_offset()),
-        "bpl" => Instruction::Bpl(read_unwrapped_offset()),
-        "bmi" => Instruction::Bmi(read_unwrapped_offset()),
+        "mov" => Instruction::Mov(read_operands(&mut iter).or_panic(line_idx)),
+        "psh" => Instruction::Psh(read_operand(&mut iter).or_panic(line_idx)),
+        "pop" => Instruction::Pop(read_operand(&mut iter).or_panic(line_idx)),
+        "add" => Instruction::Add(read_operands(&mut iter).or_panic(line_idx)),
+        "sub" => Instruction::Sub(read_operands(&mut iter).or_panic(line_idx)),
+        "mul" => Instruction::Mul(read_operands(&mut iter).or_panic(line_idx)),
+        "muh" => Instruction::Muh(read_operands(&mut iter).or_panic(line_idx)),
+        "mus" => Instruction::Mus(read_operands(&mut iter).or_panic(line_idx)),
+        "div" => Instruction::Div(read_operands(&mut iter).or_panic(line_idx)),
+        "mod" => Instruction::Mod(read_operands(&mut iter).or_panic(line_idx)),
+        "and" => Instruction::And(read_operands(&mut iter).or_panic(line_idx)),
+        "or" => Instruction::Or(read_operands(&mut iter).or_panic(line_idx)),
+        "xor" => Instruction::Xor(read_operands(&mut iter).or_panic(line_idx)),
+        "not" => Instruction::Not(read_operand(&mut iter).or_panic(line_idx)),
+        "lsl" => Instruction::Lsl(read_operand(&mut iter).or_panic(line_idx)),
+        "lsr" => Instruction::Lsr(read_operand(&mut iter).or_panic(line_idx)),
+        "cmp" => Instruction::Cmp(read_operand(&mut iter).or_panic(line_idx)),
+        "bit" => Instruction::Bit(read_operand(&mut iter).or_panic(line_idx)),
+        "jmp" => Instruction::Jmp(read_address(&mut iter).or_panic(line_idx)),
+        "bcc" => Instruction::Bcc(read_hex_word(&mut iter).or_panic(line_idx).cast_to_signed()),
+        "bcs" => Instruction::Bcs(read_hex_word(&mut iter).or_panic(line_idx).cast_to_signed()),
+        "bne" => Instruction::Bne(read_hex_word(&mut iter).or_panic(line_idx).cast_to_signed()),
+        "beq" => Instruction::Beq(read_hex_word(&mut iter).or_panic(line_idx).cast_to_signed()),
+        "bpl" => Instruction::Bpl(read_hex_word(&mut iter).or_panic(line_idx).cast_to_signed()),
+        "bmi" => Instruction::Bmi(read_hex_word(&mut iter).or_panic(line_idx).cast_to_signed()),
         "clc" => Instruction::Clc,
         "sec" => Instruction::Sec,
-        "cal" => Instruction::Cal(read_unwrapped_address()),
+        "cal" => Instruction::Cal(read_address(&mut iter).or_panic(line_idx)),
         "ret" => Instruction::Ret,
         "nop" => Instruction::Nop,
         _ => panic!("Invalid mnemonic {}", mnemonic),
@@ -119,6 +93,24 @@ enum ReadError {
 }
 
 type ReadResult<T> = Result<T, ReadError>;
+
+trait ReadOrPanic<T> {
+    fn or_panic(self, line: usize) -> T;
+}
+
+impl<T> ReadOrPanic<T> for ReadResult<T> {
+    fn or_panic(self, line: usize) -> T {
+        match self {
+            Ok(value) => value,
+            Err(err) => match err {
+                ReadError::NoMoreChars => panic!("Unexpected EOF."),
+                ReadError::UnexpectedChar(col) => {
+                    panic!("Unexpected character at {}:{}", line, col)
+                }
+            },
+        }
+    }
+}
 
 struct WindowSource<'s> {
     source: &'s str,
@@ -174,7 +166,7 @@ impl<'k, 's> SlidingWindow<'k, 's> {
         }
     }
 
-    fn peek(&self) -> Option<&char> {
+    fn peek(&mut self) -> Option<&char> {
         self.parent.chars.peek().map(|(_, c)| c)
     }
 
@@ -192,7 +184,7 @@ impl<'k, 's> SlidingWindow<'k, 's> {
         Some(slice)
     }
 
-    fn take_while<F: Fn(&char) -> bool>(mut self, pred: F) -> Self {
+    fn take_while<F: Fn(&char) -> bool>(&mut self, pred: F) -> &mut Self {
         let mut next = Some(' '); // doesn't matter the char here
         while next.is_some() && self.peek().is_some() && pred(self.peek().unwrap()) {
             next = self.next()
@@ -239,7 +231,9 @@ fn match_char(to_match: char, chars: &mut SlidingWindow) -> ReadResult<()> {
     }
 }
 
-fn eat_whitespace<'k, 's>(chars: &mut SlidingWindow<'k, 's>) -> SlidingWindow<'k, 's> {
+fn eat_whitespace<'r, 'k, 's>(
+    chars: &'r mut SlidingWindow<'k, 's>,
+) -> &'r mut SlidingWindow<'k, 's> {
     chars.take_while(|c| c.is_whitespace())
 }
 
@@ -299,7 +293,7 @@ fn read_address(chars: &mut SlidingWindow) -> ReadResult<Address> {
 }
 
 fn read_decimal(chars: &mut SlidingWindow) -> ReadResult<UWord> {
-    let subwindow = chars.window_from_here();
+    let mut subwindow = chars.window_from_here();
     let value = subwindow
         .take_while(|c| c.is_digit(10))
         .collect()

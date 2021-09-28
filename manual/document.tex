@@ -8,7 +8,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[british]{babel}
 \usepackage{csquotes}
-\usepackage[a4paper]{geometry}
+%\usepackage[a4paper]{geometry}
 
 \usepackage[whole]{bxcjkjatype}
 
@@ -34,7 +34,7 @@
 \newcommand{\imp}{\mathrel{\mkern3mu\Rightarrow\mkern3mu}}
 
 \usepackage{tikz}
-\usetikzlibrary{shapes,arrows,positioning,calc,decorations,arrows.meta}
+\usetikzlibrary{shapes,arrows,positioning,calc,decorations,arrows.meta,matrix}
 \input{tikz}
 
 \definecolor{linkblue}{HTML}{0066cc}
@@ -374,7 +374,7 @@ The following is a quick-reference list of instructions.
 }
 
 \noindent
-\textit{\small Note: unless otherwise noted, instructions that 「set the \ttt{Z} flag」 set it if the result is zero, and clear it otherwise, instructions that 「set the \ttt{N} flag」 set it to the value of the most significant bit of the result (i.e.\ set if negative, clear otherwise); and instructions that 「set the \ttt{V} flag」  set it to the value of the second most significant bit of the result (i.e.\ set if signed arithmetic overflows, clear otherwise).}.
+\textit{\small Note: unless otherwise noted, instructions that 「set the \ttt{Z} flag」 set it if the result is zero, and clear it otherwise, instructions that 「set the \ttt{N} flag」 set it to the value of the most significant bit of the result (i.e.\ set if negative, clear otherwise); and instructions that 「set the \ttt{V} flag」  set if signed arithmetic overflows, and clear it otherwise.}.
 \subsubsection*{Memory}
 
 \instruction{MOV src dst}{Set word at \texttt{dst} to contents of \texttt{src}. \\ Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.}
