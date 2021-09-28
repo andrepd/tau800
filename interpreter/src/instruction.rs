@@ -51,6 +51,7 @@ pub enum Operand {
 //          Operands { src: Imm(src), reg: Reg(reg) } => ...,
 //          _ => ...
 //      }
+#[derive(Debug)]
 pub struct Operands {
     pub src: Operand,
     pub dst: Operand,
@@ -64,6 +65,7 @@ impl Operands {
 
 pub type Offset = IWord;
 
+#[derive(Debug)]
 pub enum Instruction {
     Mov(Operands),
     Psh(Operand),

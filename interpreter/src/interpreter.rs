@@ -140,14 +140,14 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
         Instruction::Muh(Operands { src, dst }) => {
             // Multiply normally
             let result: u16 = mk_ref(state, &dst).value() as u16 * mk_ref(state, &src).value() as u16;
-            let word = UWord::from((result >> WORD_SIZE) as u8)
+            let word = UWord::from((result >> WORD_SIZE) as u8);
             *mk_mref(state, &dst) = word;
             set_flag_nvz(state, &word);            
         }
         Instruction::Mus(Operands { src, dst }) => {
             // First sign-extend to 12-bit two's complement integer
             fn sign_extend(x: u8) -> u16 {
-                if x & 0b100_000 == 0 { x } else { 0b111_111_000_000 | x }
+                if x & 0b100_000 == 0 { x as u16 } else { 0b111_111_000_000 | (x as u16) }
             }
             let result = sign_extend(mk_ref(state, &dst).value()) * sign_extend(mk_ref(state, &src).value());
             let word = UWord::from((result >> WORD_SIZE) as u8);
@@ -157,13 +157,13 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
         Instruction::Div(Operands { src, dst }) => {
             let result = mk_ref(state, &dst).value() / mk_ref(state, &src).value();
             let word = UWord::from(result);
-            *mk_ref(state, &dst) = word;
+            *mk_mref(state, &dst) = word;
             set_flag_z(state, &word);
         }
         Instruction::Mod(Operands { src, dst }) => {
             let result = mk_ref(state, &dst).value() / mk_ref(state, &src).value();
             let word = UWord::from(result);
-            *mk_ref(state, &dst) = word;
+            *mk_mref(state, &dst) = word;
             set_flag_z(state, &word);
         }
 
@@ -266,7 +266,7 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
     }
 }
 
-fn step(state: &mut Machine) {
+pub fn step(state: &mut Machine) {
     let instruction = Instruction::decode(/*&mut*/ state);
     execute(state, &instruction)
 }
