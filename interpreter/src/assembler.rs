@@ -3,7 +3,7 @@ use crate::prelude::*;
 use std::iter::Peekable;
 use std::str::{CharIndices, Lines};
 
-struct LineIterator<'i> {
+pub struct LineIterator<'i> {
     lines: Lines<'i>,
     line_idx: usize,
 }
@@ -30,7 +30,7 @@ impl<'i> Iterator for LineIterator<'i> {
     }
 }
 
-fn assemble<'i>(input: &'i str) -> LineIterator<'i> {
+pub fn assemble<'i>(input: &'i str) -> LineIterator<'i> {
     LineIterator {
         lines: input.lines(),
         line_idx: 0,
