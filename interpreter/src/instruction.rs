@@ -270,40 +270,34 @@ fn address_encode(m: &mut Machine, x: &Address) {
 }
 
 fn offset_encode(m: &mut Machine, x: &Offset) {
-    m.write_pc(x.cast_to_unsigned())
+    m.write_pc(dbg!(x.cast_to_unsigned()))
 }
 
 impl Instruction {
     pub fn decode(m: &mut Machine) -> Self {
         use Instruction::*;
         let opcode = m.read_pc();
-        let mode = m.read_pc();
+        /*let mode = m.read_pc();*/
         match opcode.value() {
-            0x00 => match mode.value() {
-                0x00 => Nop,
-                0x01 => Clc,
-                0x02 => Sec,
-                0x3f => Ret,
-                _ => unreachable!(),
-            },
-            0x01 => Mov(Operands::decode(m, mode)),
-            0x02 => Psh(Operand::decode(m, mode)),
-            0x03 => Pop(Operand::decode(m, mode)),
-            0x04 => Add(Operands::decode(m, mode)),
-            0x05 => Sub(Operands::decode(m, mode)),
-            0x06 => Mul(Operands::decode(m, mode)),
-            0x20 => Muh(Operands::decode(m, mode)),
-            0x07 => Mus(Operands::decode(m, mode)),
-            0x08 => Div(Operands::decode(m, mode)),
-            0x0a => Mod(Operands::decode(m, mode)),
-            0x0c => And(Operands::decode(m, mode)),
-            0x0d => Or(Operands::decode(m, mode)),
-            0x0e => Xor(Operands::decode(m, mode)),
-            0x0f => Not(Operand::decode(m, mode)),
-            0x10 => Lsl(Operand::decode(m, mode)),
-            0x11 => Lsr(Operand::decode(m, mode)),
-            0x12 => Cmp(Operand::decode(m, mode)),
-            0x13 => Bit(Operand::decode(m, mode)),
+            0x00 => Nop, 
+            0x01 => { let mode = m.read_pc(); Mov(Operands::decode(m, mode)) },
+            0x02 => { let mode = m.read_pc(); Psh(Operand::decode(m, mode))  },
+            0x03 => { let mode = m.read_pc(); Pop(Operand::decode(m, mode))  },
+            0x04 => { let mode = m.read_pc(); Add(Operands::decode(m, mode)) },
+            0x05 => { let mode = m.read_pc(); Sub(Operands::decode(m, mode)) },
+            0x06 => { let mode = m.read_pc(); Mul(Operands::decode(m, mode)) },
+            0x20 => { let mode = m.read_pc(); Muh(Operands::decode(m, mode)) },
+            0x07 => { let mode = m.read_pc(); Mus(Operands::decode(m, mode)) },
+            0x08 => { let mode = m.read_pc(); Div(Operands::decode(m, mode)) },
+            0x0a => { let mode = m.read_pc(); Mod(Operands::decode(m, mode)) },
+            0x0c => { let mode = m.read_pc(); And(Operands::decode(m, mode)) },
+            0x0d => { let mode = m.read_pc(); Or (Operands::decode(m, mode)) },
+            0x0e => { let mode = m.read_pc(); Xor(Operands::decode(m, mode)) },
+            0x0f => { let mode = m.read_pc(); Not(Operand::decode(m, mode))  },
+            0x10 => { let mode = m.read_pc(); Lsl(Operand::decode(m, mode))  },
+            0x11 => { let mode = m.read_pc(); Lsr(Operand::decode(m, mode))  },
+            0x12 => { let mode = m.read_pc(); Cmp(Operand::decode(m, mode))  },
+            0x13 => { let mode = m.read_pc(); Bit(Operand::decode(m, mode))  },
             0x14 => Jmp(address_decode(m)),
             0x15 => Bcc(offset_decode(m)),
             0x16 => Bcs(offset_decode(m)),
@@ -312,6 +306,9 @@ impl Instruction {
             0x19 => Bpl(offset_decode(m)),
             0x1a => Bmi(offset_decode(m)),
             0x1d => Cal(address_decode(m)),
+            0x21 => Clc,
+            0x22 => Sec,
+            0x3f => Ret,
             _ => unreachable!(),
         }
     }
@@ -321,18 +318,15 @@ impl Instruction {
         match instruction {
             Nop => {
                 m.write_pc(UWord::from(0x00));
-                m.write_pc(UWord::from(0x00));
+                /*m.write_pc(UWord::from(0x00));*/
             }
             Clc => {
-                m.write_pc(UWord::from(0x00));
-                m.write_pc(UWord::from(0x01));
+                m.write_pc(UWord::from(0x21));
             }
             Sec => {
-                m.write_pc(UWord::from(0x00));
-                m.write_pc(UWord::from(0x02));
+                m.write_pc(UWord::from(0x22));
             }
             Ret => {
-                m.write_pc(UWord::from(0x00));
                 m.write_pc(UWord::from(0x3f));
             }
             Mov(ops) => {
