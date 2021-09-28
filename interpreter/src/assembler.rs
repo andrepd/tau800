@@ -110,7 +110,7 @@ fn read_instruction(literal: &str, line_idx: usize) -> Instruction {
         _ => panic!("Invalid mnemonic {}", mnemonic),
     };
 
-    todo!()
+    instruction
 }
 
 #[derive(Debug)]
