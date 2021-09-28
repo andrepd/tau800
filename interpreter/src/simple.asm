@@ -1,1 +1,1 @@
-mov %f300 a
+mov #3f a
