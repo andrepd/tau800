@@ -8,7 +8,8 @@ use crate::prelude::{div_rem, Address};
 pub const WORD_SIZE: usize = 6;
 
 pub const MAX_UNSIGNED_VALUE: u8 = (1 << WORD_SIZE) as u8 - 1;
-pub const MAX_SIGNED_VALUE: u8 = (1 << (WORD_SIZE - 1)) as u8 - 1;
+pub const MAX_SIGNED_VALUE: i8 = (1 << (WORD_SIZE - 1)) as i8 - 1;
+pub const MIN_SIGNED_VALUE: i8 = -MAX_SIGNED_VALUE - 1;
 pub const SIGN_BIT: u8 = (1 << WORD_SIZE) as u8;
 
 pub mod sig {
@@ -113,10 +114,10 @@ impl Word<sig::Signed> {
 
 impl From<i8> for Word<sig::Signed> {
     fn from(value: i8) -> Self {
+        debug_assert!(MIN_SIGNED_VALUE <= value && value <= MAX_SIGNED_VALUE, "Value {} isn't in {} – {}", value, MIN_SIGNED_VALUE, MAX_SIGNED_VALUE);
+
         let negative = value < 0;
         let abs = value.abs() as u8;
-
-        debug_assert!(abs <= MAX_SIGNED_VALUE, "Value {} doesn't have absolute value <= {}", value, MAX_SIGNED_VALUE);
 
         let value = if negative {
             ((!abs & MAX_UNSIGNED_VALUE) + 1) & MAX_UNSIGNED_VALUE
@@ -252,7 +253,7 @@ pub trait CheckedIncrement {
 impl CheckedIncrement for Word<sig::Signed> {
     fn try_increment(&mut self) -> Result<(), ()> {
         let value = self.value();
-        if value + 1 <= MAX_SIGNED_VALUE as i8 {
+        if value + 1 <= MAX_SIGNED_VALUE {
             *self.raw_inner_mut() = (value + 1) as u8;
             Ok(())
         } else {
