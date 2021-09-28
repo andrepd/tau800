@@ -119,11 +119,11 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
                 src_orig 
                 + dst_orig 
                 + u8::from(state.cpu.flags.read(Flag::C));
-            let (div, rem) = div_rem(result, MAX_UNSIGNED_VALUE);
+            let (div, rem) = div_rem(result, MAX_UNSIGNED_VALUE+1);
             let carry = div > 0;
             let word = UWord::from(rem);
             *mk_mref(state, &dst) = word;
-            state.cpu.flags.write(Flag::C, carry);
+            state.cpu.flags.write(Flag::C, dbg!(carry));
             set_flag_nvz(state, &word);
             set_flag_v(state, src_orig, dst_orig, rem);
         }
@@ -131,11 +131,11 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
             let src_orig = mk_ref(state, &src).value();
             let dst_orig = mk_ref(state, &dst).value();
             let result = 
-                MAX_UNSIGNED_VALUE
+                MAX_UNSIGNED_VALUE+1
                 + dst_orig
                 - src_orig
                 - u8::from(!state.cpu.flags.read(Flag::C));
-            let (div, rem) = div_rem(result, MAX_UNSIGNED_VALUE);
+            let (div, rem) = div_rem(result, MAX_UNSIGNED_VALUE+1);
             let carry = !(div > 0);
             let word = UWord::from(rem);
             *mk_mref(state, &dst) = word;
@@ -149,7 +149,7 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
             /*let (_div, rem) = div_rem(result, MAX_UNSIGNED_VALUE);
             let carry = !(div > 0);
             let word = UWord::from(rem);*/
-            let word = UWord::from(result % MAX_UNSIGNED_VALUE);
+            let word = UWord::from(result % (MAX_UNSIGNED_VALUE+1));
             *mk_mref(state, &dst) = word;
             /*state.cpu.flags.write(Flag::C, carry);*/
             set_flag_nvz(state, &word);
