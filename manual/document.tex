@@ -385,48 +385,53 @@ The following is a quick-reference list of instructions.
 \subsubsection*{Arithmetic}
 
 \instruction{ADD src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}+\texttt{dst}+\ttt{C}$. \\
+	Set word at \texttt{dst} to $\texttt{dst}+\texttt{src}+\ttt{C}$. \\
 	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on overflow.
 }
 
 \instruction{SUB src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}-\texttt{dst}-\overline{\ttt{C}}$. \\
+	Set word at \texttt{dst} to $\texttt{dst}-\texttt{src}-\overline{\ttt{C}}$. \\
 	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on underflow.
 }
 
 \instruction{MUL src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}×\texttt{dst}$, where operands are unsigned values. \\
-	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on overflow.
+	Set word at \texttt{dst} to the lower bits of $\texttt{dst}×\texttt{src}$. \\
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.
+}
+
+\instruction{MUH src dst}{%
+	Set word at \texttt{dst} to the upper bits of $\texttt{dst}×\texttt{src}$, where operands are unsigned values. \\
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.
 }
 
 \instruction{MUS src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}×\texttt{dst}$, where operands are signed values. \\
-	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}, set \ttt{C} on overflow.
+	Set word at \texttt{dst} to the upper bits of $\texttt{dst}×\texttt{src}$, where operands are signed values. \\
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.
 }
 
 %\todo{Como fazer handle de divisoes por zero?}
 \instruction{DIV src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}\div\texttt{dst}$, where operands are unsigned values. \\
+	Set word at \texttt{dst} to $\texttt{dst}\div\texttt{src}$, where operands are unsigned values. \\
 	Flags: set \ttt{Z}.
 }
 
-\instruction{DIS src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}\div\texttt{dst}$, where operands are signed values. \\
-	Flags: set \ttt{Z}.
-}
+%\instruction{DIS src dst}{%
+%	Set word at \texttt{dst} to $\texttt{src}\div\texttt{dst}$, where operands are signed values. \\
+%	Flags: set \ttt{Z}.
+%}
 
 \renewcommand\mod%
 {\mathrel{\mathrm{mod}}}
 
 \instruction{MOD src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}\mod\texttt{dst}$, where operands are unsigned values. \\
+	Set word at \texttt{dst} to $\texttt{dst}\mod\texttt{src}$, where operands are unsigned values. \\
 	Flags: set \ttt{Z}.
 }
 
-\instruction{MOS src dst}{%
-	Set word at \texttt{dst} to $\texttt{src}\mod\texttt{dst}$, where operands are signed values.\\
-	Flags: set \ttt{Z}.
-}
+%\instruction{MOS src dst}{%
+%	Set word at \texttt{dst} to $\texttt{src}\mod\texttt{dst}$, where operands are signed values.\\
+%	Flags: set \ttt{Z}.
+%}
 
 
 \instruction{AND src dst}{%
