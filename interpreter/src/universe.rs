@@ -9,8 +9,8 @@ use crate::{
 
 const MAX_ITERATIONS_BEFORE_INCONSISTENCY: usize = 100;
 const CYCLE_RANGE: usize = 200;
-const BEFORE_CURRENT_IDX: usize = CYCLE_RANGE + 1;
-const AFTER_CURRENT_IDX: usize = BEFORE_CURRENT_IDX - 1;
+const BEFORE_CURRENT_IDX: usize = CYCLE_RANGE;
+const AFTER_CURRENT_IDX: usize = BEFORE_CURRENT_IDX + 1;
 const TOTAL_SNAPSHOTS: usize = 2 * CYCLE_RANGE + 3;
 
 #[derive(Debug)]
@@ -55,8 +55,8 @@ impl Universe {
             //      (state after each future command) + (state before and after first and last command, respectively) =
             // = 200+1+200+2 = 403 snapshots
             //
-            // Larger indices = older cycles
-            //  (index 201 is before the current command, index 200 is after current command)
+            // Index up = Future
+            //  (index 200 is before the current command, index 201 is after current command)
             //
             // In order to bootstrap the timeline, the machines must be able to
             // read from the timeline in the first place. The rules for this bootstrapping
@@ -70,7 +70,7 @@ impl Universe {
             timeline[BEFORE_CURRENT_IDX] = entry_point.clone();
 
             let mut current_state = entry_point;
-            for t in (0..=AFTER_CURRENT_IDX).rev() {
+            for t in AFTER_CURRENT_IDX..TOTAL_SNAPSHOTS {
                 let bootstrap_universe = Universe {
                     timeline: timeline.clone(),
                     past: 0,
@@ -88,6 +88,18 @@ impl Universe {
             .expect("Could not bootstrap consistency.")
     }
 
+    pub fn now(&self) -> &Machine {
+        &self.timeline[BEFORE_CURRENT_IDX]
+    }
+
+    pub fn future(&self, offset: usize) -> &Machine {
+        &self.timeline[BEFORE_CURRENT_IDX + offset]
+    }
+
+    pub fn past(&self, offset: usize) -> &Machine {
+        &self.timeline[BEFORE_CURRENT_IDX - offset]
+    }
+
     pub fn step(mut self) -> Result<Self, ConsistencyError> {
         self.timeline.pop_front();
         let mut next_state = self.timeline.back().unwrap().clone();
@@ -99,19 +111,15 @@ impl Universe {
         Ok(self.consist().expect("Could not self-consist."))
     }
 
-    pub fn now(&self) -> &Machine {
-        &self.timeline[BEFORE_CURRENT_IDX]
-    }
-
     fn consist(self) -> Result<Self, ConsistencyError> {
-        let past_limit = BEFORE_CURRENT_IDX + self.past;
+        let past_limit = BEFORE_CURRENT_IDX - self.past;
         let mut last_universe = self.clone();
         for _iteration in 0..MAX_ITERATIONS_BEFORE_INCONSISTENCY {
             let mut new_universe = last_universe.clone();
-            for instant in (1..=past_limit).rev() {
+            for instant in (past_limit..(TOTAL_SNAPSHOTS - 1)).rev() {
                 let mut next_state = new_universe.timeline[instant].clone();
                 interpreter::step(&mut next_state, &new_universe);
-                new_universe.timeline[instant - 1] = next_state;
+                new_universe.timeline[instant + 1] = next_state;
             }
 
             if new_universe == last_universe {

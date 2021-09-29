@@ -18,7 +18,7 @@ fn main() -> std::io::Result<()> {
     let buffer = buffer.to_lowercase(); // For flexibility
     let mut universe = Universe::bootstrap(&buffer);
     println!("{:}", universe.now());
-
+    
     for _i in 0..100 {
         universe = universe.step().unwrap();
         println!("{:}", universe.now());
