@@ -1,19 +1,16 @@
 use crate::prelude::*;
-use flagset::flags;
 
 // CPU
 
-flags! {
-    pub enum Flag: u8 {
-        /// Negative: set if value is negative
-        N,
-        /// Overflow: set if signed arithmetic overflows
-        V,
-        /// Zero: set if value is zero
-        Z, 
-        /// Carry: set if unsigned overflows the register
-        C,
-    }
+pub enum Flag {
+    /// Negative: set if value is negative
+    N = 1 << 0,
+    /// Overflow: set if signed arithmetic overflows
+    V = 1 << 1,
+    /// Zero: set if value is zero
+    Z = 1 << 2, 
+    /// Carry: set if unsigned overflows the register
+    C = 1 << 3,
 }
 
 impl From<Flag> for u8 {

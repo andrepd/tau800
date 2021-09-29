@@ -119,8 +119,8 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
                 src_orig 
                 + dst_orig 
                 + u8::from(state.cpu.flags.read(Flag::C));
-            let (div, rem) = div_rem(result, MAX_UNSIGNED_VALUE);
-            let carry = div > 0;
+            let carry = result > MAX_UNSIGNED_VALUE;
+            let rem = result % MAX_UNSIGNED_VALUE;
             let word = UWord::from(rem);
             *mk_mref(state, &dst) = word;
             state.cpu.flags.write(Flag::C, carry);
@@ -135,8 +135,8 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
                 + dst_orig
                 - src_orig
                 - u8::from(!state.cpu.flags.read(Flag::C));
-            let (div, rem) = div_rem(result, MAX_UNSIGNED_VALUE);
-            let carry = !(div > 0);
+            let carry = result > MAX_UNSIGNED_VALUE;
+            let rem = result % MAX_UNSIGNED_VALUE;
             let word = UWord::from(rem);
             *mk_mref(state, &dst) = word;
             state.cpu.flags.write(Flag::C, carry);
