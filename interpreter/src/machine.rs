@@ -20,19 +20,29 @@ impl Machine {
         }
     }
 
+    fn increment_pc_or_overflow(&mut self) {
+        // self.cpu.pc.try_increment().expect("Overflowed program counter.");
+        // Don't panic on overflow of PC because the futures on the timeline will
+        // panic when close to the maximum.
+        // Instead, overflow the PC
+        if self.cpu.pc.try_increment().is_err() {
+            self.cpu.pc = ULongWord { low: UWord::zero(), high: UWord::zero() };
+        }
+    }
+
     /// Read the next value in ram, as indicated by the Program Counter (PC) in
     /// CPU, and increment the PC.
     pub fn read_pc(&mut self) -> UWord {
         let word = self.ram[self.cpu.pc];
-        self.cpu.pc.try_increment().expect("Overflowed program counter.");
+        self.increment_pc_or_overflow();
         word
     }
 
     /// Write a word at PC and increment the PC.
-    pub fn write_pc(&mut self, word: UWord) -> () {
+    pub fn write_pc(&mut self, word: UWord) {
         self.ram[self.cpu.pc] = word;
-        self.cpu.pc.try_increment().expect("Overflowed program counter.");
-        ()
+        self.increment_pc_or_overflow();
+
     }
 
     /// Read a word from stack and increment the sp. 

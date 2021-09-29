@@ -1,3 +1,4 @@
+use core::panic;
 use std::io::Read;
 
 use universe::Universe;
