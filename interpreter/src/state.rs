@@ -34,12 +34,12 @@ impl Default for FlagWord {
 
 impl FlagWord {
     pub fn read(&self, flag: Flag) -> bool {
-        let mask = 1 << u8::from(flag);
+        let mask = u8::from(flag);
         self.word.value() & mask != 0
     }
 
     pub fn write(&mut self, flag: Flag, value: bool) -> () {
-        let mask = 1 << u8::from(flag);
+        let mask = u8::from(flag);
         let new = 
             if value {
                 self.word.value() | mask
