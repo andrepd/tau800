@@ -1,6 +1,7 @@
 use crate::instruction::{Instruction, Operand, Operands, Register, Timed};
 use crate::prelude::*;
 use crate::state::Flag;
+use crate::universe::Universe;
 
 // De momento tá a ignorar o time, depois temos de fazer um struct estado total que tem
 // os estados em todos os momentos.
@@ -82,7 +83,7 @@ fn set_flag_nvz(state: &mut Machine, value: &UWord) {
     set_flag_z(state, value);
 }
 
-fn execute(state: &mut Machine, instruction: &Instruction) {
+fn execute(state: &mut Machine, instruction: &Instruction, universe: &Universe) {
     let mk_ref = operand_to_ref;
     let mk_mref = operand_to_mut_ref;
 
@@ -270,7 +271,7 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
     }
 }
 
-pub fn step(state: &mut Machine) {
+pub fn step(state: &mut Machine, universe: &Universe) {
     let instruction = Instruction::decode(state);
-    execute(state, &instruction)
+    execute(state, &instruction, universe)
 }

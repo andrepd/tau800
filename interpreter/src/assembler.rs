@@ -3,12 +3,12 @@ use crate::prelude::*;
 use std::iter::Peekable;
 use std::str::{CharIndices, Lines};
 
-pub struct LineIterator<'i> {
+pub struct InstructionIterator<'i> {
     lines: Lines<'i>,
     line_idx: usize,
 }
 
-impl<'i> Iterator for LineIterator<'i> {
+impl<'i> Iterator for InstructionIterator<'i> {
     type Item = Instruction;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -30,8 +30,8 @@ impl<'i> Iterator for LineIterator<'i> {
     }
 }
 
-pub fn assemble<'i>(input: &'i str) -> LineIterator<'i> {
-    LineIterator {
+pub fn assemble<'i>(input: &'i str) -> InstructionIterator<'i> {
+    InstructionIterator {
         lines: input.lines(),
         line_idx: 0,
     }

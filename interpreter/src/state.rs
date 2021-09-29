@@ -52,6 +52,7 @@ impl FlagWord {
 
 pub type Address = ULongWord;
 
+#[derive(Debug, Clone)]
 pub struct Cpu {
     pub a: UWord,
     pub flags: FlagWord,
@@ -85,6 +86,7 @@ impl Default for Cpu {
 
 const RAM_SIZE: usize = 1 << (2 * WORD_SIZE);
 
+#[derive(Debug, Clone)]
 pub struct Ram([UWord; RAM_SIZE]);
 
 impl std::ops::Index<usize> for Ram {

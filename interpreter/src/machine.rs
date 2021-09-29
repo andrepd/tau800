@@ -1,5 +1,6 @@
 use crate::prelude::*;
 
+#[derive(Debug, Clone)]
 pub struct Machine {
     pub ram: Ram,
     pub cpu: Cpu,

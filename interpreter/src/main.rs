@@ -14,20 +14,5 @@ fn main() -> std::io::Result<()> {
     std::io::stdin().read_to_string(&mut buffer)?;
     let buffer = buffer.to_lowercase(); // For flexibility
 
-    let mut state = machine::Machine::new();
-    for i in assembler::assemble(buffer.as_str()) {
-        eprint!("{:?}", i);
-        instruction::Instruction::encode(&mut state, &i);
-    }
-    eprint!("\n");
-
-    // Encoding messes with e.g. the PC
-    state.reset_cpu();
-
-    /*loop*/ for _ in 0..100 {
-        eprint!("{}\n", state);
-        interpreter::step(&mut state);
-    };
-
     Ok(())
 }
