@@ -4,13 +4,13 @@
 ; it out à mão. Gastavamos mais tempo a implementar do que a fazer à mão.
 
 ;dados
-mov #02 %0001  ; len-1
+mov #03 %0001  ; len
 
-mov #03 %000a
+mov #03 %000a  ; vector a
 mov #04 %010a
 mov #05 %020a
 
-mov #01 %000b
+mov #01 %000b  ; vector b
 mov #00 %010b
 mov #02 %020b
 
@@ -20,10 +20,10 @@ mov #00 bl
 mov #00 bh
 
 ;loop
-mov %000a,x cl
-mov %000a,x ch
-mul %000b,x cl   ; Lower bits of %000a × %000b
-muh %000b,x ch   ; Upper bits of %000a × %000b
+mov %3f09,x cl   ; $000a - 1 = 3f09, 000b - 1 = 3f0a
+mov %3f09,x ch
+mul %3f0a,x cl   ; Lower bits of %000a × %000b
+muh %3f0a,x ch   ; Upper bits of %000a × %000b
 clc              ; Clear carry flag
 add cl bl        ; Add lower bits
 add ch bh        ; Add upper bits + carry, so no need to jsr carry
