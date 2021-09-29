@@ -1,11 +1,6 @@
 use std::collections::VecDeque;
 
-use crate::{
-    assembler,
-    instruction::{self, Instruction},
-    interpreter,
-    prelude::Machine,
-};
+use crate::{assembler, instruction::{self, Instruction}, interpreter, prelude::{IWord, Machine}};
 
 const MAX_ITERATIONS_BEFORE_INCONSISTENCY: usize = 100;
 const CYCLE_RANGE: usize = 200;
@@ -71,11 +66,11 @@ impl Universe {
 
             let mut current_state = entry_point;
             for t in AFTER_CURRENT_IDX..TOTAL_SNAPSHOTS {
-                let bootstrap_universe = Universe {
+                let mut bootstrap_universe = Universe {
                     timeline: timeline.clone(),
                     past: 0,
                 };
-                interpreter::step(&mut current_state, &bootstrap_universe);
+                interpreter::step(&mut current_state, &mut bootstrap_universe);
                 timeline[t] = current_state.clone();
             }
 
@@ -92,18 +87,12 @@ impl Universe {
         &self.timeline[BEFORE_CURRENT_IDX]
     }
 
-    pub fn future(&self, offset: usize) -> &Machine {
-        &self.timeline[BEFORE_CURRENT_IDX + offset]
-    }
 
-    pub fn past(&self, offset: usize) -> &Machine {
-        &self.timeline[BEFORE_CURRENT_IDX - offset]
-    }
 
     pub fn step(mut self) -> Result<Self, ConsistencyError> {
         self.timeline.pop_front();
         let mut next_state = self.timeline.back().unwrap().clone();
-        interpreter::step(&mut next_state, &self);
+        interpreter::step(&mut next_state, &mut self);
         self.timeline.push_back(next_state);
         if self.past < CYCLE_RANGE + 1 {
             self.past += 1;
@@ -116,9 +105,9 @@ impl Universe {
         let mut last_universe = self.clone();
         for _iteration in 0..MAX_ITERATIONS_BEFORE_INCONSISTENCY {
             let mut new_universe = last_universe.clone();
-            for instant in (past_limit..(TOTAL_SNAPSHOTS - 1)).rev() {
+            for instant in past_limit..(TOTAL_SNAPSHOTS - 1) {
                 let mut next_state = new_universe.timeline[instant].clone();
-                interpreter::step(&mut next_state, &new_universe);
+                interpreter::step(&mut next_state, &mut new_universe);
                 new_universe.timeline[instant + 1] = next_state;
             }
 
