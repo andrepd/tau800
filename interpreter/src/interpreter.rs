@@ -4,7 +4,6 @@ use crate::state::Flag;
 
 // De momento tá a ignorar o time, depois temos de fazer um struct estado total que tem
 // os estados em todos os momentos.
-// fn operand_to_ref<'a, Signedness: sig::Signature>(state: &'a Machine, operand: &Operand) -> &'a Word<Signedness> {
 fn operand_to_ref<'a>(state: &'a Machine, operand: &'a Operand) -> &'a UWord {
     use Register as R;
     type TR = Timed<Register>;
@@ -13,17 +12,13 @@ fn operand_to_ref<'a>(state: &'a Machine, operand: &'a Operand) -> &'a UWord {
 
     match operand {
         Reg(TR { op: R::A, time }) => &state.cpu.a,
-        /*Reg({op=F; time}) => &state.cpu.flags,*/
         Reg(TR { op: R::BH, time }) => &state.cpu.bh,
         Reg(TR { op: R::BL, time }) => &state.cpu.bl,
         Reg(TR { op: R::CH, time }) => &state.cpu.ch,
         Reg(TR { op: R::CL, time }) => &state.cpu.cl,
         Reg(TR { op: R::X, time }) => &state.cpu.x,
-        /*Reg(TR { op: R::SP, time }) => &state.cpu.sp,*/
-        // Se quisermos mesmo que se possa mudar o sítio do stack, é preciso dividir em SH/SL
 
         Imm(word) => &word,
-        /*Iml(dword) => &dword,*/
         Abs(TA { op, time }) => &state.ram[*op],
         Abx(TA { op, time }) => &state.ram[*op + state.cpu.x],
 
@@ -32,7 +27,7 @@ fn operand_to_ref<'a>(state: &'a Machine, operand: &'a Operand) -> &'a UWord {
             let high = state.ram[u16::from(*op) as usize + 1];
             let address = LongWord::<sig::Unsigned> { low, high };
             &state.ram[u16::from(address) as usize]
-        } /*Inr(A{op, time}) => &state.ram[state.ram[]], */
+        }
     }
 }
 
@@ -44,16 +39,13 @@ fn operand_to_mut_ref<'a>(state: &'a mut Machine, operand: &'a Operand) -> &'a m
 
     match operand {
         Reg(TR { op: R::A, time }) => &mut state.cpu.a,
-        /*Reg({op=F; time}) => &mut state.cpu.flags,*/
         Reg(TR { op: R::BH, time }) => &mut state.cpu.bh,
         Reg(TR { op: R::BL, time }) => &mut state.cpu.bl,
         Reg(TR { op: R::CH, time }) => &mut state.cpu.ch,
         Reg(TR { op: R::CL, time }) => &mut state.cpu.cl,
         Reg(TR { op: R::X, time }) => &mut state.cpu.x,
-        /*Reg(TR { op: R::SP, time }) => &mut state.cpu.sp,*/
 
-        Imm(word) => unreachable!(),
-        /*Iml(dword) => unreachable!(),*/
+        Imm(_word) => unreachable!(),
         Abs(TA { op, time }) => &mut state.ram[*op],
         Abx(TA { op, time }) => &mut state.ram[*op + state.cpu.x],
 
@@ -61,9 +53,8 @@ fn operand_to_mut_ref<'a>(state: &'a mut Machine, operand: &'a Operand) -> &'a m
             let low = state.ram[*op];
             let high = state.ram[u16::from(*op) as usize + 1];
             let address = LongWord::<sig::Unsigned> { low, high };
-            /*&mut state.ram[u16::from(address) as usize]*/
-            unimplemented!() // doesnt work lol
-        } /*Inr(A{op, time}) => &state.ram[state.ram[]], */
+            &mut state.ram[address.value() as usize]
+        }
     }
 }
 
@@ -146,12 +137,8 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
 
         Instruction::Mul(Operands { src, dst }) => {
             let result = mk_ref(state, &dst).value() * mk_ref(state, &src).value();
-            /*let (_div, rem) = div_rem(result, MAX_UNSIGNED_VALUE);
-            let carry = !(div > 0);
-            let word = UWord::from(rem);*/
             let word = UWord::from(result % (MAX_UNSIGNED_VALUE+1));
             *mk_mref(state, &dst) = word;
-            /*state.cpu.flags.write(Flag::C, carry);*/
             set_flag_nvz(state, &word);
         }
         Instruction::Muh(Operands { src, dst }) => {
@@ -284,6 +271,6 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
 }
 
 pub fn step(state: &mut Machine) {
-    let instruction = Instruction::decode(/*&mut*/ state);
+    let instruction = Instruction::decode(state);
     execute(state, &instruction)
 }
