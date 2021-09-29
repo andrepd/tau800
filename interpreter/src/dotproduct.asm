@@ -24,7 +24,7 @@ mov %000a,x cl
 mov %000a,x ch
 mul %000b,x cl   ; Lower bits of %000a × %000b
 muh %000b,x ch   ; Upper bits of %000a × %000b
-;clc              ; Clear carry flag
+clc              ; Clear carry flag
 add cl bl        ; Add lower bits
 add ch bh        ; Add upper bits + carry, so no need to jsr carry
 sec              ; Set carry flag aka clear borrow flag
