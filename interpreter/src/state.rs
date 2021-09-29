@@ -37,13 +37,19 @@ impl Default for FlagWord {
 
 impl FlagWord {
     pub fn read(&self, flag: Flag) -> bool {
-        (self.word.value() & u8::from(flag)) != 0
+        let mask = 1 << u8::from(flag);
+        self.word.value() & mask != 0
     }
 
     pub fn write(&mut self, flag: Flag, value: bool) -> () {
-        let value = if value { u8::from(flag) } else { 0 };
-        let new = (self.word.value() & !value) | value;
-        *self.word.raw_inner_mut() = new;
+        let mask = dbg!(1 << dbg!(u8::from(dbg!(flag))));
+        let new = 
+            if value {
+                self.word.value() | mask
+            } else {
+                self.word.value() & !mask
+            };
+        *self.word.raw_inner_mut() = new
     }
 }
 
