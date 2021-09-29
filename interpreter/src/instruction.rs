@@ -27,22 +27,24 @@ impl<T> Timed<T> {
 }
 
 #[derive(Debug)]
-pub enum Operand {
+pub enum Op {
     /// Named register
-    Reg(Timed<Register>),
+    Reg(Register),
     /// Literal one-word value
     Imm(UWord),
     /*/// Literal two-word value
     Iml(LongUWord),*/
     /// Absolute address (byte order: lo hi)
-    Abs(Timed<Address>),
+    Abs(Address),
     /// Absolute address + X register
-    Abx(Timed<Address>),
+    Abx(Address),
     /// Indirect access (address is value at that address, lo hi order)
-    Ind(Timed<Address>),
+    Ind(Address),
     /*/// Indirect access (address is value at that register, lo hi order)
     Inr(Timed<Register>),*/
 }
+
+pub type Operand = Timed<Op>;
 
 // You can match on structs in Rust. If you want to check for, for example, ImmReg,
 // you can accomplish this with
@@ -111,10 +113,9 @@ pub enum Instruction {
 }
 
 /// Read a timed register from the RAM.
-fn read_timed_register(m: &mut Machine) -> Timed<Register> {
+fn read_register(m: &mut Machine) -> Register {
     use Register::*;
-
-    let op = match m.read_pc().value() {
+    match m.read_pc().value() {
         0x0 => A,
         // 0x1 => F,
         0x2 => BH,
@@ -124,15 +125,29 @@ fn read_timed_register(m: &mut Machine) -> Timed<Register> {
         0x6 => X,
         // 0x7 => SP,
         _ => unreachable!(),
-    };
-
-    let time = m.read_pc().cast_to_signed();
-    Timed { op, time }
+    }
 }
 
-fn write_timed_register(m: &mut Machine, x: &Timed<Register>) -> () {
+/// Read a literal word from the RAM at pc.
+fn read_word(m: &mut Machine) -> UWord {
+    m.read_pc()
+}
+
+/// Read a timed address from the RAM.
+fn read_address(m: &mut Machine) -> Address {
+    let low = m.read_pc();
+    let high = m.read_pc();
+    Address { low, high }
+}
+
+fn read_time(m: &mut Machine) -> IWord {
+    m.read_pc().cast_to_signed()
+}
+
+fn write_register(m: &mut Machine, x: &Register) -> () {
+    use Op::*;
     use Register::*;
-    match x.op {
+    match x {
         A => m.write_pc(UWord::from(0x0)),
         // F => m.write_pc(UWord::from(0x1)),
         BH => m.write_pc(UWord::from(0x2)),
@@ -141,69 +156,61 @@ fn write_timed_register(m: &mut Machine, x: &Timed<Register>) -> () {
         CL => m.write_pc(UWord::from(0x5)),
         X => m.write_pc(UWord::from(0x6)),
         // SP => m.write_pc(UWord::from(0x7)),
-    };
-    m.write_pc(x.time.cast_to_unsigned());
-}
-
-/// Read a literal word from the RAM at pc.
-fn read_word(m: &mut Machine) -> UWord {
-    m.read_pc()
+    }
 }
 
 fn write_word(m: &mut Machine, x: &UWord) -> () {
-    m.write_pc(*x)
+    m.write_pc(x)
 }
 
-/// Read a timed address from the RAM.
-fn read_timed_address(m: &mut Machine) -> Timed<Address> {
-    let low = m.read_pc();
-    let high = m.read_pc();
-    let op = Address { low, high };
-    let time = m.read_pc().cast_to_signed();
-    Timed { op, time }
+fn write_address(m: &mut Machine, x: &Address) -> () {
+    m.write_pc(x.low);
+    m.write_pc(x.high);
 }
 
-fn write_timed_address(m: &mut Machine, x: &Timed<Address>) -> () {
-    m.write_pc(x.op.low);
-    m.write_pc(x.op.high);
-    m.write_pc(x.time.cast_to_unsigned());
+fn write_time(m: &mut Machine, x: &IWord) -> () {
+    m.write_pc(x.cast_to_unsigned());
 }
 
 impl Operand {
     fn decode(m: &mut Machine, mode: UWord) -> Self {
-        use Operand::*;
+        use Op::*;
         match mode.value() {
-            0x0 => Reg(read_timed_register(m)),
-            0x1 => Imm(read_word(m)),
-            0x2 => Abs(read_timed_address(m)),
-            0x3 => Ind(read_timed_address(m)),
-            0x4 => Abx(read_timed_address(m)),
+            0x0 => Timed { op: Reg(read_register(m)), time: read_time(m) },
+            0x1 => Timed { op: Imm(read_word(m)),     time: 0.into()     },
+            0x2 => Timed { op: Abs(read_address(m)),  time: read_time(m) },
+            0x3 => Timed { op: Ind(read_address(m)),  time: read_time(m) },
+            0x4 => Timed { op: Abx(read_address(m)),  time: read_time(m) },
             _ => unreachable!(),
         }
     }
 
-    fn encode(m: &mut Machine, op: &Operand) -> () {
-        use Operand::*;
-        match op {
-            Reg(x) => {
+    fn encode(m: &mut Machine, x: &Operand) -> () {
+        use Op::*;
+        match x.op {
+            Reg(y) => {
                 m.write_pc(UWord::from(0x0));
-                write_timed_register(m, &x);
+                write_register(m, &y);
+                write_time(m, &x.time);
             }
-            Imm(x) => {
+            Imm(y) => {
                 m.write_pc(UWord::from(0x1));
-                write_word(m, &x);
+                write_word(m, &y);
             }
-            Abs(x) => {
+            Abs(y) => {
                 m.write_pc(UWord::from(0x2));
-                write_timed_address(m, &x);
+                write_address(m, &y);
+                write_time(m, &x.time);
             }
-            Ind(x) => {
+            Ind(y) => {
                 m.write_pc(UWord::from(0x3));
-                write_timed_address(m, &x);
+                write_address(m, &y);
+                write_time(m, &x.time);
             }
-            Abx(x) => {
+            Abx(y) => {
                 m.write_pc(UWord::from(0x4));
-                write_timed_address(m, &x);
+                write_address(m, &y);
+                write_time(m, &x.time);
             }
         }
     }
@@ -218,17 +225,17 @@ impl Operands {
         Operands { src, dst }
     }
 
-    fn encode(m: &mut Machine, op: &Operands) -> () {
-        use Operand::*;
+    fn encode(m: &mut Machine, x: &Operands) -> () {
+        use Op::*;
         let mut mode = 0;
-        match op.src {
+        match x.src.op {
             Reg(_) => mode |= 0x0 << 0,
             Imm(_) => mode |= 0x1 << 0,
             Abs(_) => mode |= 0x2 << 0,
             Ind(_) => mode |= 0x3 << 0,
             Abx(_) => mode |= 0x4 << 0,
         };
-        match op.dst {
+        match x.dst.op {
             Reg(_) => mode |= 0x0 << 3,
             Imm(_) => mode |= 0x1 << 3,
             Abs(_) => mode |= 0x2 << 3,
@@ -236,19 +243,19 @@ impl Operands {
             Abx(_) => mode |= 0x4 << 3,
         };
         m.write_pc(UWord::from(mode));
-        match &op.src {
-            Reg(x) => write_timed_register(m, &x),
-            Imm(x) => write_word(m, &x),
-            Abs(x) => write_timed_address(m, &x),
-            Ind(x) => write_timed_address(m, &x),
-            Abx(x) => write_timed_address(m, &x),
+        match &x.src.op {
+            Reg(y) => {write_register(m, &y); write_time(m, &x.src.time)},
+            Imm(y) => write_word(m, &y),
+            Abs(y) => {write_address(m, &y);  write_time(m, &x.src.time)},
+            Ind(y) => {write_address(m, &y);  write_time(m, &x.src.time)},
+            Abx(y) => {write_address(m, &y);  write_time(m, &x.src.time)},
         };
-        match &op.dst {
-            Reg(x) => write_timed_register(m, &x),
-            Imm(x) => write_word(m, &x),
-            Abs(x) => write_timed_address(m, &x),
-            Ind(x) => write_timed_address(m, &x),
-            Abx(x) => write_timed_address(m, &x),
+        match &x.dst.op {
+            Reg(y) => {write_register(m, &y); write_time(m, &x.dst.time)},
+            Imm(y) => write_word(m, &y),
+            Abs(y) => {write_address(m, &y);  write_time(m, &x.dst.time)},
+            Ind(y) => {write_address(m, &y);  write_time(m, &x.dst.time)},
+            Abx(y) => {write_address(m, &y);  write_time(m, &x.dst.time)},
         };
     }
 }
