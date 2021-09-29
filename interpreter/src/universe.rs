@@ -48,7 +48,10 @@ impl Universe {
             // and *instructions are transitives between states*, we need to keep
             // (state after each past command) + (state after present command) +
             //      (state after each future command) + (state before and after first and last command, respectively) =
-            // = 200+1+200+2 = 403 snapshots (index 200 is before the current command)
+            // = 200+1+200+2 = 403 snapshots
+            //
+            // Larger indices = older cycles 
+            //  (index 201 is before the current command, index 200 is after current command)
             //
             // In order to bootstrap the timeline, the machines must be able to
             // read from the timeline in the first place. The rules for this bootstrapping
@@ -59,15 +62,15 @@ impl Universe {
             //  - Past writes - performed without "re-consistency"
             let mut timeline = VecDeque::from(vec![Machine::new(); 403]);
 
-            timeline[200] = entry_point.clone();
+            timeline[201] = entry_point.clone();
 
             let mut current_state = entry_point;
-            for delta_t in 0..200 {
+            for t in (0..=200).rev() {
                 let bootstrap_universe = Universe {
                     timeline: timeline.clone(),
                 };
                 interpreter::step(&mut current_state, &bootstrap_universe);
-                timeline[201 + delta_t] = current_state.clone();
+                timeline[t] = current_state.clone();
             }
 
             timeline
@@ -81,24 +84,24 @@ impl Universe {
 
     pub fn step(mut self) -> Result<Self, ConsistencyError> {
         self.timeline.pop_front();
-        let mut next_state = self.timeline.front().unwrap().clone();
+        let mut next_state = self.timeline.back().unwrap().clone();
         interpreter::step(&mut next_state, &self);
         self.timeline.push_back(next_state);
         Ok(self.consist().expect("Could not self-consist."))
     }
 
     pub fn now(&self) -> &Machine {
-        &self.timeline[200]
+        &self.timeline[201]
     }
 
     fn consist(self) -> Result<Self, ConsistencyError> {
         let mut last_universe = self.clone();
         for _iteration in 0..MAX_ITERATIONS_BEFORE_INCONSISTENCY {
             let mut new_universe = last_universe.clone();
-            for delta_t in 0..200 {
-                let mut next_state = new_universe.timeline[200 + delta_t].clone();
+            for instant in (1..=201).rev() {
+                let mut next_state = new_universe.timeline[instant].clone();
                 interpreter::step(&mut next_state, &new_universe);
-                new_universe.timeline[201 + delta_t + 1] = next_state;
+                new_universe.timeline[instant - 1] = next_state;
             }
 
             if new_universe == last_universe {
