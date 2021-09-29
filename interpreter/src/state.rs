@@ -4,13 +4,13 @@ use crate::prelude::*;
 
 pub enum Flag {
     /// Negative: set if value is negative
-    N = 0,
+    N = 1 << 0,
     /// Overflow: set if signed arithmetic overflows
-    V = 1,
+    V = 1 << 1,
     /// Zero: set if value is zero
-    Z = 2, 
+    Z = 1 << 2, 
     /// Carry: set if unsigned overflows the register
-    C = 3,
+    C = 1 << 3,
 }
 
 impl From<Flag> for u8 {
