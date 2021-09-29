@@ -269,7 +269,7 @@ fn address_encode(m: &mut Machine, x: &Address) {
 }
 
 fn offset_encode(m: &mut Machine, x: &Offset) {
-    m.write_pc(dbg!(x.cast_to_unsigned()))
+    m.write_pc(x.cast_to_unsigned())
 }
 
 impl Instruction {

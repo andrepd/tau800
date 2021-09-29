@@ -26,7 +26,7 @@ impl<'i> Iterator for InstructionIterator<'i> {
             };
             line = line.trim();
         }
-        Some(read_instruction(dbg!(line), self.line_idx))
+        Some(read_instruction(line, self.line_idx))
     }
 }
 
@@ -227,7 +227,7 @@ fn eat_whitespace<'r, 'k, 's>(
 }
 
 fn read_register(chars: &mut SlidingWindow) -> ReadResult<Register> {
-    let register = match dbg!(read_char(chars)?) {
+    let register = match read_char(chars)? {
         'a' => Register::A,
         'b' => match read_char(chars)? {
             'h' => Register::BH,

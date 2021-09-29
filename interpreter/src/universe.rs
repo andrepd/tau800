@@ -1,4 +1,4 @@
-use std::{collections::VecDeque};
+use std::collections::VecDeque;
 
 use crate::{
     assembler,
@@ -7,15 +7,25 @@ use crate::{
     prelude::Machine,
 };
 
+const MAX_ITERATIONS_BEFORE_INCONSISTENCY: usize = 100;
+
 #[derive(Debug)]
 pub enum ConsistencyError {
-
+    DidNotConverge,
 }
 
-pub struct UniversePov {}
-
+#[derive(Clone)]
 pub struct Universe {
     timeline: VecDeque<Machine>,
+}
+
+impl PartialEq for Universe {
+    fn eq(&self, other: &Self) -> bool {
+        self.timeline
+            .iter()
+            .zip(other.timeline.iter())
+            .all(|(a, b)| a == b)
+    }
 }
 
 impl Universe {
@@ -52,23 +62,53 @@ impl Universe {
             timeline[200] = entry_point.clone();
 
             let mut current_state = entry_point;
-            for plus_t in 0..200 {
-                let bootstrap_universe = Universe { timeline: timeline.clone() };
+            for delta_t in 0..200 {
+                let bootstrap_universe = Universe {
+                    timeline: timeline.clone(),
+                };
                 interpreter::step(&mut current_state, &bootstrap_universe);
-                timeline[201 + plus_t] = current_state.clone();
+                timeline[201 + delta_t] = current_state.clone();
             }
 
             timeline
         };
-        
-        let mut universe = Universe { timeline };
 
-        universe.self_consist().expect("Could not bootstrap consistency.");
-
+        let universe = Universe { timeline };
         universe
+            .consist()
+            .expect("Could not bootstrap consistency.")
     }
 
-    fn self_consist(&mut self) -> Result<(), ConsistencyError> {
-        todo!()
+    pub fn step(mut self) -> Result<Self, ConsistencyError> {
+        self.timeline.pop_front();
+        let mut next_state = self.timeline.front().unwrap().clone();
+        interpreter::step(&mut next_state, &self);
+        self.timeline.push_back(next_state);
+        Ok(self.consist().expect("Could not self-consist."))
+    }
+
+    pub fn now(&self) -> &Machine {
+        &self.timeline[200]
+    }
+
+    fn consist(self) -> Result<Self, ConsistencyError> {
+        let mut last_universe = self.clone();
+        for _iteration in 0..MAX_ITERATIONS_BEFORE_INCONSISTENCY {
+            let mut new_universe = last_universe.clone();
+            for delta_t in 0..200 {
+                let mut next_state = new_universe.timeline[200 + delta_t].clone();
+                interpreter::step(&mut next_state, &new_universe);
+                new_universe.timeline[201 + delta_t + 1] = next_state;
+            }
+
+            if new_universe == last_universe {
+                return Ok(new_universe);
+            } else {
+                last_universe = new_universe;
+                continue;
+            }
+        }
+
+        Err(ConsistencyError::DidNotConverge)
     }
 }

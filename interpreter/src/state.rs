@@ -8,7 +8,7 @@ pub enum Flag {
     /// Overflow: set if signed arithmetic overflows
     V = 1 << 1,
     /// Zero: set if value is zero
-    Z = 1 << 2, 
+    Z = 1 << 2,
     /// Carry: set if unsigned overflows the register
     C = 1 << 3,
 }
@@ -19,7 +19,7 @@ impl From<Flag> for u8 {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct FlagWord {
     word: UWord,
 }
@@ -40,12 +40,11 @@ impl FlagWord {
 
     pub fn write(&mut self, flag: Flag, value: bool) -> () {
         let mask = u8::from(flag);
-        let new = 
-            if value {
-                self.word.value() | mask
-            } else {
-                self.word.value() & !mask
-            };
+        let new = if value {
+            self.word.value() | mask
+        } else {
+            self.word.value() & !mask
+        };
         *self.word.raw_inner_mut() = new
     }
 }
@@ -65,9 +64,26 @@ pub struct Cpu {
     pub pc: Address,
 }
 
+impl PartialEq for Cpu {
+    fn eq(&self, other: &Self) -> bool {
+        self.a == other.a
+            && self.flags == other.flags
+            && self.bh == other.bh
+            && self.bl == other.bl
+            && self.ch == other.ch
+            && self.cl == other.cl
+            && self.x == other.x
+            && self.sp == other.sp
+            && self.pc == other.pc
+    }
+}
+
 impl Default for Cpu {
     fn default() -> Self {
-        let pc = Address{ high: UWord::from(0x02), low: UWord::from(0x00) };
+        let pc = Address {
+            high: UWord::from(0x02),
+            low: UWord::from(0x00),
+        };
         Self {
             a: Default::default(),
             flags: Default::default(),
@@ -88,6 +104,12 @@ const RAM_SIZE: usize = 1 << (2 * WORD_SIZE);
 
 #[derive(Debug, Clone)]
 pub struct Ram([UWord; RAM_SIZE]);
+
+impl PartialEq for Ram {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.iter().zip(other.0.iter()).all(|(a, b)| a == b)
+    }
+}
 
 impl std::ops::Index<usize> for Ram {
     type Output = UWord;

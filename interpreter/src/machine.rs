@@ -6,6 +6,12 @@ pub struct Machine {
     pub cpu: Cpu,
 }
 
+impl PartialEq for Machine {
+    fn eq(&self, other: &Self) -> bool {
+        self.ram == other.ram && self.cpu == other.cpu
+    }
+}
+
 impl Machine {
     pub fn new() -> Self {
         Machine {

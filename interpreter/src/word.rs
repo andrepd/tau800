@@ -1,5 +1,7 @@
-use std::marker::PhantomData;
 use crate::prelude::*;
+use std::marker::PhantomData;
+
+use self::sig::Signature;
 
 /// The number of bits in a word.
 /// (In reality words are represented by at least an `u8`, but checks are in place
@@ -32,6 +34,12 @@ where
 {
     value: u8,
     phantom: PhantomData<S>,
+}
+
+impl<S: Signature> PartialEq for Word<S> {
+    fn eq(&self, other: &Self) -> bool {
+        self.value == other.value
+    }
 }
 
 impl<S> Word<S>
@@ -82,7 +90,12 @@ impl Word<sig::Unsigned> {
 
 impl From<u8> for Word<sig::Unsigned> {
     fn from(value: u8) -> Self {
-        debug_assert!(value <= MAX_UNSIGNED_VALUE, "Value ${:x} is > ${:x}", value, MAX_UNSIGNED_VALUE);
+        debug_assert!(
+            value <= MAX_UNSIGNED_VALUE,
+            "Value ${:x} is > ${:x}",
+            value,
+            MAX_UNSIGNED_VALUE
+        );
         Word {
             value,
             phantom: PhantomData::default(),
@@ -113,7 +126,13 @@ impl Word<sig::Signed> {
 
 impl From<i8> for Word<sig::Signed> {
     fn from(value: i8) -> Self {
-        debug_assert!(MIN_SIGNED_VALUE <= value && value <= MAX_SIGNED_VALUE, "Value {} isn't in {} – {}", value, MIN_SIGNED_VALUE, MAX_SIGNED_VALUE);
+        debug_assert!(
+            MIN_SIGNED_VALUE <= value && value <= MAX_SIGNED_VALUE,
+            "Value {} isn't in {} – {}",
+            value,
+            MIN_SIGNED_VALUE,
+            MAX_SIGNED_VALUE
+        );
 
         let negative = value < 0;
         let abs = value.abs() as u8;
@@ -175,6 +194,12 @@ where
     }
 }
 
+impl<S: Signature> PartialEq for LongWord<S> {
+    fn eq(&self, other: &Self) -> bool {
+        self.high == other.high && self.low == other.low
+    }
+}
+
 pub type ULongWord = LongWord<sig::Unsigned>;
 
 impl LongWord<sig::Unsigned> {
@@ -185,9 +210,12 @@ impl LongWord<sig::Unsigned> {
 
 impl From<u16> for LongWord<sig::Unsigned> {
     fn from(x: u16) -> Self {
-        debug_assert!(x < 1 << (2*WORD_SIZE));
+        debug_assert!(x < 1 << (2 * WORD_SIZE));
         let (high, low) = div_rem(x, (MAX_UNSIGNED_VALUE + 1) as u16);
-        LongWord { high: u8::into(high as u8), low: u8::into(low as u8) }
+        LongWord {
+            high: u8::into(high as u8),
+            low: u8::into(low as u8),
+        }
     }
 }
 

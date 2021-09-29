@@ -87,7 +87,7 @@ fn execute(state: &mut Machine, instruction: &Instruction, universe: &Universe) 
     let mk_ref = operand_to_ref;
     let mk_mref = operand_to_mut_ref;
 
-    match dbg!(instruction) {
+    match instruction {
         // Memory
         Instruction::Mov(Operands { src, dst }) => {
             let word = *mk_ref(state, &src);
@@ -115,7 +115,7 @@ fn execute(state: &mut Machine, instruction: &Instruction, universe: &Universe) 
             let carry = div > 0;
             let word = UWord::from(rem);
             *mk_mref(state, &dst) = word;
-            state.cpu.flags.write(Flag::C, dbg!(carry));
+            state.cpu.flags.write(Flag::C, carry);
             set_flag_nvz(state, &word);
             set_flag_v(state, src_orig, dst_orig, rem);
         }
