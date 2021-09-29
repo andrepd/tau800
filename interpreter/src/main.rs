@@ -17,6 +17,7 @@ fn main() -> std::io::Result<()> {
     std::io::stdin().read_to_string(&mut buffer)?;
     let buffer = buffer.to_lowercase(); // For flexibility
     let mut universe = Universe::bootstrap(&buffer);
+    println!("{:}", universe.now());
 
     for _i in 0..100 {
         universe = universe.step().unwrap();

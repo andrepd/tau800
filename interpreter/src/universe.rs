@@ -9,6 +9,9 @@ use crate::{
 
 const MAX_ITERATIONS_BEFORE_INCONSISTENCY: usize = 100;
 const CYCLE_RANGE: usize = 200;
+const BEFORE_CURRENT_IDX: usize = CYCLE_RANGE + 1;
+const AFTER_CURRENT_IDX: usize = BEFORE_CURRENT_IDX - 1;
+const TOTAL_SNAPSHOTS: usize = 2 * CYCLE_RANGE + 3;
 
 #[derive(Debug)]
 pub enum ConsistencyError {
@@ -18,7 +21,7 @@ pub enum ConsistencyError {
 #[derive(Clone)]
 pub struct Universe {
     timeline: VecDeque<Machine>,
-    offset: usize,
+    past: usize,
 }
 
 impl PartialEq for Universe {
@@ -62,15 +65,15 @@ impl Universe {
             //  - Past reads - as are, despite consistency
             //  - Future writes - overridden
             //  - Past writes - performed without "re-consistency"
-            let mut timeline = VecDeque::from(vec![Machine::new(); 3 + CYCLE_RANGE * 2]);
+            let mut timeline = VecDeque::from(vec![Machine::new(); TOTAL_SNAPSHOTS]);
 
-            timeline[CYCLE_RANGE + 1] = entry_point.clone();
+            timeline[BEFORE_CURRENT_IDX] = entry_point.clone();
 
             let mut current_state = entry_point;
-            for t in (0..=(2 * CYCLE_RANGE)).rev() {
+            for t in (0..=AFTER_CURRENT_IDX).rev() {
                 let bootstrap_universe = Universe {
                     timeline: timeline.clone(),
-                    offset: 0,
+                    past: 0,
                 };
                 interpreter::step(&mut current_state, &bootstrap_universe);
                 timeline[t] = current_state.clone();
@@ -79,10 +82,7 @@ impl Universe {
             timeline
         };
 
-        let universe = Universe {
-            timeline,
-            offset: 0,
-        };
+        let universe = Universe { timeline, past: 0 };
         universe
             .consist()
             .expect("Could not bootstrap consistency.")
@@ -93,18 +93,18 @@ impl Universe {
         let mut next_state = self.timeline.back().unwrap().clone();
         interpreter::step(&mut next_state, &self);
         self.timeline.push_back(next_state);
-        if self.offset < 2 * CYCLE_RANGE + 2 {
-            self.offset += 1;
+        if self.past < CYCLE_RANGE + 1 {
+            self.past += 1;
         }
         Ok(self.consist().expect("Could not self-consist."))
     }
 
     pub fn now(&self) -> &Machine {
-        &self.timeline[CYCLE_RANGE + 1]
+        &self.timeline[BEFORE_CURRENT_IDX]
     }
 
     fn consist(self) -> Result<Self, ConsistencyError> {
-        let past_limit = CYCLE_RANGE + 1 + self.offset;
+        let past_limit = BEFORE_CURRENT_IDX + self.past;
         let mut last_universe = self.clone();
         for _iteration in 0..MAX_ITERATIONS_BEFORE_INCONSISTENCY {
             let mut new_universe = last_universe.clone();
