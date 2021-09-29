@@ -1,6 +1,5 @@
 use std::marker::PhantomData;
-
-use crate::prelude::{div_rem, Address};
+use crate::prelude::*;
 
 /// The number of bits in a word.
 /// (In reality words are represented by at least an `u8`, but checks are in place

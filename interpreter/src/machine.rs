@@ -40,6 +40,10 @@ impl Machine {
         self.ram[self.cpu.sp] = word;
         self.cpu.sp = self.cpu.sp + IWord::from(-1);  // Ugly af
     }
+
+    pub fn reset_cpu(&mut self) -> () {
+        self.cpu = Cpu::default();
+    }
 }
 
 impl std::fmt::Display for Machine {
@@ -71,7 +75,7 @@ impl std::fmt::Display for Machine {
                 if val != 0 {
                     write!(f, "{:02x} ", val).unwrap()
                 } else {
-                    write!(f, "   ").unwrap()
+                    write!(f, "__ ").unwrap()
                 }
             }
             write!(f, "\n").unwrap();

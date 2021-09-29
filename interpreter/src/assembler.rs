@@ -170,10 +170,6 @@ impl<'k, 's> SlidingWindow<'k, 's> {
         self.parent.chars.peek().map(|(_, c)| c)
     }
 
-    fn forget(&mut self) -> () {
-        self.start = self.last + 1;
-    }
-
     fn collect(&mut self) -> Option<&'s str> {
         if self.oob(self.start) {
             return None;

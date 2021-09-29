@@ -1,4 +1,4 @@
-use crate::instruction::{Instruction, Offset, Operand, Operands, Register, Timed};
+use crate::instruction::{Instruction, Operand, Operands, Register, Timed};
 use crate::prelude::*;
 use crate::state::Flag;
 
@@ -136,7 +136,7 @@ fn execute(state: &mut Machine, instruction: &Instruction) {
                 - src_orig
                 - u8::from(!state.cpu.flags.read(Flag::C));
             let (div, rem) = div_rem(result, MAX_UNSIGNED_VALUE+1);
-            let carry = (div > 0);  // Ca puta de confusão
+            let carry = div > 0;
             let word = UWord::from(rem);
             *mk_mref(state, &dst) = word;
             state.cpu.flags.write(Flag::C, carry);

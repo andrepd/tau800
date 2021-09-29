@@ -7,7 +7,7 @@ mod machine;
 mod instruction;
 mod interpreter;
 mod assembler;
-// mod universe;
+mod universe;
 
 fn main() -> std::io::Result<()> {
     let mut buffer = String::new();
@@ -21,12 +21,13 @@ fn main() -> std::io::Result<()> {
     }
     eprint!("\n");
 
-    state.cpu = state::Cpu::default();
+    // Encoding messes with e.g. the PC
+    state.reset_cpu();
 
     /*loop*/ for _ in 0..100 {
         eprint!("{}\n", state);
         interpreter::step(&mut state);
     };
 
-    Ok(())  // Sintaxe linda
+    Ok(())
 }

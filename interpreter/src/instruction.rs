@@ -211,7 +211,6 @@ impl Operand {
 
 impl Operands {
     fn decode(m: &mut Machine, mode: UWord) -> Self {
-        use Operand::*;
         let src_mode = (mode.value() & 0b000111) >> 0;
         let dst_mode = (mode.value() & 0b111000) >> 3;
         let src = Operand::decode(m, UWord::from(src_mode));
