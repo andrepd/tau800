@@ -187,7 +187,7 @@ impl LongWord<sig::Unsigned> {
 impl From<u16> for LongWord<sig::Unsigned> {
     fn from(x: u16) -> Self {
         debug_assert!(x < 1 << (2*WORD_SIZE));
-        let (high, low) = div_rem(x, MAX_UNSIGNED_VALUE as u16);
+        let (high, low) = div_rem(x, (MAX_UNSIGNED_VALUE + 1) as u16);
         LongWord { high: u8::into(high as u8), low: u8::into(low as u8) }
     }
 }
@@ -218,7 +218,7 @@ impl std::ops::Add<Word<sig::Unsigned>> for LongWord<sig::Unsigned> {
 
     fn add(self, other: Word<sig::Unsigned>) -> Self {
         let sum = u8::from(self.low) + u8::from(other);
-        let (div, rem) = div_rem(sum, MAX_UNSIGNED_VALUE);
+        let (div, rem) = div_rem(sum, MAX_UNSIGNED_VALUE + 1);
         let low = Word::<sig::Unsigned>::from(rem);
         let high = Word::<sig::Unsigned>::from(u8::from(self.high) + div);
         Self { high, low }
