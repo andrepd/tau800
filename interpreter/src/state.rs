@@ -42,7 +42,7 @@ impl FlagWord {
     }
 
     pub fn write(&mut self, flag: Flag, value: bool) -> () {
-        let mask = dbg!(1 << dbg!(u8::from(dbg!(flag))));
+        let mask = 1 << u8::from(flag);
         let new = 
             if value {
                 self.word.value() | mask
