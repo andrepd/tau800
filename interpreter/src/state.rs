@@ -1,3 +1,5 @@
+use std::slice::SliceIndex;
+
 use crate::prelude::*;
 
 // CPU
@@ -103,7 +105,7 @@ impl Default for Cpu {
 const RAM_SIZE: usize = 1 << (2 * WORD_SIZE);
 
 #[derive(Debug, Clone)]
-pub struct Ram([UWord; RAM_SIZE]);
+pub struct Ram(pub [UWord; RAM_SIZE]);
 
 impl PartialEq for Ram {
     fn eq(&self, other: &Self) -> bool {

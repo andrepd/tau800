@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use crate::{modules::Module, prelude::*};
 
 #[derive(Debug, Clone)]
 pub struct Machine {

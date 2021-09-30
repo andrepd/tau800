@@ -1,4 +1,5 @@
 use crate::instruction::{Instruction, Operand, Operands, Register, Op, Timed};
+use crate::modules::{Module, ModuleCollection};
 use crate::prelude::*;
 use std::iter::Peekable;
 use std::str::{CharIndices, Lines};
@@ -41,6 +42,7 @@ pub fn assemble_into(m: &mut Machine, input: &str) {
     for i in assemble(input) {
         Instruction::encode(m, &i);
     };
+    
     m.cpu.pc = Address::from(0x80);
 }
 
