@@ -144,10 +144,10 @@ impl Module for DisplayModule {
         {
             let bytes = unsafe { self.hours.as_bytes_mut() };
             if let Ok(a) = a {
-                a.encode_utf8(&mut bytes[0..0]);
+                a.encode_utf8(&mut bytes[0..1]);
             }
             if let Ok(b) = b {
-                b.encode_utf8(&mut bytes[1..1]);
+                b.encode_utf8(&mut bytes[1..2]);
             }
         }
 
