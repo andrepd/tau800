@@ -2,12 +2,12 @@ use crate::prelude::*;
 
 pub type Timeline = Vec<Machine>;
 
-pub struct Universe<'a> {
+pub struct Universe {
     pub states: Timeline,
     pub t: usize,
     /// If currently trying for consistency, this will contain Some(ti, tf, operand, value). If 
     /// normal operation, this will be None.
-    pub target: Option<(usize, usize, &'a Op, &'a UWord)>,
+    pub target: Option<(usize, usize, Op, UWord)>,
 }
 
 impl std::ops::Add<&IWord> for usize {
@@ -18,7 +18,7 @@ impl std::ops::Add<&IWord> for usize {
     }
 }
 
-impl<'a> Universe<'a> {
+impl Universe {
     pub fn new() -> Self {
         Universe { states: vec![Machine::new()], t: 0, target: None }
     }
@@ -65,7 +65,7 @@ impl<'a> Universe<'a> {
     }
 }
 
-impl std::ops::Index<usize> for Universe<'_> {
+impl std::ops::Index<usize> for Universe {
     type Output = Machine;
 
     fn index(&self, i: usize) -> &Self::Output {
@@ -73,7 +73,7 @@ impl std::ops::Index<usize> for Universe<'_> {
     }
 }
 
-impl std::ops::IndexMut<usize> for Universe<'_> {
+impl std::ops::IndexMut<usize> for Universe {
     fn index_mut(&mut self, i: usize) -> &mut Self::Output {
         &mut self.states[i]
     }

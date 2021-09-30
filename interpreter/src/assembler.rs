@@ -308,14 +308,23 @@ fn read_time(chars: &mut SlidingWindow) -> ReadResult<IWord> {
     match match_char('@', chars).optional() {
         None => Ok(IWord::zero()),
         Some(_) => {
-            let negative = match_char('-', chars).map(|_| true)?;
-            let absolute_value = read_hex_word(chars)?.value() as i8;
-            Ok(IWord::from(if negative {
-                -absolute_value
-            } else {
-                match_char('+', chars).optional();
-                absolute_value
-            }))
+            eprintln!("baz");
+            let next = chars.peek().map_or(Err(ReadError::NoMoreChars), |x| Ok(x));
+            let value = 
+                match next? {
+                    '-' => {
+                        match_char('-', chars)?;
+                        -(read_hex_word(chars)?.value() as i8)
+                    }
+                    '+' => {
+                        match_char('+', chars)?;
+                        read_hex_word(chars)?.value() as i8
+                    }
+                    _ => {
+                        read_hex_word(chars)?.value() as i8
+                    }
+                };
+            Ok(IWord::from(value))
         }
     }
 }
@@ -334,6 +343,7 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
             let high = read_hex_word(chars)?;
             let op = Address { low, high };
 
+            eprintln!("foo");
             let next = chars.peek();
             if next.is_some() && *next.unwrap() == ',' {
                 match_char(',', chars)?;
@@ -342,6 +352,7 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
                 let time = read_time(chars)?;
                 Timed::new(Op::Abx(op), time)
             } else {
+                eprintln!("bar");
                 let time = read_time(chars)?;
                 Timed::new(Op::Abs(op), time)
             }

@@ -53,7 +53,7 @@ fn operand_to_mut_ref_inner<'a>(state: &'a mut Machine, op: &'a Op) -> &'a mut U
 
 // 
 
-fn operand_to_ref<'a>(state: &'a Universe<'a>, operand: &'a Operand) -> &'a UWord {
+fn operand_to_ref<'a>(state: &'a mut Universe, operand: &'a Operand) -> &'a UWord {
     // Trivial reads
     if operand.time.value() <= 0 {
         operand_to_ref_inner(state.t_offset(&operand.time), &operand.op)
@@ -62,9 +62,9 @@ fn operand_to_ref<'a>(state: &'a Universe<'a>, operand: &'a Operand) -> &'a UWor
     else {
         let ti = state.t;
         let tf = state.t + &operand.time;
-        let guess = operand_to_ref_inner(state.now(), &operand.op);
-        let target = Some((ti, tf, &operand.op, guess));
-        state.target = target;
+        // Que lol... passei 40m à volta desta linha mas turns out que mudar `state.states[ti]` para `state.now()`, apesar de ser a definição, parte isto tudo
+        let guess = operand_to_ref_inner(&state.states[ti], &operand.op);
+        state.target = Some((ti, tf, operand.op.clone(), guess.clone()));
         guess
     }
 }
@@ -321,14 +321,15 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
 }
 
 pub fn step(state: &mut Universe) {
-    match state.target {
+    let target_to_match = state.target.clone();  // Epá se eu não fizer cópia o compilador grita comigo e eu não percebo 1 caralho
+    match target_to_match {
         // Normal execution
         None => { () }
         // Time resolution
         Some ((ti, tf, op, guess)) => {
             // Target time
             if tf == state.t {
-                let value = operand_to_ref_inner(state.now(), op);
+                let value = operand_to_ref_inner(state.now(), &op).clone();
                 // Fixed point: we're done, go back to ti with the correct result
                 if value == guess {
                     state.rewind_keep(ti);
@@ -336,8 +337,7 @@ pub fn step(state: &mut Universe) {
                 // No fixed point: go back to ti, destroying this timeline, try again with guess=value
                 else {
                     state.rewind_destroy(ti);
-                    let target_new = Some((ti, tf, op, value));
-                    state.target = target_new
+                    state.target = Some((ti, tf, op.clone(), value));
                 }
             } 
             // Running the resolution

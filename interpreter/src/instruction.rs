@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Register {
     A,
     // F,
@@ -12,7 +12,7 @@ pub enum Register {
     // SP,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// An object referencing an operand at a time different from the call
 pub struct Timed<T> {
     pub op: T,
@@ -26,7 +26,7 @@ impl<T> Timed<T> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Op {
     /// Named register
     Reg(Register),
@@ -53,7 +53,7 @@ pub type Operand = Timed<Op>;
 //          Operands { src: Imm(src), reg: Reg(reg) } => ...,
 //          _ => ...
 //      }
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Operands {
     pub src: Operand,
     pub dst: Operand,
@@ -67,7 +67,7 @@ impl Operands {
 
 pub type Offset = IWord;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Instruction {
     Mov(Operands),
     Psh(Operand),
