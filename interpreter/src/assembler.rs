@@ -406,10 +406,10 @@ pub fn mnemonic(cmd: Instruction) -> String {
                 Register::X => "x",
             }
             .to_string(),
-            Op::Imm(v) => radix(v.value(), 10).to_string(),
-            Op::Abs(v) => radix(v.value(), 10).to_string(),
-            Op::Abx(v) => radix(v.value(), 10).to_string(),
-            Op::Ind(v) => radix(v.value(), 10).to_string(),
+            Op::Imm(v) => format!("#{}", radix(v.value(), 10)),
+            Op::Abs(v) => format!("%{}", radix(v.value(), 10)),
+            Op::Abx(v) => format!("%{},x", radix(v.value(), 10)),
+            Op::Ind(v) => format!("(%{})", radix(v.value(), 10)),
         }
     };
     let mnemonic_timed_op = |op: Operand| -> String {
