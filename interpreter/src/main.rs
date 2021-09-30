@@ -33,7 +33,11 @@ fn main() -> std::io::Result<()> {
     println!("{}", universe.now());
     for _ in 0..100 {
         interpreter::step(&mut universe);
+        while universe.target.is_some() { // In resolution
+            interpreter::step(&mut universe);
+        }
         println!("{}", universe.now());
+        
     };
 
     Ok(())
