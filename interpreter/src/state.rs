@@ -104,8 +104,14 @@ impl Default for Cpu {
 
 const RAM_SIZE: usize = 1 << (2 * WORD_SIZE);
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Ram(pub [UWord; RAM_SIZE]);
+
+impl std::fmt::Debug for Ram {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Ram (omitted)").finish()
+    }
+}
 
 impl PartialEq for Ram {
     fn eq(&self, other: &Self) -> bool {

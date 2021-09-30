@@ -119,7 +119,8 @@ impl From<Word<sig::Unsigned>> for u8 {
 
 impl Word<sig::Signed> {
     pub fn value(&self) -> i8 {
-        self.value as i8
+        /*self.value as i8*/
+        if self.value >= 32 {self.value as i8 - 64} else { self.value as i8 }
     }
 
     pub fn cast_to_unsigned(self) -> Word<sig::Unsigned> {
