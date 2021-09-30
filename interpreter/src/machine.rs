@@ -47,8 +47,8 @@ impl Machine {
 
     /// Read a word from stack and increment the sp. 
     pub fn read_sp(&mut self) -> UWord {
-        let word = self.ram[self.cpu.sp];
         self.cpu.sp = self.cpu.sp + IWord::from(1);  // Ugly af
+        let word = self.ram[self.cpu.sp];
         word
     }
 

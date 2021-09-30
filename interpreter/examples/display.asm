@@ -1,11 +1,61 @@
 ; Inputs: %10 %11 %12 %13
 ; Outputs: %15 ... 2b
 
-; a= current bit mask
+; Digito 1
 mov #01 a
-; bl = current digit
 mov %1300 bl
-; cl = current segment
+cal 1703
+
+; Digito 2
+mov #02 a
+mov %1200 bl
+cal 1703
+
+; Digito 3
+mov #04 a
+mov %1100 bl
+cal 1703
+
+; Digito 4
+mov #08 a
+mov %1000 bl
+cal 1703
+
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+
+;; Subroutine ;;
+; Inputs:
+;   a = current bit mask
+;   bl = current digit
+; Locals:
+;   x = current segment
+
 mov #00 x
 
 ; First digit
@@ -99,5 +149,6 @@ cmp #07 bl
 beq +7
 or a %1500,x
 
+ret
 
 ; 0d 20 __ __ 15 __ __

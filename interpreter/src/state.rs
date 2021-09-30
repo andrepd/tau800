@@ -86,6 +86,10 @@ impl Default for Cpu {
             high: UWord::from(0x02),
             low: UWord::from(0x00),
         };
+        let sp = Address {
+            high: UWord::from(0x01),
+            low: UWord::from(0x3f),
+        };
         Self {
             a: Default::default(),
             flags: Default::default(),
@@ -94,7 +98,7 @@ impl Default for Cpu {
             ch: Default::default(),
             cl: Default::default(),
             x: Default::default(),
-            sp: Default::default(),
+            sp,
             pc,
         }
     }
