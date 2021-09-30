@@ -1,6 +1,6 @@
 use std::slice::SliceIndex;
 
-use crate::prelude::*;
+use super::prelude::*;
 
 // CPU
 
@@ -23,7 +23,7 @@ impl From<Flag> for u8 {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct FlagWord {
-    word: UWord,
+    pub word: UWord,
 }
 
 impl Default for FlagWord {
@@ -95,7 +95,7 @@ impl Default for Cpu {
             cl: Default::default(),
             x: Default::default(),
             sp: Default::default(),
-            pc: pc,
+            pc,
         }
     }
 }

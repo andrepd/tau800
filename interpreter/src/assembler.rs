@@ -1,6 +1,8 @@
-use crate::instruction::{Instruction, Operand, Operands, Register, Op, Timed};
-use crate::modules::{Module, ModuleCollection};
-use crate::prelude::*;
+use radix_fmt::radix;
+
+use super::instruction::{Instruction, Op, Operand, Operands, Register, Timed};
+use super::modules::{Module, ModuleCollection};
+use super::prelude::*;
 use std::iter::Peekable;
 use std::str::{CharIndices, Lines};
 
@@ -41,8 +43,8 @@ pub fn assemble<'i>(input: &'i str) -> InstructionIterator<'i> {
 pub fn assemble_into(m: &mut Machine, input: &str) {
     for i in assemble(input) {
         Instruction::encode(m, &i);
-    };
-    
+    }
+
     m.cpu.pc = Address::from(0x80);
 }
 
@@ -310,22 +312,19 @@ fn read_time(chars: &mut SlidingWindow) -> ReadResult<IWord> {
     match match_char('@', chars).optional() {
         None => Ok(IWord::zero()),
         Some(_) => {
-            eprintln!("baz");
+            
             let next = chars.peek().map_or(Err(ReadError::NoMoreChars), |x| Ok(x));
-            let value = 
-                match next? {
-                    '-' => {
-                        match_char('-', chars)?;
-                        -(read_hex_word(chars)?.value() as i8)
-                    }
-                    '+' => {
-                        match_char('+', chars)?;
-                        read_hex_word(chars)?.value() as i8
-                    }
-                    _ => {
-                        read_hex_word(chars)?.value() as i8
-                    }
-                };
+            let value = match next? {
+                '-' => {
+                    match_char('-', chars)?;
+                    -(read_hex_word(chars)?.value() as i8)
+                }
+                '+' => {
+                    match_char('+', chars)?;
+                    read_hex_word(chars)?.value() as i8
+                }
+                _ => read_hex_word(chars)?.value() as i8,
+            };
             Ok(IWord::from(value))
         }
     }
@@ -345,7 +344,7 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
             let high = read_hex_word(chars)?;
             let op = Address { low, high };
 
-            eprintln!("foo");
+            
             let next = chars.peek();
             if next.is_some() && *next.unwrap() == ',' {
                 match_char(',', chars)?;
@@ -354,7 +353,7 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
                 let time = read_time(chars)?;
                 Timed::new(Op::Abx(op), time)
             } else {
-                eprintln!("bar");
+                
                 let time = read_time(chars)?;
                 Timed::new(Op::Abs(op), time)
             }
@@ -370,11 +369,11 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
 
                     Timed::new(Op::Ind(op), time)
                 }
-                _ => unreachable!() /*{
-                    let register = read_register(chars)?;
-                    let time = read_time(chars)?;
-                    Operand::Reg(Timed::new(register, time))
-                }*/
+                _ => unreachable!(), /*{
+                                         let register = read_register(chars)?;
+                                         let time = read_time(chars)?;
+                                         Operand::Reg(Timed::new(register, time))
+                                     }*/
             };
             match_char(')', chars)?;
             operand
@@ -393,4 +392,96 @@ fn read_operands(chars: &mut SlidingWindow) -> ReadResult<Operands> {
     eat_whitespace(chars);
     let dest = read_operand(chars)?;
     Ok(Operands::new(src, dest))
+}
+
+pub fn mnemonic(cmd: Instruction) -> String {
+    let mnemonic_op = |op: Op| -> String {
+        match op {
+            Op::Reg(r) => match r {
+                Register::A => "a",
+                Register::BH => "bh",
+                Register::BL => "bl",
+                Register::CH => "ch",
+                Register::CL => "cl",
+                Register::X => "x",
+            }
+            .to_string(),
+            Op::Imm(v) => radix(v.value(), 10).to_string(),
+            Op::Abs(v) => radix(v.value(), 10).to_string(),
+            Op::Abx(v) => radix(v.value(), 10).to_string(),
+            Op::Ind(v) => radix(v.value(), 10).to_string(),
+        }
+    };
+    let mnemonic_timed_op = |op: Operand| -> String {
+        let time = op.time.value();
+        let op = op.op;
+        if time == 0 {
+            mnemonic_op(op)
+        } else {
+            if time > 0 {
+                format!("{}@+{}", mnemonic_op(op), radix(time, 10))
+            } else {
+                format!("{}@-{}", mnemonic_op(op), radix(time.abs(), 10))
+            }
+        }
+    };
+
+    match cmd {
+        Instruction::Mov(Operands { src, dst }) => {
+            format!("mov {} {}", mnemonic_timed_op(src), mnemonic_timed_op(dst))
+        }
+        Instruction::Psh(op) => format!("psh {}", mnemonic_timed_op(op)),
+        Instruction::Pop(op) => format!("pop {}", mnemonic_timed_op(op)),
+        Instruction::Add(Operands { src, dst }) => {
+            format!("add {} {}", mnemonic_timed_op(src), mnemonic_timed_op(dst))
+        }
+        Instruction::Sub(Operands { src, dst }) => {
+            format!(" {} {}", mnemonic_timed_op(src), mnemonic_timed_op(dst))
+        }
+        Instruction::Mul(Operands { src, dst }) => {
+            format!(" {} {}", mnemonic_timed_op(src), mnemonic_timed_op(dst))
+        }
+        Instruction::Muh(Operands { src, dst }) => {
+            format!(" {} {}", mnemonic_timed_op(src), mnemonic_timed_op(dst))
+        }
+        Instruction::Mus(Operands { src, dst }) => {
+            format!(" {} {}", mnemonic_timed_op(src), mnemonic_timed_op(dst))
+        }
+        Instruction::Div(Operands { src, dst }) => {
+            format!(" {} {}", mnemonic_timed_op(src), mnemonic_timed_op(dst))
+        }
+        Instruction::Mod(Operands { src, dst }) => {
+            format!(" {} {}", mnemonic_timed_op(src), mnemonic_timed_op(dst))
+        }
+        Instruction::And(Operands { src, dst }) => {
+            format!(" {} {}", mnemonic_timed_op(src), mnemonic_timed_op(dst))
+        }
+        Instruction::Or(Operands { src, dst }) => {
+            format!(" {} {}", mnemonic_timed_op(src), mnemonic_timed_op(dst))
+        }
+        Instruction::Xor(Operands { src, dst }) => {
+            format!(" {} {}", mnemonic_timed_op(src), mnemonic_timed_op(dst))
+        }
+        Instruction::Not(op) => format!("not {}", mnemonic_timed_op(op)),
+        Instruction::Lsl(op) => format!("lsl {}", mnemonic_timed_op(op)),
+        Instruction::Lsr(op) => format!("lsr {}", mnemonic_timed_op(op)),
+        Instruction::Cmp(Operands { src, dst }) => {
+            format!(" {} {}", mnemonic_timed_op(src), mnemonic_timed_op(dst))
+        }
+        Instruction::Bit(Operands { src, dst }) => {
+            format!(" {} {}", mnemonic_timed_op(src), mnemonic_timed_op(dst))
+        }
+        Instruction::Jmp(op) => format!("jmp %{}", radix(op.value(), 16)),
+        Instruction::Bcc(op) => format!("bcc #{}", radix(op.value() as u8, 16)),
+        Instruction::Bcs(op) => format!("bcs #{}", radix(op.value() as u8, 16)),
+        Instruction::Bne(op) => format!("bne #{}", radix(op.value() as u8, 16)),
+        Instruction::Beq(op) => format!("beq #{}", radix(op.value() as u8, 16)),
+        Instruction::Bpl(op) => format!("bpl #{}", radix(op.value() as u8, 16)),
+        Instruction::Bmi(op) => format!("bmi #{}", radix(op.value() as u8, 16)),
+        Instruction::Clc => "clc".to_string(),
+        Instruction::Sec => "sec".to_string(),
+        Instruction::Cal(op) => format!("cal #{}", radix(op.value(), 16)),
+        Instruction::Ret => "ret".to_string(),
+        Instruction::Nop => "nop".to_string(),
+    }
 }

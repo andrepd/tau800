@@ -1,8 +1,8 @@
-pub(crate) use crate::word::*;
-pub(crate) use crate::state::*;
-pub(crate) use crate::machine::Machine;
-pub(crate) use crate::instruction::{Instruction, Op, Operand, Operands, Register};
-pub(crate) use crate::universe::Universe;
+pub(super) use super::word::*;
+pub(super) use super::state::*;
+pub(super) use super::machine::Machine;
+pub(super) use super::instruction::{Instruction, Op, Operand, Operands, Register};
+pub(super) use super::universe::Universe;
 
 /// Tou sempre a ter de usar isto
 pub fn div_rem<

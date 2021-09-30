@@ -1,4 +1,4 @@
-use crate::{modules::Module, prelude::*};
+use super::{modules::Module, prelude::*};
 
 #[derive(Debug, Clone)]
 pub struct Machine {
@@ -67,10 +67,10 @@ impl std::fmt::Display for Machine {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "Cpu: a={:02x} NVZC={}{}{}{} b={:02x}{:02x} c={:02x}{:02x} x={:02x} sp={:02x}{:02x} pc={:02x}{:02x}\n", 
             self.cpu.a.value(), 
-            (self.cpu.flags.read(crate::state::Flag::N) as u8),
-            (self.cpu.flags.read(crate::state::Flag::V) as u8),
-            (self.cpu.flags.read(crate::state::Flag::Z) as u8),
-            (self.cpu.flags.read(crate::state::Flag::C) as u8),
+            (self.cpu.flags.read(super::state::Flag::N) as u8),
+            (self.cpu.flags.read(super::state::Flag::V) as u8),
+            (self.cpu.flags.read(super::state::Flag::Z) as u8),
+            (self.cpu.flags.read(super::state::Flag::C) as u8),
             self.cpu.bh.value(), self.cpu.bl.value(),
             self.cpu.ch.value(), self.cpu.cl.value(),
             self.cpu.x.value(),
