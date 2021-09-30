@@ -31,7 +31,7 @@ fn main() -> std::io::Result<()> {
 
     let mut universe = Universe::new();
     assembler::assemble_into(universe.now_mut(), buffer.as_str());
-    /*io_modules.run(&mut universe);*/
+    io_modules.run(&mut universe);
 
     println!("{}", universe.now());
     for _ in 0..100 {
@@ -39,7 +39,7 @@ fn main() -> std::io::Result<()> {
         // @André: Não sei quais as consequências de não correr isto na fase de
         //         resolução, se pode causar inconsistência.
         // @Mike: Boa pergunta
-        /*io_modules.run(&mut universe);*/
+        io_modules.run(&mut universe);
 
         // Step the machine
         {
