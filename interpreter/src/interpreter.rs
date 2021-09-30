@@ -56,7 +56,7 @@ fn operand_to_mut_ref_inner<'a>(state: &'a mut Machine, op: &'a Op) -> &'a mut U
 fn operand_to_ref<'a>(universe: &'a mut Universe, operand: &'a Operand) -> &'a UWord {
     // Trivial reads
     /*if operand.time.value() <= 0 {*/
-    if universe.t + &operand.time - 1 < universe.states.len() {
+    if dbg!(universe.t + &operand.time - 1) < dbg!(universe.states.len()) {
         operand_to_ref_inner(universe.t_offset(&operand.time), &operand.op)
     }
     // Reads into the future
@@ -407,7 +407,7 @@ pub fn step(universe: &mut Universe) {
             if tf == universe.t {
                 let value = operand_to_ref_inner(universe.now(), &op).clone();
                 // Fixed point: we're done, go back to ti with the correct result
-                if value == guess {
+                if dbg!(value) == dbg!(guess) {
                     universe.rewind_keep(ti);
                     universe.mode = Mode::Normal;
                 }
