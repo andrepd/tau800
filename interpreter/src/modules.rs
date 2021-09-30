@@ -117,25 +117,23 @@ impl Module for DisplayModule {
     }
 
     fn run(&mut self, memory: &mut [UWord]) -> Result<(), Box<dyn Error>> {
+        println!("{:?}", memory);
+        
         let a = memory[0..7]
             .iter()
-            .enumerate()
-            .map(|(i, v)| (0b000001 & v.value()) != 0)
+            .map(|v| (0b000001 & v.value()) != 0)
             .collect::<Vec<bool>>();
         let b = memory[0..7]
             .iter()
-            .enumerate()
-            .map(|(i, v)| (0b000010 & v.value()) != 0)
+            .map(|v| (0b000010 & v.value()) != 0)
             .collect::<Vec<bool>>();
         let c = memory[0..7]
             .iter()
-            .enumerate()
-            .map(|(i, v)| (0b000100 & v.value()) != 0)
+            .map(|v| (0b000100 & v.value()) != 0)
             .collect::<Vec<bool>>();
         let d = memory[0..7]
             .iter()
-            .enumerate()
-            .map(|(i, v)| (0b001000 & v.value()) != 0)
+            .map(|v| (0b001000 & v.value()) != 0)
             .collect::<Vec<bool>>();
 
         let a = DisplayModule::read_seven_segment(&a[..]);
@@ -156,10 +154,10 @@ impl Module for DisplayModule {
         {
             let bytes = unsafe { self.minutes.as_bytes_mut() };
             if let Ok(c) = c {
-                c.encode_utf8(&mut bytes[0..0]);
+                c.encode_utf8(&mut bytes[0..1]);
             }
             if let Ok(d) = d {
-                d.encode_utf8(&mut bytes[1..1]);
+                d.encode_utf8(&mut bytes[1..2]);
             }
         }
 
