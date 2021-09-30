@@ -166,6 +166,15 @@ impl From<Word<sig::Signed>> for i8 {
     }
 }
 
+impl std::ops::Neg for Word<sig::Signed> {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        self.value = (-self.value()) as u8;
+        self
+    }
+}
+
 // Long word:
 
 #[derive(Debug, Clone, Copy)]
