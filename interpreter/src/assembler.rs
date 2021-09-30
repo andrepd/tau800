@@ -123,11 +123,13 @@ impl<T> ReadOrPanic<T> for ReadResult<T> {
     }
 }
 
+#[derive(Debug)]
 struct WindowSource<'s> {
     source: &'s str,
     chars: Peekable<CharIndices<'s>>,
 }
 
+#[derive(Debug)]
 struct SlidingWindow<'k, 's: 'k> {
     parent: &'k mut WindowSource<'s>,
     start: usize,
@@ -155,8 +157,8 @@ impl<'k, 's> SlidingWindow<'k, 's> {
     fn window_from_here(&mut self) -> SlidingWindow<'_, 's> {
         SlidingWindow {
             parent: self.parent,
-            start: self.start,
-            last: self.start,
+            start: self.last,
+            last: self.last,
         }
     }
 
@@ -170,7 +172,7 @@ impl<'k, 's> SlidingWindow<'k, 's> {
 
     fn next(&mut self) -> Option<char> {
         if let Some((next_idx, next_chr)) = self.parent.chars.next() {
-            self.last = next_idx;
+            self.last = dbg!(next_idx);
             Some(next_chr)
         } else {
             None

@@ -170,8 +170,10 @@ impl std::ops::Neg for Word<sig::Signed> {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
-        self.value = (-self.value()) as u8;
-        self
+        Self {
+            value: (-self.value()) as u8,
+            ..self
+        }
     }
 }
 
