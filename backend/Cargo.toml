@@ -15,6 +15,7 @@ crate-type = ["cdylib"]
 oneshot = "~0.1.2"
 rand = "~0.8.4"
 chrono = "~0.4.19"
+radix_fmt = "~1.0.0"
 
 [dependencies.neon]
 version = "0.9"
