@@ -24,7 +24,7 @@ impl<'a> ModuleCollection<'a> {
     }
 
     pub fn run(&mut self, universe: &mut Universe) {
-        let mut slice_start = 0x10 << 6;
+        let mut slice_start = 0x10;
         for module in self.0.iter_mut() {
             let slice_length = module.size();
             let memmap = &mut universe.now_mut().ram.0[slice_start..(slice_start + slice_length)];
@@ -91,7 +91,7 @@ impl DisplayModule {
     fn read_seven_segment(memory: u8) -> Result<char, DisplayModuleError> {
         let bits = (0..7)
             .map(|i| {
-                if dbg!(memory) & (1 << (7 - i)) != 0 {
+                if dbg!(memory) & (1 << i) != 0 {
                     true
                 } else {
                     false
