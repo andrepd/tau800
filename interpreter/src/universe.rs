@@ -9,7 +9,7 @@ pub enum Mode {
     /// Currently resolving a forward reference to read from the future
     Fw {ti: usize, tf: usize, op: Op, guess: UWord},
     /// Currently resolving a backward reference to write to the past
-    Bw (),
+    Bw {ti: usize, tf: usize, state: Machine},
 }
 
 pub struct Universe {
@@ -17,6 +17,7 @@ pub struct Universe {
     pub t: usize,
     pub mode: Mode,
     pub guess: UWord,
+    pub pending_writes: Vec<(usize, Op, UWord)>,
 }
 
 impl std::ops::Add<&IWord> for usize {
@@ -29,7 +30,13 @@ impl std::ops::Add<&IWord> for usize {
 
 impl Universe {
     pub fn new() -> Self {
-        Universe { states: vec![Machine::new()], t: 0, mode: Mode::Normal, guess: UWord::from(0) }
+        Universe { 
+            states: vec![Machine::new()], 
+            t: 0, 
+            mode: Mode::Normal, 
+            guess: UWord::from(0), 
+            pending_writes: vec![],
+        }
     }
 
     /// Pushes, overwriting existing state if necessary

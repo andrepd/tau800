@@ -326,6 +326,7 @@ fn read_time(chars: &mut SlidingWindow) -> ReadResult<IWord> {
                         read_hex_word(chars)?.value() as i8
                     }
                 };
+            eprintln!("qux {:?} {:?}", value, IWord::from(value));
             Ok(IWord::from(value))
         }
     }

@@ -79,7 +79,7 @@ fn operand_to_ref<'a>(universe: &'a mut Universe, operand: &'a Operand) -> &'a U
                 //&state.target.unwrap().3 //&guess
                 &universe.guess
             }
-            Mode::Bw() => {
+            Mode::Bw{ti: _, tf: _, state: _} => {
                 panic!("Tried to read from future while resolving write to past.")
             }
         }
@@ -87,14 +87,57 @@ fn operand_to_ref<'a>(universe: &'a mut Universe, operand: &'a Operand) -> &'a U
 }
 
 fn operand_set<'a>(universe: &'a mut Universe, operand: &'a Operand, value: UWord) {
-    let dt = operand.time.value();
+    let dt = dbg!(operand.time.value());
+    // Write to current time: normal
     if dt == 0 {
-        /*operand_to_mut_ref_inner(state.t_offset(operand.time), &operand.op)*/
         *operand_to_mut_ref_inner(universe.now_mut(), &operand.op) = value;
-    } else {
-        if dt < 0 {
-            *operand_to_mut_ref_inner(universe.t_offset_mut(&operand.time), &operand.op) = value;
-            
+    } 
+    // Write to the future: add to pending writes
+    else if dt > 0 {
+        universe.pending_writes.push((universe.t + &operand.time, operand.op.clone(), value));
+        /* *operand_to_mut_ref_inner(universe.t_offset_mut(&operand.time), &operand.op) = value;*/
+    } 
+    // Write to the past: must enter Bw resolution mode, go backwards, write the value, emulate 
+    //   until present time, and see if the state is the same as it is now. If not, must re-iterate
+    else {
+        let mode_to_match = universe.mode.clone();  // Expensive...
+        match mode_to_match {
+            // Normal mode: we need to resolve this jump
+            Mode::Normal => {
+                let ti = universe.t + &operand.time;
+                let tf = universe.t;
+                // Grab current state
+                let state_now = universe.now().clone();
+                // Do write to past state
+                *operand_to_mut_ref_inner(&mut universe.states[ti], &operand.op) = value;
+                // Rewind to that state
+                universe.rewind_destroy(ti);
+                // Mode: run back from ti to tf, when tf is reached see if state is back to this, if not go back
+                universe.mode = Mode::Bw{ ti, tf, state: state_now };
+            }
+            // Bw mode: we were resolving. Assuming there are no nested jumps, this must be the reference we are resolving
+            Mode::Bw{ti, tf, state} => {
+                assert_eq!(ti, universe.t + &operand.time);
+                assert_eq!(tf, universe.t);
+                // Check if the state we have come to is the same, if yes then fixed point
+                let state_now = universe.now().clone();
+                if state_now == state {
+                    universe.mode = Mode::Normal
+                }
+                // If not then coiso
+                else {
+                    // Do write to past state
+                    *operand_to_mut_ref_inner(&mut universe.states[ti], &operand.op) = value;
+                    // Rewind to that state
+                    universe.rewind_destroy(ti);
+                    // Mode: run back from ti to tf, when tf is reached see if state is back to this, if not go back
+                    universe.mode = Mode::Bw{ ti, tf, state: state_now };                    
+                }
+            }
+            // Fw mode: must mean nested
+            Mode::Fw{ti: _, tf: _, op: _, guess: _} => {
+                panic!("Tried to write to past while resolving read from future.")
+            }
         }
     }
 }
@@ -380,7 +423,7 @@ pub fn step(universe: &mut Universe) {
                 ()
             }
         }
-        Mode::Bw() => unimplemented!()
+        Mode::Bw{ti: _, tf: _, state: _} => (),
     }
 
     eprintln!("=>    t={} mode={:?}", universe.t, universe.mode);
