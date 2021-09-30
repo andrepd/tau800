@@ -91,7 +91,7 @@ impl DisplayModule {
     fn read_seven_segment(memory: u8) -> Result<char, DisplayModuleError> {
         let bits = (0..7)
             .map(|i| {
-                if dbg!(memory) & (1 << (7 - i)) != 0 {
+                if dbg!(memory) & (1 << i) != 0 {
                     true
                 } else {
                     false
