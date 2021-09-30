@@ -28,6 +28,7 @@ impl<'a> ModuleCollection<'a> {
         for module in self.0.iter_mut() {
             let slice_length = module.size();
             let memmap = &mut universe.now_mut().ram.0[slice_start..(slice_start + slice_length)];
+            println!("{:?}", slice_start..(slice_start + slice_length));
             module.run(memmap).expect("Failed to run IO module.");
             slice_start += slice_length;
         }
@@ -88,17 +89,7 @@ impl DisplayModule {
         }
     }
 
-    fn read_seven_segment(memory: u8) -> Result<char, DisplayModuleError> {
-        let bits = (0..7)
-            .map(|i| {
-                if dbg!(memory) & (1 << i) != 0 {
-                    true
-                } else {
-                    false
-                }
-            })
-            .collect::<Vec<bool>>();
-
+    fn read_seven_segment(bits: &[bool]) -> Result<char, DisplayModuleError> {
         let number = match &bits[..] {
             [true, true, true, true, true, true, false] => '0',
             [true, false, false, true, false, false, false] => '1',
@@ -111,6 +102,7 @@ impl DisplayModule {
             [true, true, true, true, true, true, true] => '8',
             [true, true, true, false, false, true, true] => '9',
             _ => {
+                eprintln!("WARNING: Ignoring 7-segment display bits: {:?}", bits);
                 return Err(DisplayModuleError::BadSevenSegment);
             }
         };
@@ -125,15 +117,31 @@ impl Module for DisplayModule {
     }
 
     fn run(&mut self, memory: &mut [UWord]) -> Result<(), Box<dyn Error>> {
-        let a = 0b000001 & (memory[0..7].iter().fold(0, |a, e| a | e.value()));
-        let b = 0b000010 & (memory[0..7].iter().fold(0, |a, e| a | e.value()));
-        let c = 0b000100 & (memory[0..7].iter().fold(0, |a, e| a | e.value()));
-        let d = 0b001000 & (memory[0..7].iter().fold(0, |a, e| a | e.value()));
+        let a = memory[0..7]
+            .iter()
+            .enumerate()
+            .map(|(i, v)| (0b000001 & v.value()) != 0)
+            .collect::<Vec<bool>>();
+        let b = memory[0..7]
+            .iter()
+            .enumerate()
+            .map(|(i, v)| (0b000010 & v.value()) != 0)
+            .collect::<Vec<bool>>();
+        let c = memory[0..7]
+            .iter()
+            .enumerate()
+            .map(|(i, v)| (0b000100 & v.value()) != 0)
+            .collect::<Vec<bool>>();
+        let d = memory[0..7]
+            .iter()
+            .enumerate()
+            .map(|(i, v)| (0b001000 & v.value()) != 0)
+            .collect::<Vec<bool>>();
 
-        let a = DisplayModule::read_seven_segment(a);
-        let b = DisplayModule::read_seven_segment(b);
-        let c = DisplayModule::read_seven_segment(c);
-        let d = DisplayModule::read_seven_segment(d);
+        let a = DisplayModule::read_seven_segment(&a[..]);
+        let b = DisplayModule::read_seven_segment(&b[..]);
+        let c = DisplayModule::read_seven_segment(&c[..]);
+        let d = DisplayModule::read_seven_segment(&d[..]);
 
         {
             let bytes = unsafe { self.hours.as_bytes_mut() };
