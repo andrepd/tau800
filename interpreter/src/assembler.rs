@@ -313,17 +313,17 @@ fn read_time(chars: &mut SlidingWindow) -> ReadResult<IWord> {
         None => Ok(IWord::zero()),
         Some(_) => {
             
-            let next = chars.peek().map_or(Err(ReadError::NoMoreChars), |x| Ok(x));
-            let value = match next? {
+            let next = chars.peek().map_or(Err(ReadError::NoMoreChars), |x| Ok(x))?;
+            let value = match next {
                 '-' => {
                     match_char('-', chars)?;
-                    -(read_hex_word(chars)?.value() as i8)
+                    -read_decimal(chars)?
                 }
                 '+' => {
                     match_char('+', chars)?;
-                    read_hex_word(chars)?.value() as i8
+                    read_decimal(chars)?
                 }
-                _ => read_hex_word(chars)?.value() as i8,
+                _ => read_decimal(chars)?,
             };
             eprintln!("qux {:?} {:?}", value, IWord::from(value));
             Ok(IWord::from(value))
