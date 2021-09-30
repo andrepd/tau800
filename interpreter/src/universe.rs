@@ -2,9 +2,12 @@ use crate::prelude::*;
 
 pub type Timeline = Vec<Machine>;
 
-pub struct Universe {
+pub struct Universe<'a> {
     pub states: Timeline,
     pub t: usize,
+    /// If currently trying for consistency, this will contain Some(ti, tf, operand, value). If 
+    /// normal operation, this will be None.
+    pub target: Option<(usize, usize, &'a Op, &'a UWord)>,
 }
 
 impl std::ops::Add<&IWord> for usize {
@@ -15,14 +18,23 @@ impl std::ops::Add<&IWord> for usize {
     }
 }
 
-impl Universe {
+impl<'a> Universe<'a> {
     pub fn new() -> Self {
-        Universe { states: vec![Machine::new()], t: 0 }
+        Universe { states: vec![Machine::new()], t: 0, target: None }
     }
 
+    /// Pushes, overwriting existing state if necessary
     pub fn push_state(&mut self, x: Machine) {
-        self.states.push(x);
+        if self.t+1 < self.states.len() {
+            self.states[self.t+1] = x
+        } else {
+            self.states.push(x);
+        };
         self.t += 1;
+    }
+
+    pub fn push_new_state(&mut self) {
+        self.push_state(self.now().clone())
     }
 
     pub fn now(&self) -> &Machine {
@@ -40,9 +52,20 @@ impl Universe {
     pub fn t_offset_mut(&mut self, x: &IWord) -> &mut Machine {
         &mut self.states[self.t + x]
     }
+
+    pub fn rewind_keep(&mut self, t: usize) {
+        debug_assert!(t < self.t);
+        self.t = t;
+    }
+
+    pub fn rewind_destroy(&mut self, t: usize) {
+        debug_assert!(t < self.t);
+        self.states.resize_with(t+1, || {unreachable!()});
+        self.t = t;
+    }
 }
 
-impl std::ops::Index<usize> for Universe {
+impl std::ops::Index<usize> for Universe<'_> {
     type Output = Machine;
 
     fn index(&self, i: usize) -> &Self::Output {
@@ -50,7 +73,7 @@ impl std::ops::Index<usize> for Universe {
     }
 }
 
-impl std::ops::IndexMut<usize> for Universe {
+impl std::ops::IndexMut<usize> for Universe<'_> {
     fn index_mut(&mut self, i: usize) -> &mut Self::Output {
         &mut self.states[i]
     }

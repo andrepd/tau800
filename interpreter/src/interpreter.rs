@@ -53,15 +53,20 @@ fn operand_to_mut_ref_inner<'a>(state: &'a mut Machine, op: &'a Op) -> &'a mut U
 
 // 
 
-fn operand_to_ref<'a>(state: &'a Universe, operand: &'a Operand) -> &'a UWord {
+fn operand_to_ref<'a>(state: &'a Universe<'a>, operand: &'a Operand) -> &'a UWord {
     // Trivial reads
     if operand.time.value() <= 0 {
         operand_to_ref_inner(state.t_offset(&operand.time), &operand.op)
     } 
+    // Reads into the future
     else {
-        panic!()
+        let ti = state.t;
+        let tf = state.t + &operand.time;
+        let guess = operand_to_ref_inner(state.now(), &operand.op);
+        let target = Some((ti, tf, &operand.op, guess));
+        state.target = target;
+        guess
     }
-
 }
 
 fn operand_to_mut_ref<'a>(state: &'a mut Universe, operand: &'a Operand) -> &'a mut UWord {
@@ -71,7 +76,6 @@ fn operand_to_mut_ref<'a>(state: &'a mut Universe, operand: &'a Operand) -> &'a 
     } else {
         panic!()
     }
-    
 }
 
 //
@@ -317,6 +321,32 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
 }
 
 pub fn step(state: &mut Universe) {
+    match state.target {
+        // Normal execution
+        None => { () }
+        // Time resolution
+        Some ((ti, tf, op, guess)) => {
+            // Target time
+            if tf == state.t {
+                let value = operand_to_ref_inner(state.now(), op);
+                // Fixed point: we're done, go back to ti with the correct result
+                if value == guess {
+                    state.rewind_keep(ti);
+                }
+                // No fixed point: go back to ti, destroying this timeline, try again with guess=value
+                else {
+                    state.rewind_destroy(ti);
+                    let target_new = Some((ti, tf, op, value));
+                    state.target = target_new
+                }
+            } 
+            // Running the resolution
+            else {
+                ()
+            }
+        }
+    }
+    state.push_new_state();
     let instruction = Instruction::decode(state.now_mut());
-    execute(state, &instruction)
+    execute(state, &instruction);
 }
