@@ -91,8 +91,8 @@ pub enum Instruction {
     Lsl(Operand),
     Lsr(Operand),
 
-    Cmp(Operand),
-    Bit(Operand),
+    Cmp(Operands),
+    Bit(Operands),
 
     Jmp(Address),
 
@@ -302,8 +302,8 @@ impl Instruction {
             0x0f => { let mode = m.read_pc(); Not(Operand::decode(m, mode))  },
             0x10 => { let mode = m.read_pc(); Lsl(Operand::decode(m, mode))  },
             0x11 => { let mode = m.read_pc(); Lsr(Operand::decode(m, mode))  },
-            0x12 => { let mode = m.read_pc(); Cmp(Operand::decode(m, mode))  },
-            0x13 => { let mode = m.read_pc(); Bit(Operand::decode(m, mode))  },
+            0x12 => { let mode = m.read_pc(); Cmp(Operands::decode(m, mode))  },
+            0x13 => { let mode = m.read_pc(); Bit(Operands::decode(m, mode))  },
             0x14 => Jmp(address_decode(m)),
             0x15 => Bcc(offset_decode(m)),
             0x16 => Bcs(offset_decode(m)),
@@ -401,11 +401,11 @@ impl Instruction {
             }
             Cmp(op) => {
                 m.write_pc(UWord::from(0x12));
-                Operand::encode(m, op);
+                Operands::encode(m, op);
             }
             Bit(op) => {
                 m.write_pc(UWord::from(0x13));
-                Operand::encode(m, op);
+                Operands::encode(m, op);
             }
             Jmp(x) => {
                 m.write_pc(UWord::from(0x14));
