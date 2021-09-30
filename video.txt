@@ -1,0 +1,20 @@
+-- Video text --
+
+"TAU-800B-Super", is our, Miguel Murça and André Duarte's, submission to this year's edition of the Processing Community Day Coimbra.
+
+The piece approaches the theme of "Anachronism" from multiple angles, both from a literal interpretation of the word anachronism, based on its greek roots of Ana and Chronos, as well as from the conventional meaning of anachronism, by mixing futuristic technology with outdated development techniques and computer architecture.
+
+The installation is composed of two elements: first, and more prominently, a sleek interface of futuristic, y2k-inspired, design flashes in what is implied to be calculation, as indicated by the labels of "stack", "state", and the constant stream of assembly commands. In the center of the display, a clock shows the time inverted in its digits, in the most literal approach of "ana chornos" as "backwards time".
+
+Next to this display sits a visibly handled, and even mistreated, stack of papers, on the cover of which "TAU 800-B Super" can be read. Upon inspection, these papers reveal that the shown display is that of a computer named "TAU 800-B Super", which is a severely anachronistic entity, in the conventional sense of the word. On the one hand, this "getting started guide" indicates that the TAU obeys severely outdated computing paradigms, such as having 6 bits in a byte, only a handful of registers, and an absurd limit of six words in its computing stack. The guide itself indicates copyright from 1973 and is in the style of such guides of early computers. On the other hand, the manual repeatedly refers to the time traveling assisted computing capabilities of the machine. In fact, the machine can read and write from and to its own registers in both past and future moments, immediately using those values. This is the third way in which "TAU 800 B Super" approaches the theme, as we have devised a machine that goes "against time" as a concept.
+
+The movement on the screen and content displayed is not random; we have built an almost complete emulation of the TAU 800 B Super as described in the quick start guide, simulating only time consistency (for obvious reasons), but faithfully emulating the rest of the machine. Part of this background process is shown in notes mixed in the quick start guide. This emulation is only exposed to the viewer via the display, but serves as a conceptual cornerstone of the piece.
+
+"TAU 800 B Super" is to be presented as described: a large screen displaying the running computer program, with the quick start guide besides it accessible to the user.
+
+We hope you consider "TAU 800 B" eligible for the Processing Community Day Coimbra 2021.
+
+
+-- Submission text --
+
+"TAU 800-B Super" approaches "Anachronism" from multiple angles: a clock reversed in its digits is shown (ana+chronos) in the futuristic display for an imagined (fully emulated) computer that obeys paradigms of the 1970-80s, (e.g. 6 bit bytes, hand-made assembly) and a much-used reference manual. The manual nonetheless describes time-travel assisted computing capabilities. Code was used for producing the manual (LaTeX), emulating the machine (Rust), showing the display (html+css).
