@@ -1,5 +1,5 @@
-const REGISTER_A = 0
-const REGISTER_F = 1
+const REGISTER_F = 0
+const REGISTER_A = 1
 const REGISTER_BH = 2
 const REGISTER_BL = 3
 const REGISTER_CH = 4
@@ -9,8 +9,8 @@ const REGISTER_SP = 7
 const REGISTER_PC = 8
 
 const REGISTERS = [
-    REGISTER_A,
     REGISTER_F,
+    REGISTER_A,
     REGISTER_BH,
     REGISTER_BL,
     REGISTER_CH,
@@ -21,8 +21,8 @@ const REGISTERS = [
 ]
 
 module.exports = {
-    REGISTER_A,
     REGISTER_F,
+    REGISTER_A,
     REGISTER_BH,
     REGISTER_BL,
     REGISTER_CH,
