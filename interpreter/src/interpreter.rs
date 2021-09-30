@@ -349,8 +349,6 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
 }
 
 pub fn step(universe: &mut Universe) -> Instruction {
-    eprintln!("Step: t={} target={:?}", universe.t, universe.target);
-
     let target_to_match = universe.target.clone();
     match target_to_match {
         // Normal execution
@@ -379,13 +377,9 @@ pub fn step(universe: &mut Universe) -> Instruction {
         }
     }
 
-    eprintln!("=>    t={} target={:?}", universe.t, universe.target);
-
     universe.push_new_state();
     let instruction = Instruction::decode(universe.now_mut());
     execute(universe, &instruction);
-
-    eprintln!("=>    t={} target={:?}", universe.t, universe.target);
 
     instruction
 }
