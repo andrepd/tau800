@@ -1,6 +1,6 @@
 use crate::{
     instruction::Instruction,
-    modules::{ClockModule, Module, ModuleCollection},
+    modules::{ClockModule, DisplayModule, Module, ModuleCollection},
 };
 use core::panic;
 use std::io::Read;
@@ -22,8 +22,8 @@ fn main() -> std::io::Result<()> {
     let buffer = buffer.to_lowercase(); // For flexibility
 
     // IO
-    let clock_mod = Box::new(ClockModule);
-    let mut io_modules = ModuleCollection::new(vec![clock_mod]);
+    let mut io_modules =
+        ModuleCollection::new(vec![Box::new(ClockModule), Box::new(DisplayModule::new())]);
 
     // Emulation
 
