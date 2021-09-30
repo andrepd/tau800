@@ -65,14 +65,14 @@ pub struct DisplayModule {
 
 #[derive(Debug)]
 pub enum DisplayModuleError {
-    BadSevenSegment([bool; 7]),
+    BadSevenSegment,
 }
 
 impl std::fmt::Display for DisplayModuleError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            DisplayModuleError::BadSevenSegment(bits) => {
-                write!(f, "Bad 7-segment display bits: {:?}", bits)
+            DisplayModuleError::BadSevenSegment => {
+                write!(f, "Bad 7-segment display bits")
             }
         }
     }
@@ -100,7 +100,6 @@ impl DisplayModule {
             .collect::<Vec<bool>>();
 
         let number = match &bits[..] {
-            [false, false, false, false, false, false, false] => '-',
             [true, true, true, true, true, true, false] => '0',
             [true, false, false, true, false, false, false] => '1',
             [false, true, true, true, true, false, true] => '2',
@@ -112,9 +111,7 @@ impl DisplayModule {
             [true, true, true, true, true, true, true] => '8',
             [true, true, true, false, false, true, true] => '9',
             _ => {
-                let mut copy = [false; 7];
-                copy.clone_from_slice(&bits[..]);
-                return Err(DisplayModuleError::BadSevenSegment(copy));
+                return Err(DisplayModuleError::BadSevenSegment);
             }
         };
 
@@ -133,18 +130,30 @@ impl Module for DisplayModule {
         let c = 0b000100 & (memory[0..7].iter().fold(0, |a, e| a | e.value()));
         let d = 0b001000 & (memory[0..7].iter().fold(0, |a, e| a | e.value()));
 
-        let a = DisplayModule::read_seven_segment(a)?;
-        let b = DisplayModule::read_seven_segment(b)?;
-        let c = DisplayModule::read_seven_segment(c)?;
-        let d = DisplayModule::read_seven_segment(d)?;
+        let a = DisplayModule::read_seven_segment(a);
+        let b = DisplayModule::read_seven_segment(b);
+        let c = DisplayModule::read_seven_segment(c);
+        let d = DisplayModule::read_seven_segment(d);
 
-        self.hours.clear();
-        self.hours.push(a);
-        self.hours.push(b);
+        {
+            let bytes = unsafe { self.hours.as_bytes_mut() };
+            if let Ok(a) = a {
+                a.encode_utf8(&mut bytes[0..0]);
+            }
+            if let Ok(b) = b {
+                b.encode_utf8(&mut bytes[1..1]);
+            }
+        }
 
-        self.minutes.clear();
-        self.minutes.push(c);
-        self.minutes.push(d);
+        {
+            let bytes = unsafe { self.minutes.as_bytes_mut() };
+            if let Ok(c) = c {
+                c.encode_utf8(&mut bytes[0..0]);
+            }
+            if let Ok(d) = d {
+                d.encode_utf8(&mut bytes[1..1]);
+            }
+        }
 
         Ok(())
     }
