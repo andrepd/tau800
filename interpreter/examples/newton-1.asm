@@ -18,10 +18,10 @@ div bl cl
 add bl cl
 lsr cl
 
-cmp bl cl  ; if c<b goto END
-bpl +3
+cmp bl cl  ; if c<b goto LOOP
+bmi +3
 jmp 3d02
-mov bl cl  ; else goto LOOP
+mov cl bl  ; else goto END
 jmp 1d02
 
 ;END = START+40
