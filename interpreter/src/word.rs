@@ -25,7 +25,7 @@ pub mod sig {
     impl Signature for Unsigned {}
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 /// A value with `WORD_SIZE` bits, that can represent a signed or unsigned bit,
 /// as indicated by the `Signature` type.
 pub struct Word<S>
@@ -34,6 +34,12 @@ where
 {
     value: u8,
     phantom: PhantomData<S>,
+}
+
+impl<S: Signature> std::fmt::Debug for Word<S> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Word").field("value", &self.value).finish()
+    }
 }
 
 impl<S: Signature> PartialEq for Word<S> {

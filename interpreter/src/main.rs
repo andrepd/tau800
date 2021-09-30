@@ -31,20 +31,21 @@ fn main() -> std::io::Result<()> {
 
     let mut universe = Universe::new();
     assembler::assemble_into(universe.now_mut(), buffer.as_str());
-    io_modules.run(&mut universe);
+    /*io_modules.run(&mut universe);*/
 
     println!("{}", universe.now());
     for _ in 0..100 {
         // Run IO modules
         // @André: Não sei quais as consequências de não correr isto na fase de
         //         resolução, se pode causar inconsistência.
-        io_modules.run(&mut universe);
+        // @Mike: Boa pergunta
+        /*io_modules.run(&mut universe);*/
 
         // Step the machine
         {
             interpreter::step(&mut universe);
             let mut iterations = 0;
-            while universe.target.is_some() {
+            while !universe.is_normal() {
                 // In resolution
                 interpreter::step(&mut universe);
 

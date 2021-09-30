@@ -2,12 +2,20 @@ use crate::prelude::*;
 
 pub type Timeline = Vec<Machine>;
 
+#[derive(Debug, Clone)]
+pub enum Mode {
+    /// Normal execution mode
+    Normal,
+    /// Currently resolving a forward reference to read from the future
+    Fw {ti: usize, tf: usize, op: Op, guess: UWord},
+    /// Currently resolving a backward reference to write to the past
+    Bw (),
+}
+
 pub struct Universe {
     pub states: Timeline,
     pub t: usize,
-    /// If currently trying for consistency, this will contain Some(ti, tf, operand, value). If 
-    /// normal operation, this will be None.
-    pub target: Option<(usize, usize, Op, UWord)>,
+    pub mode: Mode,
     pub guess: UWord,
 }
 
@@ -21,7 +29,7 @@ impl std::ops::Add<&IWord> for usize {
 
 impl Universe {
     pub fn new() -> Self {
-        Universe { states: vec![Machine::new()], t: 0, target: None, guess: UWord::from(0) }
+        Universe { states: vec![Machine::new()], t: 0, mode: Mode::Normal, guess: UWord::from(0) }
     }
 
     /// Pushes, overwriting existing state if necessary
@@ -63,6 +71,10 @@ impl Universe {
         debug_assert!(t < self.t);
         self.states.resize_with(t+1, || {unreachable!()});
         self.t = t;
+    }
+
+    pub fn is_normal(&self) -> bool {
+        match self.mode { Mode::Normal => true, _ => false }
     }
 }
 

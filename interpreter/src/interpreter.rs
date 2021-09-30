@@ -62,22 +62,25 @@ fn operand_to_ref<'a>(universe: &'a mut Universe, operand: &'a Operand) -> &'a U
     // Reads into the future
     else {
         // Are we already in resolution?
-        let target_to_match = &universe.target;
-        match target_to_match {
-            None => {
+        let mode_to_match = &universe.mode;
+        match mode_to_match {
+            Mode::Normal => {
                 let ti = universe.t - 1;
                 let tf = universe.t + operand.time.value() as usize;
                 // @André: Aqui tens universe.states[universe.t - 1], mas universe.now() é [universe.t].
                 //         Qual a convenção? universe.t antes de actuar?
                 let guess = operand_to_ref_inner(&universe.states[ti], &operand.op);
-                universe.target = Some((ti, tf, operand.op.clone(), guess.clone()));
+                universe.mode = Mode::Fw{ti, tf, op: operand.op.clone(), guess: guess.clone()};
                 universe.guess = guess.clone();
-                guess
+                &guess
             }
-            Some(_) => {
-                /*debug_assert!();*/
+            Mode::Fw{ti: _, tf: _, op: _, guess} => {
+                debug_assert!(*guess == universe.guess);
                 //&state.target.unwrap().3 //&guess
                 &universe.guess
+            }
+            Mode::Bw() => {
+                panic!("Tried to read from future while resolving write to past.")
             }
         }
     }
@@ -349,26 +352,26 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
 }
 
 pub fn step(universe: &mut Universe) {
-    eprintln!("Step: t={} target={:?}", universe.t, universe.target);
+    eprintln!("Step: t={} mode={:?}", universe.t, universe.mode);
 
-    let target_to_match = universe.target.clone();
-    match target_to_match {
+    let mode_to_match = universe.mode.clone();
+    match mode_to_match {
         // Normal execution
-        None => (),
+        Mode::Normal => (),
         // Time resolution
-        Some((ti, tf, op, guess)) => {
+        Mode::Fw{ti, tf, op, mut guess} => {
             // Target time
             if tf == universe.t {
                 let value = operand_to_ref_inner(universe.now(), &op).clone();
                 // Fixed point: we're done, go back to ti with the correct result
                 if dbg!(value) == dbg!(guess) {
                     universe.rewind_keep(ti);
-                    universe.target = None;
+                    universe.mode = Mode::Normal;
                 }
                 // No fixed point: go back to ti, destroying this timeline, try again with guess=value
                 else {
                     universe.rewind_destroy(ti);
-                    universe.target = Some((ti, tf, op.clone(), value));
+                    universe.mode = Mode::Fw{ti, tf, op: op.clone(), guess:value};
                     universe.guess = value;
                 }
             }
@@ -377,13 +380,14 @@ pub fn step(universe: &mut Universe) {
                 ()
             }
         }
+        Mode::Bw() => unimplemented!()
     }
 
-    eprintln!("=>    t={} target={:?}", universe.t, universe.target);
+    eprintln!("=>    t={} mode={:?}", universe.t, universe.mode);
 
     universe.push_new_state();
     let instruction = Instruction::decode(universe.now_mut());
     execute(universe, &instruction);
 
-    eprintln!("=>    t={} target={:?}", universe.t, universe.target);
+    eprintln!("=>    t={} mode={:?}", universe.t, universe.mode);
 }
