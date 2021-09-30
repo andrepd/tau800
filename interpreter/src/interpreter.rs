@@ -429,6 +429,14 @@ pub fn step(universe: &mut Universe) {
     eprintln!("=>    t={} mode={:?}", universe.t, universe.mode);
 
     universe.push_new_state();
+    // Pending writes, são aqui que se fazem
+    let pending_writes_to_match = universe.pending_writes.clone();  // Epá outra vez esta merda
+    for i in pending_writes_to_match {
+        if i.0 == universe.t {
+            let state = universe.now_mut();
+            *operand_to_mut_ref_inner(state, &i.1) = i.2
+        }
+    }
     let instruction = Instruction::decode(universe.now_mut());
     execute(universe, &instruction);
 
