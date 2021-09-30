@@ -74,7 +74,7 @@ fn operand_to_ref<'a>(universe: &'a mut Universe, operand: &'a Operand) -> &'a U
                 universe.guess = guess.clone();
                 guess
             }
-            Some((_ti, _tf, _op, _guess)) => {
+            Some(_) => {
                 /*debug_assert!();*/
                 //&state.target.unwrap().3 //&guess
                 &universe.guess
@@ -83,12 +83,16 @@ fn operand_to_ref<'a>(universe: &'a mut Universe, operand: &'a Operand) -> &'a U
     }
 }
 
-fn operand_to_mut_ref<'a>(universe: &'a mut Universe, operand: &'a Operand) -> &'a mut UWord {
-    if operand.time.value() == 0 {
+fn operand_set<'a>(universe: &'a mut Universe, operand: &'a Operand, value: UWord) {
+    let dt = operand.time.value();
+    if dt == 0 {
         /*operand_to_mut_ref_inner(state.t_offset(operand.time), &operand.op)*/
-        operand_to_mut_ref_inner(universe.now_mut(), &operand.op)
+        *operand_to_mut_ref_inner(universe.now_mut(), &operand.op) = value;
     } else {
-        panic!()
+        if dt < 0 {
+            *operand_to_mut_ref_inner(universe.t_offset_mut(&operand.time), &operand.op) = value;
+            
+        }
     }
 }
 
@@ -142,13 +146,13 @@ fn get_flag_c(state: &Machine) -> bool {
 
 fn execute(state: &mut Universe, instruction: &Instruction) {
     let mk_ref = operand_to_ref;
-    let mk_mref = operand_to_mut_ref;
+    let mk_mref = operand_set;
 
     match instruction {
         // Memory
         Instruction::Mov(Operands { src, dst }) => {
             let word = *mk_ref(state, &src);
-            *mk_mref(state, &dst) = word;
+            mk_mref(state, &dst, word);
             set_flag_nvz(state.now_mut(), &word);
         }
         Instruction::Psh(x) => {
@@ -157,7 +161,7 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
         }
         Instruction::Pop(x) => {
             let word = state.now_mut().read_sp();
-            *mk_mref(state, &x) = word;
+            mk_mref(state, &x, word);
             set_flag_nvz(state.now_mut(), &word);
         }
 
@@ -169,7 +173,7 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
             let (div, rem) = div_rem(result, MAX_UNSIGNED_VALUE + 1);
             let carry = div > 0;
             let word = UWord::from(rem);
-            *mk_mref(state, &dst) = word;
+            mk_mref(state, &dst, word);
             set_flag_c(state.now_mut(), carry);
             set_flag_nvz(state.now_mut(), &word);
             set_flag_v(state.now_mut(), src_orig, dst_orig, rem);
@@ -182,7 +186,7 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
             let (div, rem) = div_rem(result, MAX_UNSIGNED_VALUE + 1);
             let carry = div > 0;
             let word = UWord::from(rem);
-            *mk_mref(state, &dst) = word;
+            mk_mref(state, &dst, word);
             set_flag_c(state.now_mut(), carry);
             set_flag_nvz(state.now_mut(), &word);
             set_flag_v(state.now_mut(), !src_orig, dst_orig, rem);
@@ -191,7 +195,7 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
         Instruction::Mul(Operands { src, dst }) => {
             let result = mk_ref(state, &dst).value() * mk_ref(state, &src).value();
             let word = UWord::from(result % (MAX_UNSIGNED_VALUE + 1));
-            *mk_mref(state, &dst) = word;
+            mk_mref(state, &dst, word);
             set_flag_nvz(state.now_mut(), &word);
         }
         Instruction::Muh(Operands { src, dst }) => {
@@ -199,7 +203,7 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
             let result: u16 =
                 mk_ref(state, &dst).value() as u16 * mk_ref(state, &src).value() as u16;
             let word = UWord::from((result >> WORD_SIZE) as u8);
-            *mk_mref(state, &dst) = word;
+            mk_mref(state, &dst, word);
             set_flag_nvz(state.now_mut(), &word);
         }
         Instruction::Mus(Operands { src, dst }) => {
@@ -214,19 +218,19 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
             let result =
                 sign_extend(mk_ref(state, &dst).value()) * sign_extend(mk_ref(state, &src).value());
             let word = UWord::from((result >> WORD_SIZE) as u8);
-            *mk_mref(state, &dst) = word;
+            mk_mref(state, &dst, word);
             set_flag_nvz(state.now_mut(), &word);
         }
         Instruction::Div(Operands { src, dst }) => {
             let result = mk_ref(state, &dst).value() / mk_ref(state, &src).value();
             let word = UWord::from(result);
-            *mk_mref(state, &dst) = word;
+            mk_mref(state, &dst, word);
             set_flag_z(state.now_mut(), &word);
         }
         Instruction::Mod(Operands { src, dst }) => {
             let result = mk_ref(state, &dst).value() / mk_ref(state, &src).value();
             let word = UWord::from(result);
-            *mk_mref(state, &dst) = word;
+            mk_mref(state, &dst, word);
             set_flag_z(state.now_mut(), &word);
         }
 
@@ -234,39 +238,39 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
         Instruction::And(Operands { src, dst }) => {
             let result = mk_ref(state, &src).value() & mk_ref(state, &dst).value();
             let word = UWord::from(result & 0b00111111);
-            *mk_mref(state, &dst) = word;
+            mk_mref(state, &dst, word);
             set_flag_nvz(state.now_mut(), &word);
         }
         Instruction::Or(Operands { src, dst }) => {
             let result = mk_ref(state, &src).value() | mk_ref(state, &dst).value();
             let word = UWord::from(result & 0b00111111);
-            *mk_mref(state, &dst) = word;
+            mk_mref(state, &dst, word);
             set_flag_nvz(state.now_mut(), &word);
         }
         Instruction::Xor(Operands { src, dst }) => {
             let result = mk_ref(state, &src).value() ^ mk_ref(state, &dst).value();
             let word = UWord::from(result & 0b00111111);
-            *mk_mref(state, &dst) = word;
+            mk_mref(state, &dst, word);
             set_flag_nvz(state.now_mut(), &word);
         }
         Instruction::Not(x) => {
             let result = !mk_ref(state, &x).value();
             let word = UWord::from(result & 0b00111111);
-            *mk_mref(state, &x) = word;
+            mk_mref(state, &x, word);
             set_flag_nvz(state.now_mut(), &word);
         }
         Instruction::Lsl(x) => {
             let result = mk_ref(state, &x).value() << 1;
             let carry = (0b01000000 & result) != 0;
             let word = UWord::from(result & 0b00111111);
-            *mk_mref(state, &x) = word;
+            mk_mref(state, &x, word);
             set_flag_nvz(state.now_mut(), &word);
             set_flag_c(state.now_mut(), carry);
         }
         Instruction::Lsr(x) => {
             let result = mk_ref(state, &x).value() >> 1;
             let word = UWord::from(result & 0b00111111);
-            *mk_mref(state, &x) = word;
+            mk_mref(state, &x, word);
             set_flag_nvz(state.now_mut(), &word);
         }
 

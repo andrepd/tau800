@@ -15,10 +15,10 @@ pub trait Module: Debug {
     fn run(&mut self, memory: &mut [UWord]) -> Result<(), Box<dyn Error>>;
 }
 
-pub struct ModuleCollection(Vec<Box<dyn Module>>);
+pub struct ModuleCollection<'a>(Vec<Box<&'a mut dyn Module>>);
 
-impl ModuleCollection {
-    pub fn new(modules: Vec<Box<dyn Module>>) -> Self {
+impl<'a> ModuleCollection<'a> {
+    pub fn new(modules: Vec<Box<&'a mut dyn Module>>) -> Self {
         Self(modules)
     }
 
@@ -57,8 +57,8 @@ impl Module for ClockModule {
 
 #[derive(Debug)]
 pub struct DisplayModule {
-    hours: String,
-    minutes: String,
+    pub hours: String,
+    pub minutes: String,
 }
 
 #[derive(Debug)]
@@ -120,8 +120,7 @@ impl DisplayModule {
 
 impl Module for DisplayModule {
     fn size(&self) -> usize {
-        // 0bAAAAAA 0bABBBBB 0bBBCCCC 0bCCCDDD 0bDDDDxx
-        5
+        7
     }
 
     fn run(&mut self, memory: &mut [UWord]) -> Result<(), Box<dyn Error>> {

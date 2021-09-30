@@ -22,8 +22,10 @@ fn main() -> std::io::Result<()> {
     let buffer = buffer.to_lowercase(); // For flexibility
 
     // IO
+    let mut clock_module = ClockModule;
+    let mut display_module = DisplayModule::new();
     let mut io_modules =
-        ModuleCollection::new(vec![Box::new(ClockModule), Box::new(DisplayModule::new())]);
+        ModuleCollection::new(vec![Box::new(&mut clock_module), Box::new(&mut display_module)]);
 
     // Emulation
 
