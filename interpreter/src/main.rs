@@ -34,7 +34,7 @@ fn main() -> std::io::Result<()> {
     io_modules.run(&mut universe);
 
     println!("{}", universe.now());
-    for _ in 0..100 {
+    for _ in 0..1000 {
         // Run IO modules
         // @André: Não sei quais as consequências de não correr isto na fase de
         //         resolução, se pode causar inconsistência.
