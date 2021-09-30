@@ -8,7 +8,7 @@ pub struct Universe {
     /// If currently trying for consistency, this will contain Some(ti, tf, operand, value). If 
     /// normal operation, this will be None.
     pub target: Option<(usize, usize, Op, UWord)>,
-    pub cona: UWord,
+    pub guess: UWord,
 }
 
 impl std::ops::Add<&IWord> for usize {
@@ -21,7 +21,7 @@ impl std::ops::Add<&IWord> for usize {
 
 impl Universe {
     pub fn new() -> Self {
-        Universe { states: vec![Machine::new()], t: 0, target: None, cona: UWord::from(0) }
+        Universe { states: vec![Machine::new()], t: 0, target: None, guess: UWord::from(0) }
     }
 
     /// Pushes, overwriting existing state if necessary

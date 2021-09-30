@@ -53,39 +53,40 @@ fn operand_to_mut_ref_inner<'a>(state: &'a mut Machine, op: &'a Op) -> &'a mut U
 
 // 
 
-fn operand_to_ref<'a>(state: &'a mut Universe, operand: &'a Operand) -> &'a UWord {
+fn operand_to_ref<'a>(universe: &'a mut Universe, operand: &'a Operand) -> &'a UWord {
     // Trivial reads
     /*if operand.time.value() <= 0 {*/
-    if dbg!(state.t + &operand.time - 1) < dbg!(state.states.len()) {
-        operand_to_ref_inner(state.t_offset(&operand.time), &operand.op)
+    if dbg!(universe.t + &operand.time - 1) < dbg!(universe.states.len()) {
+        operand_to_ref_inner(universe.t_offset(&operand.time), &operand.op)
     } 
     // Reads into the future
     else {
         // Are we already in resolution?
-        let target_to_match = state.target.clone();
+        let target_to_match = &universe.target;
         match target_to_match {
             None => {
-                let ti = state.t - 1;
-                let tf = state.t - 1 + &operand.time;
-                // Que lol... passei 40m à volta desta linha mas turns out que mudar `state.states[ti]` para `state.now()`, apesar de ser a definição, parte isto tudo
-                let guess = operand_to_ref_inner(&state.states[ti], &operand.op);
-                state.target = Some((ti, tf, operand.op.clone(), guess.clone()));
-                state.cona = guess.clone();
+                let ti = universe.t - 1;
+                let tf = universe.t + operand.time.value() as usize;
+                // @André: Aqui tens universe.states[universe.t - 1], mas universe.now() é [universe.t].
+                //         Qual a convenção? universe.t antes de actuar?
+                let guess = operand_to_ref_inner(&universe.states[ti], &operand.op);
+                universe.target = Some((ti, tf, operand.op.clone(), guess.clone()));
+                universe.guess = guess.clone();
                 guess
             }
-            Some ((ti, tf, op, guess)) => {
+            Some ((_ti, _tf, _op, _guess)) => {
                 /*debug_assert!();*/
                 //&state.target.unwrap().3 //&guess
-                &state.cona
+                &universe.guess
             }
         }
     }
 }
 
-fn operand_to_mut_ref<'a>(state: &'a mut Universe, operand: &'a Operand) -> &'a mut UWord {
+fn operand_to_mut_ref<'a>(universe: &'a mut Universe, operand: &'a Operand) -> &'a mut UWord {
     if operand.time.value() == 0 {
         /*operand_to_mut_ref_inner(state.t_offset(operand.time), &operand.op)*/
-        operand_to_mut_ref_inner(state.now_mut(), &operand.op)
+        operand_to_mut_ref_inner(universe.now_mut(), &operand.op)
     } else {
         panic!()
     }
@@ -333,28 +334,28 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
     }
 }
 
-pub fn step(state: &mut Universe) {
-    eprintln!("Step: t={} target={:?}", state.t, state.target);
+pub fn step(universe: &mut Universe) {
+    eprintln!("Step: t={} target={:?}", universe.t, universe.target);
 
-    let target_to_match = state.target.clone();  // Epá se eu não fizer cópia o compilador grita comigo e eu não percebo 1 caralho
+    let target_to_match = universe.target.clone();
     match target_to_match {
         // Normal execution
         None => { () }
         // Time resolution
         Some ((ti, tf, op, guess)) => {
             // Target time
-            if tf == state.t {
-                let value = operand_to_ref_inner(state.now(), &op).clone();
+            if tf == universe.t {
+                let value = operand_to_ref_inner(universe.now(), &op).clone();
                 // Fixed point: we're done, go back to ti with the correct result
                 if dbg!(value) == dbg!(guess) {
-                    state.rewind_keep(ti);
-                    state.target = None;
+                    universe.rewind_keep(ti);
+                    universe.target = None;
                 }
                 // No fixed point: go back to ti, destroying this timeline, try again with guess=value
                 else {
-                    state.rewind_destroy(ti);
-                    state.target = Some((ti, tf, op.clone(), value));
-                    state.cona = value;
+                    universe.rewind_destroy(ti);
+                    universe.target = Some((ti, tf, op.clone(), value));
+                    universe.guess = value;
                 }
             } 
             // Running the resolution
@@ -364,11 +365,11 @@ pub fn step(state: &mut Universe) {
         }
     }
 
-    eprintln!("=>    t={} target={:?}", state.t, state.target);
+    eprintln!("=>    t={} target={:?}", universe.t, universe.target);
 
-    state.push_new_state();
-    let instruction = Instruction::decode(state.now_mut());
-    execute(state, &instruction);
+    universe.push_new_state();
+    let instruction = Instruction::decode(universe.now_mut());
+    execute(universe, &instruction);
 
-    eprintln!("=>    t={} target={:?}", state.t, state.target);
+    eprintln!("=>    t={} target={:?}", universe.t, universe.target);
 }
