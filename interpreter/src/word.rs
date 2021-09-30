@@ -274,18 +274,13 @@ impl std::ops::Add<Word<sig::Signed>> for LongWord<sig::Unsigned> {
     type Output = Self;
 
     fn add(self, other: Word<sig::Signed>) -> Self {
-        let sum = if (other.value & SIGN_BIT) != 0 {
-            let absolute_value = !(other.value - 1);
-            let long_twos_complement = (!(absolute_value as u16) & (1 << (2 * WORD_SIZE - 1))) + 1;
-            long_twos_complement + self.value() as u16
-        } else {
-            other.value as u16 + self.value() as u16
-        };
-
-        let high = (sum >> WORD_SIZE) as u8 & MAX_UNSIGNED_VALUE;
-        let low = sum as u8 & MAX_UNSIGNED_VALUE;
-
-        LongWord::from_words(Word::from(high), Word::from(low))
+        let x = self.value() as i16;
+        let y = other.value() as i16;
+        let z = x + y;
+        debug_assert!(z > 0);
+        let (high, low) = div_rem(z, 1 << 6);
+        eprintln!("add {}+{}={} {} {}", x, y, z, high, low);
+        LongWord::from_words(Word::from(high as u8), Word::from(low as u8))
     }
 }
 
