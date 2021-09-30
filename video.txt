@@ -18,3 +18,7 @@ We hope you consider "TAU 800 B" eligible for the Processing Community Day Coimb
 -- Submission text --
 
 "TAU 800-B Super" approaches "Anachronism" from multiple angles: a clock reversed in its digits is shown (ana+chronos) in the futuristic display for an imagined (fully emulated) computer that obeys paradigms of the 1970-80s, (e.g. 6 bit bytes, hand-made assembly) and a much-used reference manual. The manual nonetheless describes time-travel assisted computing capabilities. Code was used for producing the manual (LaTeX), emulating the machine (Rust), showing the display (html+css).
+
+"TAU 800-B Super" approaches "Anachronism" from multiple angles: a clock reversed in its digits is shown ("ana"+"chronos"; backwards time) in the center of a futuristic display (inspired by Y2K futurism) for an imagined (but here almost fully emulated) computer. The much-used reference manual shows it obeys paradigms of the 1970-80s, (e.g. 6 bit bytes, hand-made assembly) but nonetheless boasts time-travel assisted computing capabilities. 
+
+Emulating the machine (Rust), producing the manual (LaTeX), showing the display (Web+Javascript+Rust).

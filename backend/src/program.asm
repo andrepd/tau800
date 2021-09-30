@@ -1,2 +1,1 @@
-add #01 a
-jmp 0002
+/home/miguelmurca/Documents/Art/PDC2021/repo/backend/../interpreter/examples/display.asm

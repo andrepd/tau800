@@ -143,7 +143,7 @@ fn main(mut cx: ModuleContext) -> NeonResult<()> {
 
                     let mut last_command = emu::interpreter::step(&mut universe);
                     let mut iterations = 0;
-                    while universe.target.is_some() {
+                    while !universe.is_normal() {
                         // In resolution
                         last_command = emu::interpreter::step(&mut universe);
 
@@ -164,7 +164,7 @@ fn main(mut cx: ModuleContext) -> NeonResult<()> {
                 let hours = (&display_module.hours).clone();
                 let minutes = (&display_module.minutes).clone();
 
-                let stack = universe.now().cpu.sp.value() as u32;
+                let stack = 0x7f - universe.now().cpu.sp.value() as u32;
 
                 let registers = {
                     let mut registers = [[false; 6]; 9];

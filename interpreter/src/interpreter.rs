@@ -394,7 +394,7 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
     }
 }
 
-pub fn step(universe: &mut Universe) {
+pub fn step(universe: &mut Universe) -> Instruction {
     eprintln!("Step: t={} mode={:?}", universe.t, universe.mode);
 
     let mode_to_match = universe.mode.clone();
@@ -441,4 +441,6 @@ pub fn step(universe: &mut Universe) {
     execute(universe, &instruction);
 
     eprintln!("=>    t={} mode={:?}", universe.t, universe.mode);
+
+    instruction
 }

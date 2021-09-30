@@ -4,7 +4,7 @@
 ; it out à mão. Gastavamos mais tempo a implementar do que a fazer à mão.
 
 ;dados
-mov #04 %0001  ; len
+mov #02 %0001  ; len
 
 mov #03 %000a  ; vector a
 mov #04 %010a
