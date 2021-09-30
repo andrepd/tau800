@@ -26,6 +26,7 @@ name = "interpreter"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "radix_fmt",
 ]
 
 [[package]]
@@ -52,6 +53,12 @@ checksum = "9a64b1ec5cda2586e284722486d802acf1f7dbdc623e2bfc57e65ca1cd099290"
 dependencies = [
  "autocfg",
 ]
+
+[[package]]
+name = "radix_fmt"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ce082a9940a7ace2ad4a8b7d0b1eac6aa378895f18be598230c5f2284ac05426"
 
 [[package]]
 name = "time"

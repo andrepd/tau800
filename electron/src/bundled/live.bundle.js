@@ -25,7 +25,7 @@ eval("const renderer = __webpack_require__(/*! ./renderer */ \"./src/live/render
   \*******************************/
 /***/ ((module) => {
 
-eval("const REGISTER_A = 0\nconst REGISTER_F = 1\nconst REGISTER_BH = 2\nconst REGISTER_BL = 3\nconst REGISTER_CH = 4\nconst REGISTER_CL = 5\nconst REGISTER_X = 6\nconst REGISTER_SP = 7\nconst REGISTER_PC = 8\n\nconst REGISTERS = [\n    REGISTER_A,\n    REGISTER_F,\n    REGISTER_BH,\n    REGISTER_BL,\n    REGISTER_CH,\n    REGISTER_CL,\n    REGISTER_X,\n    REGISTER_SP,\n    REGISTER_PC,\n]\n\nmodule.exports = {\n    REGISTER_A,\n    REGISTER_F,\n    REGISTER_BH,\n    REGISTER_BL,\n    REGISTER_CH,\n    REGISTER_CL,\n    REGISTER_X,\n    REGISTER_SP,\n    REGISTER_PC,\n    REGISTERS,\n}\n\n//# sourceURL=webpack://anachronic/./src/live/registers.js?");
+eval("const REGISTER_F = 0\nconst REGISTER_A = 1\nconst REGISTER_BH = 2\nconst REGISTER_BL = 3\nconst REGISTER_CH = 4\nconst REGISTER_CL = 5\nconst REGISTER_X = 6\nconst REGISTER_SP = 7\nconst REGISTER_PC = 8\n\nconst REGISTERS = [\n    REGISTER_F,\n    REGISTER_A,\n    REGISTER_BH,\n    REGISTER_BL,\n    REGISTER_CH,\n    REGISTER_CL,\n    REGISTER_X,\n    REGISTER_SP,\n    REGISTER_PC,\n]\n\nmodule.exports = {\n    REGISTER_F,\n    REGISTER_A,\n    REGISTER_BH,\n    REGISTER_BL,\n    REGISTER_CH,\n    REGISTER_CL,\n    REGISTER_X,\n    REGISTER_SP,\n    REGISTER_PC,\n    REGISTERS,\n}\n\n//# sourceURL=webpack://anachronic/./src/live/registers.js?");
 
 /***/ }),
 

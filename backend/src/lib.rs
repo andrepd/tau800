@@ -7,6 +7,12 @@ use std::iter::FromIterator;
 use std::sync::{mpsc, Arc, Once};
 use std::thread;
 
+use crate::emu::assembler;
+use crate::emu::modules::{ClockModule, DisplayModule, ModuleCollection};
+use crate::emu::universe::Universe;
+
+mod emu;
+
 macro_rules! let_move {
     ($x:ident) => {
         let $x = $x;
@@ -15,28 +21,6 @@ macro_rules! let_move {
         let mut $x = $x;
     };
 }
-
-const REGISTER_A: usize = 0;
-const REGISTER_F: usize = 1;
-const REGISTER_BH: usize = 2;
-const REGISTER_BL: usize = 3;
-const REGISTER_CH: usize = 4;
-const REGISTER_CL: usize = 5;
-const REGISTER_X: usize = 6;
-const REGISTER_SP: usize = 7;
-const REGISTER_PC: usize = 8;
-const REGISTERS: [usize; 9] = [
-    REGISTER_A,
-    REGISTER_F,
-    REGISTER_BH,
-    REGISTER_BL,
-    REGISTER_CH,
-    REGISTER_CL,
-    REGISTER_X,
-    REGISTER_SP,
-    REGISTER_PC,
-];
-
 struct Report {
     numbers: [String; 2],
     registers: [[bool; 6]; 9],
@@ -133,74 +117,89 @@ fn main(mut cx: ModuleContext) -> NeonResult<()> {
         POLL_CHANNEL = Some(send);
     }
 
-    let emulation_thread = thread::spawn(move || {
+    let _emulation_thread = thread::spawn(move || {
         let_move!(receive);
+        'all: loop {
+            // IO
+            let mut clock_module = ClockModule;
+            let mut display_module = DisplayModule::new();
 
-        let mut lines_of_code = include_str!("program.asm")
-            .lines()
-            .map(|x| x.trim())
-            .filter(|x| !x.is_empty())
-            .cycle();
-        let mut code_history = VecDeque::from_iter(lines_of_code.clone().take(6));
-        let mut stack = 0;
+            // Emulation
 
-        let mut registers = [[false; 6]; 9];
+            let mut universe = Universe::new();
+            assembler::assemble_into(universe.now_mut(), include_str!("program.asm"));
 
-        while let Ok(response_channel) = receive.recv() {
-            for _ in 0..thread_rng().gen_range(0..6) {
-                lines_of_code.next();
-            }
-            code_history.push_front(lines_of_code.next().unwrap());
-            code_history.pop_back();
+            let mut cmd_history = VecDeque::new();
+            cmd_history.resize_with(6, || "nop".to_string());
 
-            if thread_rng().gen_bool(0.25) {
-                match thread_rng().gen_range(0..=2) {
-                    0 => {
-                        if stack > 0 {
-                            stack -= 1
+            'emu: while let Ok(response_channel) = receive.recv() {
+                // Step the machine
+                {
+                    let mut io_modules = ModuleCollection::new(vec![
+                        Box::new(&mut clock_module),
+                        Box::new(&mut display_module),
+                    ]);
+                    io_modules.run(&mut universe);
+
+                    let mut last_command = emu::interpreter::step(&mut universe);
+                    let mut iterations = 0;
+                    while universe.target.is_some() {
+                        // In resolution
+                        last_command = emu::interpreter::step(&mut universe);
+
+                        iterations += 1;
+                        if iterations > 100 {
+                            eprintln!("Consistency failure. Resetting machine.");
+                            //panic!("Consistency failure.");
+                            continue 'emu; // Reset the machine on panic
                         }
                     }
-                    1 => {
-                        if stack < 6 {
-                            stack += 1
+
+                    cmd_history.pop_front();
+                    cmd_history.push_back(emu::assembler::mnemonic(last_command));
+                }
+
+                // Read the information
+
+                let hours = (&display_module.hours).clone();
+                let minutes = (&display_module.minutes).clone();
+
+                let stack = universe.now().cpu.sp.value() as u32;
+
+                let registers = {
+                    let mut registers = [[false; 6]; 9];
+                    let now = universe.now();
+
+                    let value_as_bits = |value: u16, slice: &mut [bool]| {
+                        for i in 0..6 {
+                            slice[i] = value & (1 << i) != 0
                         }
-                    }
-                    2 => {}
-                    _ => unreachable!(),
+                    };
+
+                    value_as_bits(now.cpu.flags.word.value() as u16, &mut registers[0]);
+                    value_as_bits(now.cpu.a.value() as u16, &mut registers[1]);
+                    value_as_bits(now.cpu.bh.value() as u16, &mut registers[2]);
+                    value_as_bits(now.cpu.bl.value() as u16, &mut registers[3]);
+                    value_as_bits(now.cpu.ch.value() as u16, &mut registers[4]);
+                    value_as_bits(now.cpu.cl.value() as u16, &mut registers[5]);
+                    value_as_bits(now.cpu.x.value() as u16, &mut registers[6]);
+                    value_as_bits(now.cpu.sp.value(), &mut registers[7]);
+                    value_as_bits(now.cpu.pc.value(), &mut registers[8]);
+
+                    registers
+                };
+
+                let dummy_report = Report {
+                    numbers: [hours, minutes],
+                    registers,
+                    stack,
+                    history: cmd_history.iter().cloned().collect(),
+                };
+
+                if response_channel.send(dummy_report).is_err() {
+                    // Channel is closed
+                    break 'all;
                 }
-            }
-
-            for register in registers.iter_mut() {
-                if thread_rng().gen_bool(0.5) {
-                    continue;
-                }
-                for bit in register.iter_mut() {
-                    if thread_rng().gen_bool(0.5) {
-                        *bit = !*bit;
-                    }
-                }
-            }
-
-            let now = Utc::now();
-            let minute = format!("{:0>2}", now.minute())
-                .chars()
-                .rev()
-                .collect::<String>();
-            let hour = format!("{:0>2}", now.hour())
-                .chars()
-                .rev()
-                .collect::<String>();
-
-            let dummy_report = Report {
-                numbers: [minute, hour], // Reversed on purpose
-                registers,
-                stack,
-                history: code_history.iter().map(|x| x.to_string()).collect(),
-            };
-
-            if response_channel.send(dummy_report).is_err() {
-                // Channel is closed
-                break;
             }
         }
     });

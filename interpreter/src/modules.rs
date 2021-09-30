@@ -1,11 +1,12 @@
 use std::{
     error::Error,
     fmt::{Debug, Display},
+    sync::Arc,
 };
 
 use chrono::{Local, Timelike};
 
-use crate::{universe::Universe, word::UWord};
+use super::{universe::Universe, word::UWord};
 
 pub trait Module: Debug {
     /// Number of words this module writes to memory.
@@ -23,11 +24,12 @@ impl<'a> ModuleCollection<'a> {
     }
 
     pub fn run(&mut self, universe: &mut Universe) {
-        let slice_start = 0x10 << 6;
+        let mut slice_start = 0x10 << 6;
         for module in self.0.iter_mut() {
             let slice_length = module.size();
             let memmap = &mut universe.now_mut().ram.0[slice_start..(slice_start + slice_length)];
             module.run(memmap).expect("Failed to run IO module.");
+            slice_start += slice_length;
         }
     }
 }
@@ -87,9 +89,9 @@ impl DisplayModule {
     }
 
     fn read_seven_segment(memory: u8) -> Result<char, DisplayModuleError> {
-        let bits = (0..8)
+        let bits = (0..7)
             .map(|i| {
-                if memory & (1 << (7 - i)) != 0 {
+                if dbg!(memory) & (1 << (7 - i)) != 0 {
                     true
                 } else {
                     false
@@ -98,6 +100,8 @@ impl DisplayModule {
             .collect::<Vec<bool>>();
 
         let number = match &bits[..] {
+            [false, false, false, false, false, false, false] => '-',
+            [true, true, true, true, true, true, false] => '0',
             [true, false, false, true, false, false, false] => '1',
             [false, true, true, true, true, false, true] => '2',
             [false, true, true, false, true, true, true] => '3',
