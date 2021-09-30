@@ -1,5 +1,5 @@
 ; Inputs: %10 %11 %12 %13
-; Outputs: %15 ... 2b
+; Outputs: %14 ... 1a
 
 ; Digito 1
 mov #01 a
@@ -71,7 +71,7 @@ beq +15
 sec
 cmp #07 bl
 beq +7
-or a %1500,x
+or a %1400,x
 
 clc
 add #01 x
@@ -83,7 +83,7 @@ beq +15
 sec
 cmp #04 bl
 beq +7
-or a %1500,x
+or a %1400,x
 
 clc
 add #01 x
@@ -95,7 +95,7 @@ beq +15
 sec
 cmp #06 bl
 beq +7
-or a %1500,x
+or a %1400,x
 
 clc
 add #01 x
@@ -106,7 +106,7 @@ cmp #04 bl   ; Se for 4
 beq +14
 bit #01 bl  ; Ou ímpar
 bne +7
-or a %1500,x
+or a %1400,x
 
 clc
 add #01 x
@@ -121,7 +121,7 @@ beq +15
 sec
 cmp #07 bl
 beq +7
-or a %1500,x
+or a %1400,x
 
 clc
 add #01 x
@@ -130,7 +130,7 @@ add #01 x
 sec
 cmp #02 bl
 beq +7
-or a %1500,x
+or a %1400,x
 
 clc
 add #01 x
@@ -145,7 +145,7 @@ beq +15
 sec
 cmp #07 bl
 beq +7
-or a %1500,x
+or a %1400,x
 
 ret
 
