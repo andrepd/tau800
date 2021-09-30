@@ -274,7 +274,7 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
             set_flag_z(state.now_mut(), &word);
         }
         Instruction::Mod(Operands { src, dst }) => {
-            let result = mk_ref(state, &dst).value() / mk_ref(state, &src).value();
+            let result = mk_ref(state, &dst).value() % mk_ref(state, &src).value();
             let word = UWord::from(result);
             mk_mref(state, &dst, word);
             set_flag_z(state.now_mut(), &word);
