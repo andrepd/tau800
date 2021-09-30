@@ -160,7 +160,7 @@ fn write_register(m: &mut Machine, x: &Register) -> () {
 }
 
 fn write_word(m: &mut Machine, x: &UWord) -> () {
-    m.write_pc(x)
+    m.write_pc(*x)
 }
 
 fn write_address(m: &mut Machine, x: &Address) -> () {
@@ -187,7 +187,7 @@ impl Operand {
 
     fn encode(m: &mut Machine, x: &Operand) -> () {
         use Op::*;
-        match x.op {
+        match &x.op {
             Reg(y) => {
                 m.write_pc(UWord::from(0x0));
                 write_register(m, &y);

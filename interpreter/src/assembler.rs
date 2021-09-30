@@ -1,4 +1,4 @@
-use crate::instruction::{Instruction, Operand, Operands, Register, Timed};
+use crate::instruction::{Instruction, Operand, Operands, Register, Op, Timed};
 use crate::prelude::*;
 use std::iter::Peekable;
 use std::str::{CharIndices, Lines};
@@ -35,6 +35,13 @@ pub fn assemble<'i>(input: &'i str) -> InstructionIterator<'i> {
         lines: input.lines(),
         line_idx: 0,
     }
+}
+
+pub fn assemble_into(m: &mut Machine, input: &str) {
+    for i in assemble(input) {
+        Instruction::encode(m, &i);
+    };
+    m.cpu.pc = Address::from(0x80);
 }
 
 fn read_instruction(literal: &str, line_idx: usize) -> Instruction {
@@ -319,7 +326,7 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
         '#' => {
             match_char('#', chars)?;
             let word = read_hex_word(chars)?;
-            Operand::Imm(word)
+            Timed::new(Op::Imm(word), 0.into())
         }
         '%' => {
             match_char('%', chars)?;
@@ -333,10 +340,10 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
                 match_char('x', chars)?;
 
                 let time = read_time(chars)?;
-                Operand::Abx(Timed::new(op, time))
+                Timed::new(Op::Abx(op), time)
             } else {
                 let time = read_time(chars)?;
-                Operand::Abs(Timed::new(op, time))
+                Timed::new(Op::Abs(op), time)
             }
         }
         '(' => {
@@ -348,7 +355,7 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
                     let op = Address { low, high };
                     let time = read_time(chars)?;
 
-                    Operand::Ind(Timed::new(op, time))
+                    Timed::new(Op::Ind(op), time)
                 }
                 _ => unreachable!() /*{
                     let register = read_register(chars)?;
@@ -362,7 +369,7 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
         _ => {
             let register = read_register(chars)?;
             let time = read_time(chars)?;
-            Operand::Reg(Timed::new(register, time))
+            Timed::new(Op::Reg(register), time)
         }
     };
     Ok(operand)
