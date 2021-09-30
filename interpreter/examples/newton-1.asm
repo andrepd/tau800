@@ -18,9 +18,10 @@ div bl cl
 add bl cl
 lsr cl
 
+sec
 cmp bl cl  ; if c<b goto LOOP
 bmi +3
-jmp 3c02
+jmp 3d02
 mov cl bl  ; else goto END
 jmp 1102
 
