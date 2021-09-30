@@ -125,11 +125,10 @@ impl Module for DisplayModule {
     }
 
     fn run(&mut self, memory: &mut [UWord]) -> Result<(), Box<dyn Error>> {
-        // 0bAAAAAA 0bABBBBB 0bBBCCCC 0bCCCDDD 0bDDDDxx
-        let a = (memory[0].value() << 1) | (memory[1].value() >> 5);
-        let b = ((memory[1].value() & 0b011111) << 2) | (memory[2].value() >> 4);
-        let c = ((memory[2].value() & 0b001111) << 3) | (memory[3].value() >> 3);
-        let d = ((memory[3].value() & 0b000111) << 4) | (memory[4].value() >> 2);
+        let a = 0b000001 & (memory[0..7].iter().fold(0, |a, e| a | e.value()));
+        let b = 0b000010 & (memory[0..7].iter().fold(0, |a, e| a | e.value()));
+        let c = 0b000100 & (memory[0..7].iter().fold(0, |a, e| a | e.value()));
+        let d = 0b001000 & (memory[0..7].iter().fold(0, |a, e| a | e.value()));
 
         let a = DisplayModule::read_seven_segment(a)?;
         let b = DisplayModule::read_seven_segment(b)?;
