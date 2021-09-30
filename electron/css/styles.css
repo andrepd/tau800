@@ -706,13 +706,13 @@
 
 .command-display-container .command-display.index-1 {
   bottom: 14%;
-  font-size: 12vh;
+  font-size: 10vh;
 }
 
 .command-display-container .command-display.index-2 {
   bottom: 13%;
-  font-size: 8vh;
-  opacity: 30%;
+  font-size: 9vh;
+  opacity: 20%;
 }
 
 .command-display-container .command-display.index-3 {
@@ -728,13 +728,13 @@
 }
 
 .command-display-container .command-display.index-5 {
-  bottom: 8%;
+  bottom: 10%;
   font-size: 4vh;
   opacity: 7%;
 }
 
 .command-display-container .command-display.index-6 {
-  bottom: 5%;
+  bottom: 9%;
   font-size: 3vh;
   opacity: 7%;
 }

@@ -1,4 +1,9 @@
+use chrono::{Timelike, Utc};
 use neon::prelude::*;
+use rand::distributions::Bernoulli;
+use rand::{thread_rng, Rng};
+use std::collections::VecDeque;
+use std::iter::FromIterator;
 use std::sync::{mpsc, Arc, Once};
 use std::thread;
 
@@ -32,62 +37,11 @@ const REGISTERS: [usize; 9] = [
     REGISTER_PC,
 ];
 
-/*fn poll(mut cx: FunctionContext) -> JsResult<JsObject> {
-    // Dummy example: return random values
-    let time_sampler = Uniform::new(0, 60);
-    let numbers = JsArray::new(&mut cx, 2);
-    let js_number = cx.number(time_sampler.sample(&mut thread_rng()));
-    numbers.set(&mut cx, 0, js_number)?;
-    let js_number = cx.number(time_sampler.sample(&mut thread_rng()));
-    numbers.set(&mut cx, 1, js_number)?;
-
-    let boolean_sampler = rand::distributions::Bernoulli::new(0.5).unwrap();
-    let registers = {
-        let registers = JsArray::new(&mut cx, 9);
-        for i in 0..9 {
-            let register = JsArray::new(&mut cx, 6);
-
-            for j in 0..6 {
-                let value = boolean_sampler.sample(&mut thread_rng());
-                let value = cx.boolean(value);
-                register.set(&mut cx, j, value)?;
-            }
-
-            registers.set(&mut cx, i, register)?;
-        }
-        registers
-    };
-
-    let stack = Uniform::new(0, 7).sample(&mut thread_rng());
-    let stack = cx.number(stack);
-
-    let history = {
-        let values = ["aaaaaaa", "bbbbb", "cccccc", "dd", "eeee", "ffffffff"].iter();
-        let history = JsArray::new(&mut cx, values.len() as u32);
-
-        for (i, value) in values.enumerate() {
-            let value = cx.string(value);
-            history.set(&mut cx, i as u32, value)?;
-        }
-
-        history
-    };
-
-    let response_object = JsObject::new(&mut cx);
-
-    response_object.set(&mut cx, "numbers", numbers)?;
-    response_object.set(&mut cx, "registers", registers)?;
-    response_object.set(&mut cx, "stack", stack)?;
-    response_object.set(&mut cx, "history", history)?;
-
-    Ok(response_object)
-} */
-
 struct Report {
-    numbers: [u32; 2],
+    numbers: [String; 2],
     registers: [[bool; 6]; 9],
     stack: u32,
-    history: [String; 6],
+    history: Vec<String>,
 }
 
 impl Default for Report {
@@ -108,9 +62,9 @@ impl Report {
     ) -> NeonResult<Handle<'h, JsObject>> {
         let numbers = {
             let array = JsArray::new(cx, 2);
-            let number = cx.number(self.numbers[0]);
+            let number = cx.string(self.numbers[0].clone());
             array.set(cx, 0, number)?;
-            let number = cx.number(self.numbers[1]);
+            let number = cx.string(self.numbers[1].clone());
             array.set(cx, 1, number)?;
             array
         };
@@ -182,12 +136,66 @@ fn main(mut cx: ModuleContext) -> NeonResult<()> {
     let emulation_thread = thread::spawn(move || {
         let_move!(receive);
 
+        let mut lines_of_code = include_str!("program.asm")
+            .lines()
+            .map(|x| x.trim())
+            .filter(|x| !x.is_empty())
+            .cycle();
+        let mut code_history = VecDeque::from_iter(lines_of_code.clone().take(6));
+        let mut stack = 0;
+
+        let mut registers = [[false; 6]; 9];
+
         while let Ok(response_channel) = receive.recv() {
+            for _ in 0..thread_rng().gen_range(0..6) {
+                lines_of_code.next();
+            }
+            code_history.push_front(lines_of_code.next().unwrap());
+            code_history.pop_back();
+
+            if thread_rng().gen_bool(0.25) {
+                match thread_rng().gen_range(0..=2) {
+                    0 => {
+                        if stack > 0 {
+                            stack -= 1
+                        }
+                    }
+                    1 => {
+                        if stack < 6 {
+                            stack += 1
+                        }
+                    }
+                    2 => {}
+                    _ => unreachable!(),
+                }
+            }
+
+            for register in registers.iter_mut() {
+                if thread_rng().gen_bool(0.5) {
+                    continue;
+                }
+                for bit in register.iter_mut() {
+                    if thread_rng().gen_bool(0.5) {
+                        *bit = !*bit;
+                    }
+                }
+            }
+
+            let now = Utc::now();
+            let minute = format!("{:0>2}", now.minute())
+                .chars()
+                .rev()
+                .collect::<String>();
+            let hour = format!("{:0>2}", now.hour())
+                .chars()
+                .rev()
+                .collect::<String>();
+
             let dummy_report = Report {
-                numbers: Default::default(),
-                registers: Default::default(),
-                stack: 0,
-                history: Default::default(),
+                numbers: [minute, hour], // Reversed on purpose
+                registers,
+                stack,
+                history: code_history.iter().map(|x| x.to_string()).collect(),
             };
 
             if response_channel.send(dummy_report).is_err() {
