@@ -14,8 +14,8 @@ lsr bl     ; Div by 2
 
 ; c = (b + input / b) / 2
 mov %000a cl 
-div b cl
-add b cl
+div bl cl
+add bl cl
 lsr cl
 
 cmp bl cl  ; if c<b goto END
