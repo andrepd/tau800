@@ -1,7 +1,7 @@
 mov #02 %000a
 mov #03 %010a
 
-add %000a@+4 %010a   ; Ele vê %000a@+4, faz bootstrap com %000a@+0 (= #02). 
+add %000a@+04 %010a  ; Ele vê %000a@+4, faz bootstrap com %000a@+0 (= #02). 
 cmp #06 %000a        ; Se %000a - 6 >= 0, 
 bpl +5               ; salta o increment, senão incrementa
 add #01 %000a        ; Soma 1
