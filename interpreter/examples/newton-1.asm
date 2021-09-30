@@ -20,9 +20,9 @@ lsr cl
 
 cmp bl cl  ; if c<b goto LOOP
 bmi +3
-jmp 3d02
+jmp 3c02
 mov cl bl  ; else goto END
-jmp 1d02
+jmp 1102
 
 ;END = START+40
 nop
