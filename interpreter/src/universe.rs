@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 use super::prelude::*;
 
 pub type Timeline = VecDeque<Machine>;
-const MAX_MEMORY: usize = 50;
+const MAX_MEMORY: usize = 500;
 
 #[derive(Debug, Clone)]
 pub enum Mode {
