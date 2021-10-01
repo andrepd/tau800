@@ -56,6 +56,17 @@ fn main() -> std::io::Result<()> {
             }
             println!("{}", universe.now());
         }
+    };
+
+    let words = &universe.now().ram.0[0x14..=0x1a];
+    for d in 0usize..4 {
+        // println!("{}", d);
+        let mask = (1 << d) as u8;
+        let f = |x,c| { if words[x as usize - 1].value() & mask != 0 {c} else {' '} };
+        println!(" {} ", f(2,'—'));
+        println!("{}{}{}", f(1,'|'), f(7,'_'), f(3,'|'));
+        println!("{}{}{}", f(4,'|'), f(5,'_'), f(6,'|'));
+        println!();
     }
 
     Ok(())
