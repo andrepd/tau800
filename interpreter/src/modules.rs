@@ -92,7 +92,7 @@ impl DisplayModule {
     fn read_seven_segment(bits: &[bool]) -> Result<char, DisplayModuleError> {
         let number = match &bits[..] {
             [true, true, true, true, true, true, false] => '0',
-            [true, false, false, true, false, false, false] => '1',
+            [false, false, true, false, false, true, false] => '1',
             [false, true, true, true, true, false, true] => '2',
             [false, true, true, false, true, true, true] => '3',
             [true, false, true, false, false, true, true] => '4',
