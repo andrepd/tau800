@@ -155,8 +155,8 @@ fn main(mut cx: ModuleContext) -> NeonResult<()> {
                         }
                     }
 
-                    cmd_history.pop_front();
-                    cmd_history.push_back(emu::assembler::mnemonic(last_command));
+                    cmd_history.pop_back();
+                    cmd_history.push_front(emu::assembler::mnemonic(last_command));
                 }
 
                 // Read the information
