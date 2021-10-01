@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 use super::prelude::*;
 
 pub type Timeline = VecDeque<Machine>;
-const MAX_MEMORY: usize = 500;
+const MAX_MEMORY: usize = 50;
 
 #[derive(Debug, Clone)]
 pub enum Mode {
@@ -27,7 +27,7 @@ pub enum Mode {
 pub struct Universe {
     pub states: Timeline,
     // How many states have been pop_front()ed from the timeline
-    forgetten: usize,
+    pub forgetten: usize,
     pub t: usize,
     pub mode: Mode,
     pub guess: UWord,
@@ -54,7 +54,7 @@ impl Universe {
         }
     }
 
-    fn t_as_index(&self) -> usize {
+    pub fn t_as_index(&self) -> usize {
         self.t - self.forgetten
     }
 
