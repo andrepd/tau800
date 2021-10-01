@@ -21,7 +21,7 @@ mov #08 a
 mov %1000 bl
 cal 1703
 
-jmp 0020
+jmp 0002
 nop;e
 nop;e
 nop;e
