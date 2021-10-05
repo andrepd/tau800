@@ -1,27 +1,90 @@
 ; Inputs: %10 %11 %12 %13
 ; Outputs: %14 ... 1a
 
+;; Main ;;
+
+mov #03 ch
+cal 2b02
+mov #00 ch
+cal 2b02
+jmp 0002
+
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+nop;e
+
+;; Subroutine ;;
+; Inputs:
+;   ch: direction (0 l→r, 3 r→l)
+; Locals:
+;   cl: increment
+;   x: offset
+
+clc
+mov ch cl
+add #01 cl  ; Estas 3 linhas fazem 0 → -1 e 3 → +1 
+lsr cl
+add #3f cl
+clc
+not cl
+add #01 cl
+
 ; Digito 1
+mov ch x
 mov #01 a
-mov %1300 bl
-cal 1703
+mov %1000,x bl
+cal 0c05
+
+clc
+add cl ch 
 
 ; Digito 2
+mov ch x
 mov #02 a
-mov %1200 bl
-cal 1703
+mov %1000,x bl
+cal 0c05
+
+clc
+add cl ch 
 
 ; Digito 3
+mov ch x
 mov #04 a
-mov %1100 bl
-cal 1703
+mov %1000,x bl
+cal 0c05
+
+clc
+add cl ch 
 
 ; Digito 4
+mov ch x
 mov #08 a
-mov %1000 bl
-cal 1703
+mov %1000,x bl
+cal 0c05
 
-jmp 0002
+ret
+
 nop;e
 nop;e
 nop;e
