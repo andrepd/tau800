@@ -56,7 +56,7 @@ fn operand_to_mut_ref_inner<'a>(state: &'a mut Machine, op: &'a Op) -> &'a mut U
 fn operand_to_ref<'a>(universe: &'a mut Universe, operand: &'a Operand) -> &'a UWord {
     // Trivial reads
     /*if operand.time.value() <= 0 {*/
-    if dbg!(universe.t + &operand.time - 1) < dbg!(universe.states.len()) {
+    if dbg!(universe.t_as_index() + &operand.time - 1) < dbg!(universe.states.len()) {
         operand_to_ref_inner(universe.t_offset(&operand.time), &operand.op)
     }
     // Reads into the future
