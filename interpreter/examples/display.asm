@@ -34,7 +34,7 @@ nop;e
 nop;e
 nop;e
 
-;; Subroutine ;;
+;; Subroutine: do one sweep of all digits ;;
 ; Inputs:
 ;   ch: direction (0 l→r, 3 r→l)
 ; Locals:
@@ -54,7 +54,8 @@ add #01 cl
 mov ch x
 mov #01 a
 mov %1000,x bl
-cal 0c05
+cal 0009
+cal 1805
 
 clc
 add cl ch 
@@ -63,7 +64,8 @@ add cl ch
 mov ch x
 mov #02 a
 mov %1000,x bl
-cal 0c05
+cal 0009
+cal 1805
 
 clc
 add cl ch 
@@ -72,7 +74,8 @@ add cl ch
 mov ch x
 mov #04 a
 mov %1000,x bl
-cal 0c05
+cal 0009
+cal 1805
 
 clc
 add cl ch 
@@ -81,7 +84,8 @@ add cl ch
 mov ch x
 mov #08 a
 mov %1000,x bl
-cal 0c05
+cal 0009
+cal 1805
 
 ret
 
@@ -110,7 +114,7 @@ nop;e
 nop;e
 nop;e
 
-;; Subroutine ;;
+;; Subroutine: set one digit ;;
 ; Inputs:
 ;   a = current bit mask
 ;   bl = current digit
@@ -210,6 +214,32 @@ cmp #07 bl
 beq +7
 or a %1400,x
 
+ret
+
+nop
+nop
+nop
+nop
+nop
+nop
+
+;; Subroutine: clear one digit ;;
+; Inputs:
+;   a = current bit mask
+; Locals:
+;   x = current segment
+
+sec
+not a
+
+mov #06 x
+and a %1400,x
+sub #01 x
+bne -14
+and a %1400,x
+
+clc
+not a
 ret
 
 ; 0d 20 __ __ 15 __ __
