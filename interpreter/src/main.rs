@@ -48,6 +48,7 @@ fn main() -> std::io::Result<()> {
             while !universe.is_normal() {
                 // In resolution
                 interpreter::step(&mut universe);
+                // println!("time resolution {}", universe.now());
 
                 iterations += 1;
                 if iterations > 100 {

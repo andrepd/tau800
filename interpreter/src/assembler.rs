@@ -176,7 +176,7 @@ impl<'k, 's> SlidingWindow<'k, 's> {
 
     fn next(&mut self) -> Option<char> {
         if let Some((next_idx, next_chr)) = self.parent.chars.next() {
-            self.last = dbg!(next_idx);
+            self.last = next_idx;
             Some(next_chr)
         } else {
             None
@@ -318,19 +318,9 @@ fn read_time(chars: &mut SlidingWindow) -> ReadResult<IWord> {
     match match_char('@', chars).optional() {
         None => Ok(IWord::zero()),
         Some(_) => {
-            
-            let next = chars.peek().map_or(Err(ReadError::NoMoreChars), |x| Ok(x))?;
-            let value = match next {
-                '-' => {
-                    match_char('-', chars)?;
-                    -read_decimal(chars)?
-                }
-                '+' => {
-                    match_char('+', chars)?;
-                    read_decimal(chars)?
-                }
-                _ => read_decimal(chars)?,
-            };
+            let _ = match_char('-', chars);
+            let _ = match_char('+', chars);
+            let value = read_decimal(chars)?;
             eprintln!("qux {:?} {:?}", value, IWord::from(value));
             Ok(IWord::from(value))
         }
