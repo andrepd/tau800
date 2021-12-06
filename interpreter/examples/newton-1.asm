@@ -2,28 +2,47 @@
 ; Input:  6-bit number on %000a
 ; Output: sqrt of that number on a
 
-mov #32 %000a
+mov #32 a
+cal 1202
+jmp 3d3d
 
-;START
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+
+;; Subroutine: calculate sqrt of 6-bit number with Newton's method
+; Inputs:
+;   a: Number
+; Locals:
+;   bl, cl
+; Outputs:
+;   a: √ of input
+
+:start = 1202
 
 ; b = input / 2
-mov %000a bl
-lsr bl     ; Div by 2
+mov a bl
+lsr bl
 
-;LOOP = START+8
+:loop = start+10 = 1c02
 
 ; c = (b + input / b) / 2
-mov %000a cl 
+mov a cl 
 div bl cl
 add bl cl
 lsr cl
 
 sec
-cmp bl cl  ; if c<b goto LOOP
-bmi +3
-jmp 3d02
-mov cl bl  ; else goto END
-jmp 1102
+cmp bl cl  ; if c<b goto loop
+bmi +7
+mov bl a
+ret
+mov cl bl  ; else goto end
+jmp 1c02
 
-;END = START+40
+:end
 nop
