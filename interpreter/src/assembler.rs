@@ -27,6 +27,10 @@ impl<'i> Iterator for InstructionIterator<'i> {
                 Some((prefix, _suffix)) => prefix,
                 None => line,
             };
+            line = match line.split_once(":") {
+                Some((prefix, _suffix)) => prefix,
+                None => line,
+            };
             line = line.trim();
         }
         Some(read_instruction(line, self.line_idx))
