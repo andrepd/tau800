@@ -3,11 +3,13 @@
 
 ;; Main ;;
 
+:start = 0002
+
 mov #03 ch
-cal 2b02
+cal 2b02:sweep
 mov #00 ch
-cal 2b02
-jmp 0002
+cal 2b02:sweep
+jmp 0002:start
 
 nop;e
 nop;e
@@ -33,6 +35,8 @@ nop;e
 nop;e
 nop;e
 nop;e
+
+
 
 ;; Subroutine: do one sweep of all digits ;;
 ; Inputs:
@@ -40,6 +44,8 @@ nop;e
 ; Locals:
 ;   cl: increment
 ;   x: offset
+
+:sweep = 2b02
 
 clc
 mov ch cl
@@ -54,8 +60,8 @@ add #01 cl
 mov ch x
 mov #01 a
 mov %1000,x bl
-cal 0009
-cal 1805
+cal 0009:clear
+cal 1805:digit
 
 clc
 add cl ch 
@@ -64,8 +70,8 @@ add cl ch
 mov ch x
 mov #02 a
 mov %1000,x bl
-cal 0009
-cal 1805
+cal 0009:clear
+cal 1805:digit
 
 clc
 add cl ch 
@@ -74,8 +80,8 @@ add cl ch
 mov ch x
 mov #04 a
 mov %1000,x bl
-cal 0009
-cal 1805
+cal 0009:clear
+cal 1805:digit
 
 clc
 add cl ch 
@@ -84,8 +90,8 @@ add cl ch
 mov ch x
 mov #08 a
 mov %1000,x bl
-cal 0009
-cal 1805
+cal 0009:clear
+cal 1805:digit
 
 ret
 
@@ -114,12 +120,16 @@ nop;e
 nop;e
 nop;e
 
+
+
 ;; Subroutine: set one digit ;;
 ; Inputs:
 ;   a = current bit mask
 ;   bl = current digit
 ; Locals:
 ;   x = current segment
+
+:digit = 1805
 
 mov #00 x
 
@@ -223,11 +233,15 @@ nop
 nop
 nop
 
+
+
 ;; Subroutine: clear one digit ;;
 ; Inputs:
 ;   a = current bit mask
 ; Locals:
 ;   x = current segment
+
+:clear = 0009
 
 sec
 not a
@@ -241,5 +255,3 @@ and a %1400,x
 clc
 not a
 ret
-
-; 0d 20 __ __ 15 __ __
