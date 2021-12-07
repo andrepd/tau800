@@ -70,7 +70,7 @@ fn operand_to_ref<'a>(universe: &'a mut Universe, operand: &'a Operand) -> &'a U
                 // @André: Aqui tens universe.states[universe.t - 1], mas universe.now() é [universe.t].
                 //         Qual a convenção? universe.t antes de actuar?
                 let guess =
-                    operand_to_ref_inner(&universe.states[ti - universe.forgetten], &operand.op);
+                    operand_to_ref_inner(&universe.states[ti - universe.forgetten], &operand.op);  /*TODO*/
                 universe.mode = Mode::Fw {
                     ti,
                     tf,
@@ -121,14 +121,14 @@ fn operand_set<'a>(universe: &'a mut Universe, operand: &'a Operand, value: UWor
         match mode_to_match {
             // Normal mode: we need to resolve this jump
             Mode::Normal => {
-                let ti = universe.t + &operand.time;
-                let tf = universe.t;
+                let ti = dbg!(universe.t + &operand.time);
+                let tf = dbg!(universe.t);
                 // Grab current state
                 let state_now = universe.now().clone();
-                // Do write to past state
-                *operand_to_mut_ref_inner(&mut universe.states[ti], &operand.op) = value;
-                // Rewind to that state
-                universe.rewind_destroy(ti);
+                // Rewind to past state
+                universe.rewind_destroy(ti-1);  /*Pá não faço puto de ideia mas este -1 é preciso aqui e só aqui*/
+                // Do write to that state
+                *operand_to_mut_ref_inner(universe.now_mut(), &operand.op) = value;
                 // Mode: run back from ti to tf, when tf is reached see if state is back to this, if not go back
                 universe.mode = Mode::Bw {
                     ti,
@@ -147,10 +147,10 @@ fn operand_set<'a>(universe: &'a mut Universe, operand: &'a Operand, value: UWor
                 }
                 // If not then coiso
                 else {
-                    // Do write to past state
-                    *operand_to_mut_ref_inner(&mut universe.states[ti], &operand.op) = value;
-                    // Rewind to that state
+                    // Rewind to past state
                     universe.rewind_destroy(ti);
+                    // Do write to that state
+                    *operand_to_mut_ref_inner(universe.now_mut(), &operand.op) = value;
                     // Mode: run back from ti to tf, when tf is reached see if state is back to this, if not go back
                     universe.mode = Mode::Bw {
                         ti,

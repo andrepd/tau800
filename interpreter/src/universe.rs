@@ -60,16 +60,12 @@ impl Universe {
 
     /// Pushes, overwriting existing state if necessary
     pub fn push_state(&mut self, x: Machine) {
-        if self.t_as_index() + 1 < self.states.len() {
-            let t = self.t_as_index();
-            self.states[t + 1] = x
-        } else {
-            self.states.push_back(x);
-        };
-        if self.states.len() > MAX_MEMORY {
+        eprintln!("push_state index={:?} len={:?}\n", self.t_as_index(), self.states.len());
+        if self.states.len() == MAX_MEMORY {
             self.states.pop_front();
-            self.forgetten += 1;
-        }
+            self.forgetten += 1;            
+        };
+        self.states.push_back(x);
         self.t += 1;
     }
 
@@ -78,7 +74,8 @@ impl Universe {
     }
 
     pub fn now(&self) -> &Machine {
-        &self.states[self.t_as_index()]
+        let t = self.t_as_index();
+        &self.states[t]
     }
 
     pub fn now_mut(&mut self) -> &mut Machine {
@@ -87,12 +84,13 @@ impl Universe {
     }
 
     pub fn t_offset(&self, x: &IWord) -> &Machine {
-        &self.states[self.t_as_index() + x - 1]
+        let t = self.t_as_index();
+        &self.states[t + x - 1]
     }
 
     pub fn t_offset_mut(&mut self, x: &IWord) -> &mut Machine {
         let t = self.t_as_index();
-        &mut self.states[t + x]
+        &mut self.states[t + x - 1]
     }
 
     pub fn rewind_keep(&mut self, t: usize) {
@@ -102,8 +100,8 @@ impl Universe {
 
     pub fn rewind_destroy(&mut self, t: usize) {
         debug_assert!(t < self.t);
-        self.states.resize_with(t + 1, || unreachable!());
         self.t = t;
+        self.states.resize_with(dbg!(self.t_as_index()/*-1*/ + 1), || unreachable!());
     }
 
     pub fn is_normal(&self) -> bool {
