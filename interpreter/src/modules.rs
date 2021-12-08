@@ -63,24 +63,6 @@ pub struct DisplayModule {
     pub hours: String,
     pub minutes: String,
 }
-
-#[derive(Debug)]
-pub enum DisplayModuleError {
-    BadSevenSegment,
-}
-
-impl std::fmt::Display for DisplayModuleError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            DisplayModuleError::BadSevenSegment => {
-                write!(f, "Bad 7-segment display bits")
-            }
-        }
-    }
-}
-
-impl Error for DisplayModuleError {}
-
 impl DisplayModule {
     pub fn new() -> Self {
         DisplayModule {
@@ -89,7 +71,7 @@ impl DisplayModule {
         }
     }
 
-    fn read_seven_segment(bits: &[bool]) -> Result<char, DisplayModuleError> {
+    fn read_seven_segment(bits: &[bool]) -> char {
         let number = match &bits[..] {
             [true, true, true, true, true, true, false] => '0',
             [false, false, true, false, false, true, false] => '1',
@@ -101,13 +83,23 @@ impl DisplayModule {
             [false, true, true, false, false, true, false] => '7',
             [true, true, true, true, true, true, true] => '8',
             [true, true, true, false, false, true, true] => '9',
-            _ => {
-                eprintln!("WARNING: Ignoring 7-segment display bits: {:?}", bits);
-                return Err(DisplayModuleError::BadSevenSegment);
+            bits => {
+                // Return garbage for visual effect;
+                // we convert the boolean values to an equivalent binary number,
+                // and index into some garbage &'static str.
+                let index = bits.iter().enumerate().fold(0, |acc, (i, &value)| {
+                    if value {
+                        acc + 2_usize.pow(i as u32)
+                    } else {
+                        acc
+                    }
+                });
+                const ALPHABET: &'static str = "abcd";
+                ALPHABET.chars().nth(index % ALPHABET.len()).unwrap()
             }
         };
 
-        Ok(number)
+        number
     }
 }
 
@@ -118,7 +110,7 @@ impl Module for DisplayModule {
 
     fn run(&mut self, memory: &mut [UWord]) -> Result<(), Box<dyn Error>> {
         println!("{:?}", memory);
-        
+
         let a = memory[0..7]
             .iter()
             .map(|v| (0b000001 & v.value()) != 0)
@@ -143,22 +135,14 @@ impl Module for DisplayModule {
 
         {
             let bytes = unsafe { self.hours.as_bytes_mut() };
-            if let Ok(a) = a {
-                a.encode_utf8(&mut bytes[0..1]);
-            }
-            if let Ok(b) = b {
-                b.encode_utf8(&mut bytes[1..2]);
-            }
+            a.encode_utf8(&mut bytes[0..1]);
+            b.encode_utf8(&mut bytes[1..2]);
         }
 
         {
             let bytes = unsafe { self.minutes.as_bytes_mut() };
-            if let Ok(c) = c {
-                c.encode_utf8(&mut bytes[0..1]);
-            }
-            if let Ok(d) = d {
-                d.encode_utf8(&mut bytes[1..2]);
-            }
+            c.encode_utf8(&mut bytes[0..1]);
+            d.encode_utf8(&mut bytes[1..2]);
         }
 
         Ok(())
