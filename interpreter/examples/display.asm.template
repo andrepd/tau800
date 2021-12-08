@@ -242,26 +242,22 @@
 	ret
 
 	; Improved guess: c = (b + input / b) / 2 
-	;                   = (b + input' / b * 2) / 2 
-	;                   = b / 2 + input' / b
-	;                   = b / 2 + input' / b + (input' % b * 2 + bh) / b
-	;                   = (b + input / b) / 2 
 	;                   = (b + input' / b * 2 + (input' % b * 2 + bh) / b) / 2
 	clc
-	mov a cl   ; Parcela 3
+	mov a cl   ; 3rd term
 	div bl cl
 	lsl cl
 	add bh cl
 	div bl cl
-	mov a ch   ; Parcela 2
+	mov a ch   ; 2nd term
 	div bl ch
 	lsl ch
 	add ch cl
-	add bl cl  ; Parcela 1
-	lsr cl
+	add bl cl  ; 1st term
+	lsr cl     ; div everything by 2
 
-	; Corner case, if input is 1 less than a perfect square, cl will oscillate rather than fixpoint
-	cmp bl cl  ; If cl<bl, nop. If cl>bl, make cl=bl. I.e. cl = min(bl,cl)
+	; c = min(b,c), needed for corner case where input is 1 less than a perfect square
+	cmp bl cl
 	bmi +08
 	mov bl cl
 	bne +02
