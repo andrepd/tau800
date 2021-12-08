@@ -227,6 +227,12 @@
 ; Outputs:
 ;   a: √ of input
 
+; Pseudocode:              | time
+;   b ← input/2            | 0s
+;   c ← (b + input/b) / 2  | 1s
+;   b @ 0s ← c @ 2s        | 2s
+;   return b               | 3s
+
 :newton = 3f0c
 
 	; Setup
