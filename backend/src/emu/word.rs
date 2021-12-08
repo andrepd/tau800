@@ -1,1 +1,1 @@
-/home/miguelmurca/Documents/Art/PDC2021/repo/backend/../interpreter/src/word.rs
+../../../interpreter/src/word.rs
