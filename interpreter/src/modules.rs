@@ -82,7 +82,7 @@ impl DisplayModule {
             [true, true, false, true, true, true, true] => '6',
             [false, true, true, false, false, true, false] => '7',
             [true, true, true, true, true, true, true] => '8',
-            [true, true, true, false, false, true, true] => '9',
+            [true, true, true, false, true, true, true] => '9',
             bits => {
                 // Return garbage for visual effect;
                 // we convert the boolean values to an equivalent binary number,
