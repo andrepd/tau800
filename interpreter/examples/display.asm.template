@@ -263,15 +263,21 @@
 ;; Subroutine: decimal digits → 6-bit number
 ; Inputs:
 ;   bh,bl: number
+; Locals:
+;   bh
 ; Outputs:
 ;   a: bh×10+bl
+;   flag C: 1 if overflows
 
 :decimal = 020f
 
 	mov bh a
 	clc
 	mul #0a a
-	add bl a
+	add bl a    ; Overflow in add: C set here
+	muh #0a bh  ; Overflow in mul: C set here
+	beq +1
+	sec
 	ret
 
 	SEPARATOR
