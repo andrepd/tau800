@@ -8,12 +8,12 @@
 	mov #03 ch      ; r→l
 	cal 2303:sweep
 	mov #03 ch
-	cal 0e11:sqrt
+	cal 1411:sqrt
 
 	mov #00 ch      ; l→r
 	cal 2303:sweep
 	mov #00 ch
-	cal 0e11:sqrt
+	cal 1411:sqrt
 
 	jmp 0002:start
 
@@ -244,14 +244,15 @@
 	mov a bl
 
 	; √0 = 0, √1 = 1
-	bne +1
+	bne +7
+	mov bh a
 	ret
 
 	; Improved guess: c = (b + input / b) / 2 
 	;                   = (b + input' / b * 2 + (input' % b * 2 + bh) / b) / 2
 	clc
 	mov a cl   ; 3rd term
-	div bl cl
+	mod bl cl
 	lsl cl
 	add bh cl
 	div bl cl
@@ -290,7 +291,7 @@
 ;   a: bh×10+bl
 ;   flag C: 1 if overflows
 
-:decimal = 330f
+:decimal = 390f
 
 	mov bh a
 	clc
@@ -312,13 +313,13 @@
 ; Outputs:
 ;   a: √ of input
 
-:sqrt = 0e11
+:sqrt = 1411
 
 	;cmp #00 ch
 	beq +4
-	cal 0315:sqrt_rl
+	cal 0915:sqrt_rl
 	ret
-	cal 1812:sqrt_lr
+	cal 1e12:sqrt_lr
 	ret
 
 	SEPARATOR
@@ -329,11 +330,11 @@
 ; Inputs:
 ;   bh,bl: number
 
-:sqrt_lr = 1812
+:sqrt_lr = 1e12
 
 	mov %1000 bh
 	mov %1100 bl
-	cal 330f:decimal
+	cal 390f:decimal
 	cal 3f0c:newton
 
 	mov a bl
@@ -347,7 +348,7 @@
 
 	mov %1200 bh
 	mov %1300 bl
-	cal 330f:decimal
+	cal 390f:decimal
 	cal 3f0c:newton
 
 	mov a bl
@@ -369,11 +370,11 @@
 ; Inputs:
 ;   bh,bl: number
 
-:sqrt_rl = 0315
+:sqrt_rl = 0915
 
 	mov %1300 bh
 	mov %1200 bl
-	cal 330f:decimal
+	cal 390f:decimal
 	cal 3f0c:newton
 
 	mov a bl
@@ -387,7 +388,7 @@
 
 	mov %1100 bh
 	mov %1000 bl
-	cal 330f:decimal
+	cal 390f:decimal
 	cal 3f0c:newton
 
 	mov a bl
