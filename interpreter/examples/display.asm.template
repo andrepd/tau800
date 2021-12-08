@@ -8,12 +8,12 @@
 	mov #03 ch      ; r→l
 	cal 2303:sweep
 	mov #03 ch
-	cal 1510:sqrt
+	cal 0e11:sqrt
 
 	mov #00 ch      ; l→r
 	cal 2303:sweep
 	mov #00 ch
-	cal 1510:sqrt
+	cal 0e11:sqrt
 
 	jmp 0002:start
 
@@ -218,27 +218,46 @@
 ;; Subroutine: calculate sqrt of 6-bit number with Newton's method
 ; Inputs:
 ;   a: Number
+;   flag C: msb of number
 ; Locals:
-;   bl: guess_i
-;   cl: guess_i+1
+;   bl: guess_{i}
+;   cl: guess_{i+1}
+;   bh: lsb of input number
+;   ch: scratch space
 ; Outputs:
 ;   a: √ of input
 
 :newton = 3f0c
 
-	; Initial guess: b = input / 2
-	mov a bl
-	lsr bl
+	; Setup
+	mov a bh
+	and #01 bh
 
-	; If b == 0, then a == 0,1 therefore √a = a
+	; Initial guess: b = input / 2 = input'
+	lsr a
+	mov a bl
+
+	; √0 = 0, √1 = 1
 	bne +1
 	ret
 
-	; Improved guess: c = (b + input / b) / 2
+	; Improved guess: c = (b + input / b) / 2 
+	;                   = (b + input' / b * 2) / 2 
+	;                   = b / 2 + input' / b
+	;                   = b / 2 + input' / b + (input' % b * 2 + bh) / b
+	;                   = (b + input / b) / 2 
+	;                   = (b + input' / b * 2 + (input' % b * 2 + bh) / b) / 2
 	clc
-	mov a cl 
+	mov a cl   ; Parcela 3
 	div bl cl
-	add bl cl
+	lsl cl
+	add bh cl
+	div bl cl
+	mov a ch   ; Parcela 2
+	div bl ch
+	lsl ch
+	add ch cl
+	add bl cl  ; Parcela 1
 	lsr cl
 
 	; Corner case, if input is 1 less than a perfect square, cl will oscillate rather than fixpoint
@@ -250,7 +269,7 @@
 	nop
 
 	; Put back the improved guess as the initial guess
-	mov cl bl@-10
+	mov cl bl@-16
 
 	; Return result through a
 	mov bl a
@@ -269,7 +288,7 @@
 ;   a: bh×10+bl
 ;   flag C: 1 if overflows
 
-:decimal = 020f
+:decimal = 330f
 
 	mov bh a
 	clc
@@ -291,13 +310,13 @@
 ; Outputs:
 ;   a: √ of input
 
-:sqrt = 1510
+:sqrt = 0e11
 
 	;cmp #00 ch
 	beq +4
-	cal 0a14:sqrt_rl
+	cal 0315:sqrt_rl
 	ret
-	cal 1f11:sqrt_lr
+	cal 1812:sqrt_lr
 	ret
 
 	SEPARATOR
@@ -308,11 +327,11 @@
 ; Inputs:
 ;   bh,bl: number
 
-:sqrt_lr = 1f11
+:sqrt_lr = 1812
 
 	mov %1000 bh
 	mov %1100 bl
-	cal 020f:decimal
+	cal 330f:decimal
 	cal 3f0c:newton
 
 	mov a bl
@@ -326,7 +345,7 @@
 
 	mov %1200 bh
 	mov %1300 bl
-	cal 020f:decimal
+	cal 330f:decimal
 	cal 3f0c:newton
 
 	mov a bl
@@ -348,11 +367,11 @@
 ; Inputs:
 ;   bh,bl: number
 
-:sqrt_rl = 0a14
+:sqrt_rl = 0315
 
 	mov %1300 bh
 	mov %1200 bl
-	cal 020f:decimal
+	cal 330f:decimal
 	cal 3f0c:newton
 
 	mov a bl
@@ -366,7 +385,7 @@
 
 	mov %1100 bh
 	mov %1000 bl
-	cal 020f:decimal
+	cal 330f:decimal
 	cal 3f0c:newton
 
 	mov a bl
