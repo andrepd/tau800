@@ -1,1 +1,1 @@
-/home/miguelmurca/Documents/Art/PDC2021/repo/backend/../interpreter/examples/display.asm
+../../interpreter/examples/display.asm
