@@ -32,14 +32,14 @@
 
 	clc
 	mov ch cl
-	add #01 cl  ; Estas 3 linhas fazem 0 → -1 e 3 → +1 
-	lsr cl
-	add #3f cl
+	add #01 cl  ; These lines map 0 → -1 e 3 → +1 
+	lsr cl      ;
+	add #3f cl  ; 
 	clc
 	not cl
 	add #01 cl
 
-	; Digito 1
+	; Digit 1
 	mov ch x
 	mov #01 a
 	mov %1000,x bl
@@ -49,7 +49,7 @@
 	clc
 	add cl ch 
 
-	; Digito 2
+	; Digit 2
 	mov ch x
 	mov #02 a
 	mov %1000,x bl
@@ -59,7 +59,7 @@
 	clc
 	add cl ch 
 
-	; Digito 3
+	; Digit 3
 	mov ch x
 	mov #04 a
 	mov %1000,x bl
@@ -69,7 +69,7 @@
 	clc
 	add cl ch 
 
-	; Digito 4
+	; Digit 4
 	mov ch x
 	mov #08 a
 	mov %1000,x bl
@@ -215,7 +215,7 @@
 
 
 
-;; Subroutine: calculate sqrt of 6-bit number with Newton's method
+;; Subroutine: calculate sqrt of 6-bit number with time-assisted Newton's method
 ; Inputs:
 ;   a: Number
 ;   flag C: msb of number
@@ -236,11 +236,11 @@
 :newton = 3f0c
 
 	; Setup
-	mov a bh
+	mov a bh    ; bh ← a & 1
 	and #01 bh
 
-	; Initial guess: b = input / 2 = input'
-	lsr a
+	; Initial guess: b = input' = input / 2
+	lsr a     ; bl ← a ← a/2
 	mov a bl
 
 	; √0 = 0, √1 = 1
@@ -251,16 +251,16 @@
 	; Improved guess: c = (b + input / b) / 2 
 	;                   = (b + input' / b * 2 + (input' % b * 2 + bh) / b) / 2
 	clc
-	mov a cl   ; 3rd term
+	mov a cl   ; 3rd term: (a % bl * 2 + bh) / b
 	mod bl cl
 	lsl cl
 	add bh cl
 	div bl cl
-	mov a ch   ; 2nd term
+	mov a ch   ; 2nd term: a / bl * 2
 	div bl ch
 	lsl ch
 	add ch cl
-	add bl cl  ; 1st term
+	add bl cl  ; 1st term: bl
 	lsr cl     ; div everything by 2
 
 	; c = min(b,c), needed for corner case where input is 1 less than a perfect square
@@ -268,8 +268,8 @@
 	bmi +08
 	mov bl cl
 	bne +02
-	nop  ; Needs these nop to encher chouriças to ensure same time of execution of both branches
-	nop
+	nop  ; Needs these nop to ensure same time of execution of both branches
+	nop  ; 
 
 	; Put back the improved guess as the initial guess
 	mov cl bl@-16
