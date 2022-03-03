@@ -96,17 +96,14 @@
 
 	; If number not 1237, then set segment 1
 	sec
-	cmp #01 bl
-	beq +31
-	sec
-	cmp #02 bl
-	beq +23
-	sec
-	cmp #03 bl
-	beq +15
-	sec
 	cmp #07 bl
 	beq +7
+	sec
+	cmp #01 bl  ; bl-1 < 0 ⇔ bl < 1
+	bmi +3
+	sec
+	cmp bl #03  ; 3-bl ≥ 0 ⇔ bl ≤ 3
+	bpl +1
 	or a %1400,x
 
 	clc
@@ -115,10 +112,10 @@
 	; If number not 14, then set segment 2
 	sec
 	cmp #01 bl
-	beq +15
+	beq +4
 	sec
 	cmp #04 bl
-	beq +7
+	beq +1
 	or a %1400,x
 
 	clc
@@ -127,10 +124,10 @@
 	; If number not 56, then set segment 3
 	sec
 	cmp #05 bl
-	beq +15
+	beq +4
 	sec
 	cmp #06 bl
-	beq +7
+	beq +1
 	or a %1400,x
 
 	clc
@@ -139,9 +136,9 @@
 	; If number is 0268, then set segment 4 (clever)
 	sec
 	cmp #04 bl   ; Se for 4
-	beq +14
+	beq +3
 	bit #01 bl  ; Ou ímpar
-	bne +7
+	bne +1
 	or a %1400,x
 
 	clc
@@ -150,13 +147,13 @@
 	; If number not 147, then set segment 5
 	sec
 	cmp #01 bl
-	beq +23
+	beq +7
 	sec
 	cmp #04 bl
-	beq +15
+	beq +4
 	sec
 	cmp #07 bl
-	beq +7
+	beq +1
 	or a %1400,x
 
 	clc
@@ -165,7 +162,7 @@
 	; If number not 2, then set segment 6
 	sec
 	cmp #02 bl
-	beq +7
+	beq +1
 	or a %1400,x
 
 	clc
@@ -173,14 +170,11 @@
 
 	; If number not 017, then set segment 7
 	sec
-	cmp #00 bl
-	beq +23
-	sec
-	cmp #01 bl
-	beq +15
+	cmp bl #01  ; 1-bl ≥ 0 ⇔ bl ≤ 1
+	bpl +4
 	sec
 	cmp #07 bl
-	beq +7
+	beq +1
 	or a %1400,x
 
 	ret
@@ -200,11 +194,11 @@
 
 	sec
 	not a
-
 	mov #06 x
+
 	and a %1400,x
 	sub #01 x
-	bne -14
+	bne -3
 	and a %1400,x
 
 	clc
@@ -245,7 +239,7 @@
 	mov a bl
 
 	; √0 = 0, √1 = 1
-	bne +7
+	bne +2
 	mov bh a
 	ret
 
@@ -266,11 +260,11 @@
 
 	; c = min(b,c), needed for corner case where input is 1 less than a perfect square
 	cmp bl cl
-	bmi +08
+	bmi +2
 	mov bl cl
-	bne +02
-	nop  ; Needs these nop to ensure same time of execution of both branches
-	nop  ; 
+	bne +2  ;
+	nop     ; Needs these nop to ensure same time of execution of both branches
+	nop     ; 
 
 	; Put back the improved guess as the initial guess
 	mov cl bl@-16
@@ -319,7 +313,7 @@
 :sqrt = 1411
 
 	;cmp #00 ch
-	beq +4
+	beq +2
 	cal sqrt_rl
 	ret
 	cal sqrt_lr

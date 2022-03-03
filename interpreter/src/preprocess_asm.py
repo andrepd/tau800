@@ -32,24 +32,24 @@ def words_line(str):
 with open(argv[1]) as f:
 	cursor = 0x80
 	labels = {}
+	addrs = []
 	for i in lex(f):
 		print(f'{to_le(cursor):4} | {i}', file=stderr)
+		addrs.append(cursor)
 		if i[0] == ':':
 			labels[i.split()[0][1:]] = to_le(cursor)
 		cursor += words_line(i)
 
 print(labels, file=stderr)
 
-def replace(line, labels):
-	for label in labels:
-		old1 = f'jmp {label}\n'
-		new1 = f'jmp {labels[label]}\n'
-		old2 = f'cal {label}\n'
-		new2 = f'cal {labels[label]}\n'
-		line = line.replace(old1, new1).replace(old2, new2)
-	return line
-
-
 with open(argv[1]) as f:
-	for line in f:
-		print(replace(line, labels), end='')
+	for i,line in enumerate(lex(f)):
+		op, *args = line.split()
+		if op in ['jmp','cal']:
+			addr = labels[args[0]]
+			print(f'{op} {addr}')
+		elif op in ['bcc','bcs','bne','beq','bpl','bmi']:
+			offset = addrs[i+1+int(args[0])] - addrs[i+1]
+			print(f'{op} {offset:+}')
+		else:
+			print(line)
