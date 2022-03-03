@@ -6,18 +6,16 @@
 :start = 0002
 
 	mov #03 ch      ; r→l
-	cal 2303:sweep
+	cal sweep
 	mov #03 ch
-	cal 1411:sqrt
+	cal sqrt
 
 	mov #00 ch      ; l→r
-	cal 2303:sweep
+	cal sweep
 	mov #00 ch
-	cal 1411:sqrt
+	cal sqrt
 
-	jmp 0002:start
-
-	SEPARATOR
+	jmp start
 
 
 
@@ -43,8 +41,8 @@
 	mov ch x
 	mov #01 a
 	mov %1000,x bl
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	clc
 	add cl ch 
@@ -53,8 +51,8 @@
 	mov ch x
 	mov #02 a
 	mov %1000,x bl
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	clc
 	add cl ch 
@@ -63,8 +61,8 @@
 	mov ch x
 	mov #04 a
 	mov %1000,x bl
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	clc
 	add cl ch 
@@ -73,12 +71,13 @@
 	mov ch x
 	mov #08 a
 	mov %1000,x bl
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	ret
-
-	SEPARATOR
+	ret
+	ret
+	ret
 
 
 
@@ -185,8 +184,9 @@
 	or a %1400,x
 
 	ret
-
-	SEPARATOR
+	ret
+	ret
+	ret
 
 
 
@@ -210,8 +210,9 @@
 	clc
 	not a
 	ret
-
-	SEPARATOR
+	ret
+	ret
+	ret
 
 
 
@@ -277,8 +278,9 @@
 	; Return result through a
 	mov bl a
 	ret
-
-	SEPARATOR
+	ret
+	ret
+	ret
 
 
 
@@ -301,8 +303,9 @@
 	beq +1
 	sec
 	ret
-
-	SEPARATOR
+	ret
+	ret
+	ret
 
 
 
@@ -317,12 +320,10 @@
 
 	;cmp #00 ch
 	beq +4
-	cal 0915:sqrt_rl
+	cal sqrt_rl
 	ret
-	cal 1e12:sqrt_lr
+	cal sqrt_lr
 	ret
-
-	SEPARATOR
 
 
 
@@ -334,35 +335,36 @@
 
 	mov %1000 bh
 	mov %1100 bl
-	cal 390f:decimal
-	cal 3f0c:newton
+	cal decimal
+	cal newton
 
 	mov a bl
 	mov #02 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 	mov #00 bl
 	mov #01 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	mov %1200 bh
 	mov %1300 bl
-	cal 390f:decimal
-	cal 3f0c:newton
+	cal decimal
+	cal newton
 
 	mov a bl
 	mov #08 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 	mov #00 bl
 	mov #04 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	ret
-
-	SEPARATOR
+	ret
+	ret
+	ret
 
 
 
@@ -374,32 +376,33 @@
 
 	mov %1300 bh
 	mov %1200 bl
-	cal 390f:decimal
-	cal 3f0c:newton
+	cal decimal
+	cal newton
 
 	mov a bl
 	mov #02 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 	mov #00 bl
 	mov #01 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	mov %1100 bh
 	mov %1000 bl
-	cal 390f:decimal
-	cal 3f0c:newton
+	cal decimal
+	cal newton
 
 	mov a bl
 	mov #08 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 	mov #00 bl
 	mov #04 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	ret
-
-	SEPARATOR
+	ret
+	ret
+	ret
