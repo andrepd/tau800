@@ -1,4 +1,4 @@
-from sys import argv, stderr
+from sys import argv, stdin, stderr
 
 dbg = len(argv) > 2
 
@@ -31,27 +31,27 @@ def words_line(str):
 	else:
 		return 2 + sum(words_arg(x) for x in args)
 
-with open(argv[1]) as f:
-	cursor = 0x80
-	labels = {}
-	addrs = []
-	for i in lex(f):
-		if dbg: print(f'{to_le(cursor):4} | {i}', file=stderr)
-		addrs.append(cursor)
-		if i[0] == ':':
-			labels[i.split()[0][1:]] = to_le(cursor)
-		cursor += words_line(i)
+cursor = 0x80
+labels = {}
+addrs = []
+lexed = []
+for i in lex(stdin):
+	lexed.append(i)
+	if dbg: print(f'{to_le(cursor):4} | {i}', file=stderr)
+	addrs.append(cursor)
+	if i[0] == ':':
+		labels[i.split()[0][1:]] = to_le(cursor)
+	cursor += words_line(i)
 
 if dbg: print(labels, file=stderr)
 
-with open(argv[1]) as f:
-	for i,line in enumerate(lex(f)):
-		op, *args = line.split()
-		if op in ['jmp','cal']:
-			addr = labels[args[0]] if args[0] in labels else args[0]
-			print(f'{op} {addr}')
-		elif op in ['bcc','bcs','bne','beq','bpl','bmi']:
-			offset = addrs[i+1+int(args[0])] - addrs[i+1]
-			print(f'{op} {offset:+}')
-		else:
-			print(line)
+for i, line in enumerate(lexed):
+	op, *args = line.split()
+	if op in ['jmp','cal']:
+		addr = labels[args[0]] if args[0] in labels else args[0]
+		print(f'{op} {addr}')
+	elif op in ['bcc','bcs','bne','beq','bpl','bmi']:
+		offset = addrs[i+1+int(args[0])] - addrs[i+1]
+		print(f'{op} {offset:+}')
+	else:
+		print(line)
