@@ -69,8 +69,7 @@ fn operand_to_ref<'a>(universe: &'a mut Universe, operand: &'a Operand) -> &'a U
                 let tf = universe.t + operand.time.value() as usize;
                 // @André: Aqui tens universe.states[universe.t - 1], mas universe.now() é [universe.t].
                 //         Qual a convenção? universe.t antes de actuar?
-                let guess =
-                    operand_to_ref_inner(&universe.states[ti - universe.forgetten], &operand.op);  /*TODO*/
+                let guess = operand_to_ref_inner(&universe.states[ti], &operand.op);  /*TODO*/
                 universe.mode = Mode::Fw {
                     ti,
                     tf,

@@ -26,8 +26,7 @@ pub enum Mode {
 
 pub struct Universe {
     pub states: Timeline,
-    // How many states have been pop_front()ed from the timeline
-    pub forgetten: usize,
+    pub t0: usize,  // How many states have been pop_front()ed from the timeline
     pub t: usize,
     pub mode: Mode,
     pub guess: UWord,
@@ -46,7 +45,7 @@ impl Universe {
     pub fn new() -> Self {
         Universe {
             states: VecDeque::from(vec![Machine::new()]),
-            forgetten: 0,
+            t0: 0,
             t: 0,
             mode: Mode::Normal,
             guess: UWord::from(0),
@@ -55,7 +54,7 @@ impl Universe {
     }
 
     pub fn t_as_index(&self) -> usize {
-        self.t - self.forgetten
+        self.t - self.t0
     }
 
     /// Pushes, overwriting existing state if necessary
@@ -63,7 +62,7 @@ impl Universe {
         eprintln!("push_state index={:?} len={:?}\n", self.t_as_index(), self.states.len());
         if self.states.len() == MAX_MEMORY {
             self.states.pop_front();
-            self.forgetten += 1;            
+            self.t0 += 1;            
         };
         self.states.push_back(x);
         self.t += 1;
@@ -115,13 +114,13 @@ impl Universe {
 impl std::ops::Index<usize> for Universe {
     type Output = Machine;
 
-    fn index(&self, i: usize) -> &Self::Output {
-        &self.states[i]
+    fn index(&self, t: usize) -> &Self::Output {
+        &self.states[t - self.t0]
     }
 }
 
 impl std::ops::IndexMut<usize> for Universe {
-    fn index_mut(&mut self, i: usize) -> &mut Self::Output {
-        &mut self.states[i]
+    fn index_mut(&mut self, t: usize) -> &mut Self::Output {
+        &mut self.states[t - self.t0]
     }
 }
