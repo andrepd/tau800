@@ -6,18 +6,16 @@
 :start = 0002
 
 	mov #03 ch      ; r→l
-	cal 2303:sweep
+	cal sweep
 	mov #03 ch
-	cal 1411:sqrt
+	cal sqrt
 
 	mov #00 ch      ; l→r
-	cal 2303:sweep
+	cal sweep
 	mov #00 ch
-	cal 1411:sqrt
+	cal sqrt
 
-	jmp 0002:start
-
-	SEPARATOR
+	jmp start
 
 
 
@@ -32,53 +30,54 @@
 
 	clc
 	mov ch cl
-	add #01 cl  ; Estas 3 linhas fazem 0 → -1 e 3 → +1 
-	lsr cl
-	add #3f cl
+	add #01 cl  ; These lines map 0 → -1 e 3 → +1 
+	lsr cl      ;
+	add #3f cl  ; 
 	clc
 	not cl
 	add #01 cl
 
-	; Digito 1
+	; Digit 1
 	mov ch x
 	mov #01 a
 	mov %1000,x bl
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	clc
 	add cl ch 
 
-	; Digito 2
+	; Digit 2
 	mov ch x
 	mov #02 a
 	mov %1000,x bl
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	clc
 	add cl ch 
 
-	; Digito 3
+	; Digit 3
 	mov ch x
 	mov #04 a
 	mov %1000,x bl
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	clc
 	add cl ch 
 
-	; Digito 4
+	; Digit 4
 	mov ch x
 	mov #08 a
 	mov %1000,x bl
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	ret
-
-	SEPARATOR
+	ret
+	ret
+	ret
 
 
 
@@ -97,17 +96,14 @@
 
 	; If number not 1237, then set segment 1
 	sec
-	cmp #01 bl
-	beq +31
-	sec
-	cmp #02 bl
-	beq +23
-	sec
-	cmp #03 bl
-	beq +15
-	sec
 	cmp #07 bl
 	beq +7
+	sec
+	cmp #01 bl  ; bl-1 < 0 ⇔ bl < 1
+	bmi +3
+	sec
+	cmp bl #03  ; 3-bl ≥ 0 ⇔ bl ≤ 3
+	bpl +1
 	or a %1400,x
 
 	clc
@@ -116,10 +112,10 @@
 	; If number not 14, then set segment 2
 	sec
 	cmp #01 bl
-	beq +15
+	beq +4
 	sec
 	cmp #04 bl
-	beq +7
+	beq +1
 	or a %1400,x
 
 	clc
@@ -128,10 +124,10 @@
 	; If number not 56, then set segment 3
 	sec
 	cmp #05 bl
-	beq +15
+	beq +4
 	sec
 	cmp #06 bl
-	beq +7
+	beq +1
 	or a %1400,x
 
 	clc
@@ -140,9 +136,9 @@
 	; If number is 0268, then set segment 4 (clever)
 	sec
 	cmp #04 bl   ; Se for 4
-	beq +14
+	beq +3
 	bit #01 bl  ; Ou ímpar
-	bne +7
+	bne +1
 	or a %1400,x
 
 	clc
@@ -151,13 +147,13 @@
 	; If number not 147, then set segment 5
 	sec
 	cmp #01 bl
-	beq +23
+	beq +7
 	sec
 	cmp #04 bl
-	beq +15
+	beq +4
 	sec
 	cmp #07 bl
-	beq +7
+	beq +1
 	or a %1400,x
 
 	clc
@@ -166,7 +162,7 @@
 	; If number not 2, then set segment 6
 	sec
 	cmp #02 bl
-	beq +7
+	beq +1
 	or a %1400,x
 
 	clc
@@ -174,19 +170,17 @@
 
 	; If number not 017, then set segment 7
 	sec
-	cmp #00 bl
-	beq +23
-	sec
-	cmp #01 bl
-	beq +15
+	cmp bl #01  ; 1-bl ≥ 0 ⇔ bl ≤ 1
+	bpl +4
 	sec
 	cmp #07 bl
-	beq +7
+	beq +1
 	or a %1400,x
 
 	ret
-
-	SEPARATOR
+	ret
+	ret
+	ret
 
 
 
@@ -200,22 +194,23 @@
 
 	sec
 	not a
-
 	mov #06 x
+
 	and a %1400,x
 	sub #01 x
-	bne -14
+	bne -3
 	and a %1400,x
 
 	clc
 	not a
 	ret
+	ret
+	ret
+	ret
 
-	SEPARATOR
 
 
-
-;; Subroutine: calculate sqrt of 6-bit number with Newton's method
+;; Subroutine: calculate sqrt of 6-bit number with time-assisted Newton's method
 ; Inputs:
 ;   a: Number
 ;   flag C: msb of number
@@ -236,40 +231,40 @@
 :newton = 3f0c
 
 	; Setup
-	mov a bh
+	mov a bh    ; bh ← a & 1
 	and #01 bh
 
-	; Initial guess: b = input / 2 = input'
-	lsr a
+	; Initial guess: b = input' = input / 2
+	lsr a     ; bl ← a ← a/2
 	mov a bl
 
 	; √0 = 0, √1 = 1
-	bne +7
+	bne +2
 	mov bh a
 	ret
 
 	; Improved guess: c = (b + input / b) / 2 
 	;                   = (b + input' / b * 2 + (input' % b * 2 + bh) / b) / 2
 	clc
-	mov a cl   ; 3rd term
+	mov a cl   ; 3rd term: (a % bl * 2 + bh) / b
 	mod bl cl
 	lsl cl
 	add bh cl
 	div bl cl
-	mov a ch   ; 2nd term
+	mov a ch   ; 2nd term: a / bl * 2
 	div bl ch
 	lsl ch
 	add ch cl
-	add bl cl  ; 1st term
+	add bl cl  ; 1st term: bl
 	lsr cl     ; div everything by 2
 
 	; c = min(b,c), needed for corner case where input is 1 less than a perfect square
 	cmp bl cl
-	bmi +08
+	bmi +2
 	mov bl cl
-	bne +02
-	nop  ; Needs these nop to encher chouriças to ensure same time of execution of both branches
-	nop
+	bne +2  ;
+	nop     ; Needs these nop to ensure same time of execution of both branches
+	nop     ; 
 
 	; Put back the improved guess as the initial guess
 	mov cl bl@-16
@@ -277,8 +272,9 @@
 	; Return result through a
 	mov bl a
 	ret
-
-	SEPARATOR
+	ret
+	ret
+	ret
 
 
 
@@ -301,8 +297,9 @@
 	beq +1
 	sec
 	ret
-
-	SEPARATOR
+	ret
+	ret
+	ret
 
 
 
@@ -316,13 +313,11 @@
 :sqrt = 1411
 
 	;cmp #00 ch
-	beq +4
-	cal 0915:sqrt_rl
+	beq +2
+	cal sqrt_rl
 	ret
-	cal 1e12:sqrt_lr
+	cal sqrt_lr
 	ret
-
-	SEPARATOR
 
 
 
@@ -334,35 +329,36 @@
 
 	mov %1000 bh
 	mov %1100 bl
-	cal 390f:decimal
-	cal 3f0c:newton
+	cal decimal
+	cal newton
 
 	mov a bl
 	mov #02 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 	mov #00 bl
 	mov #01 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	mov %1200 bh
 	mov %1300 bl
-	cal 390f:decimal
-	cal 3f0c:newton
+	cal decimal
+	cal newton
 
 	mov a bl
 	mov #08 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 	mov #00 bl
 	mov #04 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	ret
-
-	SEPARATOR
+	ret
+	ret
+	ret
 
 
 
@@ -374,32 +370,33 @@
 
 	mov %1300 bh
 	mov %1200 bl
-	cal 390f:decimal
-	cal 3f0c:newton
+	cal decimal
+	cal newton
 
 	mov a bl
 	mov #02 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 	mov #00 bl
 	mov #01 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	mov %1100 bh
 	mov %1000 bl
-	cal 390f:decimal
-	cal 3f0c:newton
+	cal decimal
+	cal newton
 
 	mov a bl
 	mov #08 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 	mov #00 bl
 	mov #04 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	ret
-
-	SEPARATOR
+	ret
+	ret
+	ret

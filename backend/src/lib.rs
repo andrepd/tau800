@@ -25,6 +25,7 @@ struct Report {
     numbers: [String; 2],
     registers: [[bool; 6]; 9],
     stack: u32,
+    had_time_jump: bool,
     history: Vec<String>,
 }
 
@@ -34,6 +35,7 @@ impl Default for Report {
             numbers: Default::default(),
             registers: Default::default(),
             stack: Default::default(),
+            had_time_jump: Default::default(),
             history: Default::default(),
         }
     }
@@ -79,6 +81,7 @@ impl Report {
         object.set(cx, "numbers", numbers)?;
         object.set(cx, "registers", registers)?;
         object.set(cx, "stack", stack)?;
+        object.set(cx, "had_time_jump", had_time_jump)?;
         object.set(cx, "history", history)?;
 
         Ok(object)
@@ -134,6 +137,7 @@ fn main(mut cx: ModuleContext) -> NeonResult<()> {
 
             'emu: while let Ok(response_channel) = receive.recv() {
                 // Step the machine
+                let mut time_jump_iterations = 0;
                 {
                     let mut io_modules = ModuleCollection::new(vec![
                         Box::new(&mut clock_module),
@@ -142,13 +146,12 @@ fn main(mut cx: ModuleContext) -> NeonResult<()> {
                     io_modules.run(&mut universe);
 
                     let mut last_command = emu::interpreter::step(&mut universe);
-                    let mut iterations = 0;
                     while !universe.is_normal() {
                         // In resolution
                         last_command = emu::interpreter::step(&mut universe);
 
-                        iterations += 1;
-                        if iterations > 100 {
+                        time_jump_iterations += 1;
+                        if time_jump_iterations > 100 {
                             eprintln!("Consistency failure. Resetting machine.");
                             //panic!("Consistency failure.");
                             continue 'emu; // Reset the machine on panic
@@ -189,10 +192,13 @@ fn main(mut cx: ModuleContext) -> NeonResult<()> {
                     registers
                 };
 
+                let had_time_jump = time_jump_iterations > 0;
+
                 let dummy_report = Report {
                     numbers: [hours, minutes],
                     registers,
                     stack,
+                    had_time_jump,
                     history: cmd_history.iter().cloned().collect(),
                 };
 
