@@ -91,6 +91,9 @@ pub enum Instruction {
     Lsl(Operand),
     Lsr(Operand),
 
+    Inc(Operand),
+    Dec(Operand),
+
     Cmp(Operands),
     Bit(Operands),
 
@@ -110,6 +113,7 @@ pub enum Instruction {
     Ret,
 
     Nop,
+    Hcf,
 }
 
 /// Read a timed register from the RAM.
@@ -302,6 +306,8 @@ impl Instruction {
             0x0f => { let mode = m.read_pc(); Not(Operand::decode(m, mode))  },
             0x10 => { let mode = m.read_pc(); Lsl(Operand::decode(m, mode))  },
             0x11 => { let mode = m.read_pc(); Lsr(Operand::decode(m, mode))  },
+            0x23 => { let mode = m.read_pc(); Inc(Operand::decode(m, mode))  },
+            0x24 => { let mode = m.read_pc(); Dec(Operand::decode(m, mode))  },
             0x12 => { let mode = m.read_pc(); Cmp(Operands::decode(m, mode))  },
             0x13 => { let mode = m.read_pc(); Bit(Operands::decode(m, mode))  },
             0x14 => Jmp(address_decode(m)),
@@ -314,6 +320,7 @@ impl Instruction {
             0x1d => Cal(address_decode(m)),
             0x21 => Clc,
             0x22 => Sec,
+            0x3e => Hcf,
             0x3f => Ret,
             _ => unreachable!(),
         }
@@ -324,13 +331,15 @@ impl Instruction {
         match instruction {
             Nop => {
                 m.write_pc(UWord::from(0x00));
-                /*m.write_pc(UWord::from(0x00));*/
             }
             Clc => {
                 m.write_pc(UWord::from(0x21));
             }
             Sec => {
                 m.write_pc(UWord::from(0x22));
+            }
+            Hcf => {
+                m.write_pc(UWord::from(0x3e));
             }
             Ret => {
                 m.write_pc(UWord::from(0x3f));
@@ -397,6 +406,14 @@ impl Instruction {
             }
             Lsr(op) => {
                 m.write_pc(UWord::from(0x11));
+                Operand::encode(m, op);
+            }
+            Inc(op) => {
+                m.write_pc(UWord::from(0x23));
+                Operand::encode(m, op);
+            }
+            Dec(op) => {
+                m.write_pc(UWord::from(0x24));
                 Operand::encode(m, op);
             }
             Cmp(op) => {

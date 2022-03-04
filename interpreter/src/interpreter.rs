@@ -350,6 +350,18 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
             mk_mref(state, &x, word);
             set_flag_nvz(state.now_mut(), &word);
         }
+        Instruction::Inc(x) => {
+            let result = mk_ref(state, &x).value() + 1;
+            let word = UWord::from(result & 0b00111111);
+            mk_mref(state, &x, word);
+            set_flag_nvz(state.now_mut(), &word);
+        }
+        Instruction::Dec(x) => {
+            let result = mk_ref(state, &x).value() + MAX_UNSIGNED_VALUE + 1 - 1;
+            let word = UWord::from(result & 0b00111111);
+            mk_mref(state, &x, word);
+            set_flag_nvz(state.now_mut(), &word);
+        }
 
         // Comparisons, CMP = SUB, BIT = AND, mas deitar fora os argumentos
         Instruction::Cmp(Operands { src, dst }) => {
@@ -422,6 +434,7 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
         Instruction::Clc => state.now_mut().cpu.flags.write(Flag::C, false),
         Instruction::Sec => state.now_mut().cpu.flags.write(Flag::C, true),
         Instruction::Nop => (),
+        Instruction::Hcf => std::process::exit(0),
     }
 }
 

@@ -1,5 +1,7 @@
 from sys import argv, stderr
 
+dbg = len(argv) > 2
+
 def lex(it):
 	for i in it:
 		i = i.split(';')[0].strip()
@@ -20,7 +22,7 @@ def words_arg(str):
 def words_line(str):
 	if str[0] == ':': return 0
 	op, *args = str.split()
-	if op in ['nop','ret','clc','sec']:
+	if op in ['nop','ret','clc','sec','hcf']:
 		return 1
 	elif op in ['jmp','cal']:
 		return 1+2
@@ -34,19 +36,19 @@ with open(argv[1]) as f:
 	labels = {}
 	addrs = []
 	for i in lex(f):
-		print(f'{to_le(cursor):4} | {i}', file=stderr)
+		if dbg: print(f'{to_le(cursor):4} | {i}', file=stderr)
 		addrs.append(cursor)
 		if i[0] == ':':
 			labels[i.split()[0][1:]] = to_le(cursor)
 		cursor += words_line(i)
 
-print(labels, file=stderr)
+if dbg: print(labels, file=stderr)
 
 with open(argv[1]) as f:
 	for i,line in enumerate(lex(f)):
 		op, *args = line.split()
 		if op in ['jmp','cal']:
-			addr = labels[args[0]]
+			addr = labels[args[0]] if args[0] in labels else args[0]
 			print(f'{op} {addr}')
 		elif op in ['bcc','bcs','bne','beq','bpl','bmi']:
 			offset = addrs[i+1+int(args[0])] - addrs[i+1]

@@ -81,6 +81,8 @@ fn read_instruction(literal: &str, line_idx: usize) -> Instruction {
         "not" => Instruction::Not(read_operand(&mut iter).or_panic(line_idx)),
         "lsl" => Instruction::Lsl(read_operand(&mut iter).or_panic(line_idx)),
         "lsr" => Instruction::Lsr(read_operand(&mut iter).or_panic(line_idx)),
+        "inc" => Instruction::Inc(read_operand(&mut iter).or_panic(line_idx)),
+        "dec" => Instruction::Dec(read_operand(&mut iter).or_panic(line_idx)),
         "cmp" => Instruction::Cmp(read_operands(&mut iter).or_panic(line_idx)),
         "bit" => Instruction::Bit(read_operands(&mut iter).or_panic(line_idx)),
         "jmp" => Instruction::Jmp(read_address(&mut iter).or_panic(line_idx)),
@@ -95,6 +97,7 @@ fn read_instruction(literal: &str, line_idx: usize) -> Instruction {
         "cal" => Instruction::Cal(read_address(&mut iter).or_panic(line_idx)),
         "ret" => Instruction::Ret,
         "nop" => Instruction::Nop,
+        "hcf" => Instruction::Hcf,
         _ => panic!("Invalid mnemonic {}", mnemonic),
     };
 
@@ -462,6 +465,8 @@ pub fn mnemonic(cmd: Instruction) -> String {
         Instruction::Not(op) => format!("not {}", mnemonic_timed_op(op)),
         Instruction::Lsl(op) => format!("lsl {}", mnemonic_timed_op(op)),
         Instruction::Lsr(op) => format!("lsr {}", mnemonic_timed_op(op)),
+        Instruction::Inc(op) => format!("inc {}", mnemonic_timed_op(op)),
+        Instruction::Dec(op) => format!("dec {}", mnemonic_timed_op(op)),
         Instruction::Cmp(Operands { src, dst }) => {
             format!(" {} {}", mnemonic_timed_op(src), mnemonic_timed_op(dst))
         }
@@ -480,5 +485,6 @@ pub fn mnemonic(cmd: Instruction) -> String {
         Instruction::Cal(op) => format!("cal #{}", radix(op.value(), 16)),
         Instruction::Ret => "ret".to_string(),
         Instruction::Nop => "nop".to_string(),
+        Instruction::Hcf => "hcf".to_string(),
     }
 }
