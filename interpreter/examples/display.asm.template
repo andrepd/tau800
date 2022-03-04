@@ -3,7 +3,7 @@
 
 ;; Main ;;
 
-:start = 0002
+:start
 
 	mov #03 ch      ; r→l
 	cal sweep
@@ -26,7 +26,7 @@
 ;   cl: increment
 ;   x: offset
 
-:sweep = 2303
+:sweep
 
 	clc
 	mov ch cl
@@ -88,7 +88,7 @@
 ; Locals:
 ;   x = current segment
 
-:digit = 3806
+:digit
 
 	mov #00 x
 
@@ -190,7 +190,7 @@
 ; Locals:
 ;   x = current segment
 
-:clear = 1a0b
+:clear
 
 	sec
 	not a
@@ -228,7 +228,7 @@
 ;   b @ 0s ← c @ 2s        | 2s
 ;   return b               | 3s
 
-:newton = 3f0c
+:newton
 
 	; Setup
 	mov a bh    ; bh ← a & 1
@@ -287,7 +287,7 @@
 ;   a: bh×10+bl
 ;   flag C: 1 if overflows
 
-:decimal = 390f
+:decimal
 
 	mov bh a
 	clc
@@ -310,7 +310,7 @@
 ; Outputs:
 ;   a: √ of input
 
-:sqrt = 1411
+:sqrt
 
 	;cmp #00 ch
 	beq +2
@@ -325,7 +325,7 @@
 ; Inputs:
 ;   bh,bl: number
 
-:sqrt_lr = 1e12
+:sqrt_lr
 
 	mov %1000 bh
 	mov %1100 bl
@@ -366,7 +366,7 @@
 ; Inputs:
 ;   bh,bl: number
 
-:sqrt_rl = 0915
+:sqrt_rl
 
 	mov %1300 bh
 	mov %1200 bl
