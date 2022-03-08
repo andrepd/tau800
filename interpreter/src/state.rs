@@ -109,7 +109,7 @@ impl Default for Cpu {
 const RAM_SIZE: usize = 1 << (2 * WORD_SIZE);
 
 #[derive(Clone)]
-pub struct Ram(pub [UWord; RAM_SIZE]);
+pub struct Ram(pub Vec<UWord>);
 
 impl std::fmt::Debug for Ram {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -119,7 +119,8 @@ impl std::fmt::Debug for Ram {
 
 impl PartialEq for Ram {
     fn eq(&self, other: &Self) -> bool {
-        self.0.iter().zip(other.0.iter()).all(|(a, b)| a == b)
+        self.0.len() == other.0.len() && self.0 == other.0
+        /*self.0.iter().zip(other.0.iter()).all(|(a, b)| a == b)*/
     }
 }
 
@@ -127,6 +128,8 @@ impl std::ops::Index<usize> for Ram {
     type Output = UWord;
 
     fn index(&self, index: usize) -> &Self::Output {
+        debug_assert!(0 <= index && index < RAM_SIZE);
+        if index >= self.0.len() { return &UZERO };
         &self.0[index]
     }
 }
@@ -135,24 +138,26 @@ impl std::ops::Index<Address> for Ram {
     type Output = UWord;
 
     fn index(&self, index: Address) -> &Self::Output {
-        &self.0[index.value() as usize]
+        &self[index.value() as usize]
     }
 }
 
 impl std::ops::IndexMut<usize> for Ram {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        debug_assert!(0 <= index && index < RAM_SIZE);
+        if index >= self.0.len() { self.0.resize(index+1, UZERO) };
         &mut self.0[index]
     }
 }
 
 impl std::ops::IndexMut<Address> for Ram {
     fn index_mut(&mut self, index: Address) -> &mut Self::Output {
-        &mut self.0[index.value() as usize]
+        &mut self[index.value() as usize]
     }
 }
 
 impl Default for Ram {
     fn default() -> Self {
-        Self([Word::<sig::Unsigned>::zero(); RAM_SIZE])
+        Self(Vec::with_capacity(64 * 4))
     }
 }

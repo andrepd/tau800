@@ -313,3 +313,6 @@ impl CheckedIncrement for LongWord<sig::Unsigned> {
         }
     }
 }
+
+pub static UZERO: UWord = UWord { value: 0, phantom: std::marker::PhantomData::<sig::Unsigned> };  // sim sim mike, rust é legível
+// let zero: UWord.t = UWord.make 0

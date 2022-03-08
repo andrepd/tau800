@@ -53,10 +53,6 @@ fn operand_to_mut_ref_inner<'a>(state: &'a mut Machine, op: &'a Op) -> &'a mut U
 
 //
 
-pub static ZERO: UWord = UWord { value: 0, phantom: std::marker::PhantomData::<sig::Unsigned> };  // sim sim mike, rust é legível
-
-// let zero: UWord.t = UWord.make 0
-
 fn operand_get<'a>(universe: &'a mut Universe, operand: &'a Operand) -> &'a UWord {
     let delta_t = operand.time.value();
     let t1 = universe.t - 1;  // -1: because we read from the state before execution and write to state after execution
@@ -69,8 +65,8 @@ fn operand_get<'a>(universe: &'a mut Universe, operand: &'a Operand) -> &'a UWor
     else {
         // Does that moment in the future not even exist? Then we need to run until it does and then check consistency
         if dbg!(t2) >= dbg!(universe.timeline.tf()) || universe.timeline.tf() == universe.t + 1 {
-            universe.pending_reads.push((t2, t1, operand.op.clone(), ZERO));  // Bootstrap with 0
-            &ZERO
+            universe.pending_reads.push((t2, t1, operand.op.clone(), UZERO));  // Bootstrap with 0
+            &UZERO
         }
         // If it already does
         else {
