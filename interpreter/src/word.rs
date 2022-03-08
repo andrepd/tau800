@@ -32,8 +32,8 @@ pub struct Word<S>
 where
     S: sig::Signature,
 {
-    value: u8,
-    phantom: PhantomData<S>,
+    pub value: u8,
+    pub phantom: PhantomData<S>,
 }
 
 impl<S: Signature> std::fmt::Debug for Word<S> {
