@@ -232,16 +232,20 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
             set_flag_nvz(state.now_mut(), &word);
         }
         Instruction::Div(Operands { src, dst }) => {
-            let result = mk_ref(state, &dst).value() / mk_ref(state, &src).value();
-            let word = UWord::from(result);
-            mk_mref(state, &dst, word);
-            set_flag_z(state.now_mut(), &word);
+            if mk_ref(state, &src).value() != 0 {
+                let result = (mk_ref(state, &dst).value() + u8::from(get_flag_c(state.now())) * 0b01000000) / mk_ref(state, &src).value();
+                let word = UWord::from(result);
+                mk_mref(state, &dst, word);
+                set_flag_z(state.now_mut(), &word);
+            }
         }
         Instruction::Mod(Operands { src, dst }) => {
-            let result = mk_ref(state, &dst).value() % mk_ref(state, &src).value();
-            let word = UWord::from(result);
-            mk_mref(state, &dst, word);
-            set_flag_z(state.now_mut(), &word);
+            if mk_ref(state, &src).value() != 0 {
+                let result = (mk_ref(state, &dst).value() + u8::from(get_flag_c(state.now())) * 0b01000000) % mk_ref(state, &src).value();
+                let word = UWord::from(result);
+                mk_mref(state, &dst, word);
+                set_flag_z(state.now_mut(), &word);
+            }
         }
 
         // Logic
