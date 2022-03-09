@@ -26,7 +26,7 @@
 	bne -3
 	dec a
 	beq +2
-	inc %1a02  ; high word of addr in (1)
+	inc %1702  ; high word of addr in (1)
 	jmp loop_init
 
 	mov #20 %1a02

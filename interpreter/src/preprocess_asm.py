@@ -15,9 +15,9 @@ def words_arg(str):
 	if str[0] == '#':
 		return 1
 	elif str.split('@')[0] in ['a','bl','bh','cl','ch','x']:
-		return 2
+		return 1
 	else:
-		return 3
+		return 2
 
 def words_line(str):
 	if str[0] == ':': return 0
@@ -29,7 +29,7 @@ def words_line(str):
 	elif op in ['bcc','bcs','bne','beq','bpl','bmi']:
 		return 1+1
 	else:
-		return 2 + sum(words_arg(x) for x in args)
+		return 2 + sum(words_arg(x) for x in args) + len(args)*('@' in str)
 
 cursor = 0x80
 labels = {}
