@@ -431,9 +431,20 @@ pub fn step_micro(universe: &mut Universe) -> Instruction {
 
     eprintln!(">writ   t={} mode={:?}", universe.t, universe.mode);
 
+    for i in &universe.pending_writes { eprintln!("pending w: {:?}", i) };
+    for i in &universe.pending_reads { eprintln!("pending r: {:?}", i) };
+
     instruction
 }
 
 pub fn step(universe: &mut Universe) -> Instruction {
+    // Fix memory leak: every 2000 iterations clean unreachable in pending_{reads,writes}
+    if universe.t % 2000 == 0 {
+        let pending_reads_ = universe.pending_reads.clone().into_iter().filter(|x| x.0 >= universe.timeline.ti());  
+        universe.pending_reads = pending_reads_.collect::<Vec<_>>();
+        let pending_writes_ = universe.pending_writes.clone().into_iter().filter(|x| x.0 >= universe.timeline.ti());  
+        universe.pending_writes = pending_writes_.collect::<Vec<_>>();
+    }
+
     step_micro(universe)
 }

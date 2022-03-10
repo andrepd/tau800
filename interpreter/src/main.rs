@@ -54,7 +54,7 @@ fn main() -> std::io::Result<()> {
                 // println!("time resolution {}", universe.now());
 
                 iterations += 1;
-                if iterations > 100 {
+                if iterations > 100*10 {
                     panic!("Consistency failure.");
                 }
             }
