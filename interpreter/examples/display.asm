@@ -75,10 +75,6 @@
 	cal digit
 
 	ret
-	ret
-	ret
-	ret
-
 
 
 ;; Subroutine: set one digit ;;
@@ -178,10 +174,6 @@
 	or a %1400,x
 
 	ret
-	ret
-	ret
-	ret
-
 
 
 ;; Subroutine: clear one digit ;;
@@ -204,10 +196,6 @@
 	clc
 	not a
 	ret
-	ret
-	ret
-	ret
-
 
 
 ;; Subroutine: calculate sqrt of 6-bit number with time-assisted Newton's method
@@ -272,9 +260,6 @@
 	; Return result through a
 	mov bl a
 	ret
-	ret
-	ret
-	ret
 
 
 
@@ -297,10 +282,6 @@
 	beq +1
 	sec
 	ret
-	ret
-	ret
-	ret
-
 
 
 ;; Subroutine: calculate sqrt of hh, of mm, and write to display
@@ -356,10 +337,6 @@
 	cal digit
 
 	ret
-	ret
-	ret
-	ret
-
 
 
 ;; Subroutine: calculate sqrt of hh, of mm, and write to display
@@ -396,7 +373,4 @@
 	cal clear
 	cal digit
 
-	ret
-	ret
-	ret
 	ret
