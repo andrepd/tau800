@@ -43,14 +43,14 @@ fn main() -> std::io::Result<()> {
         // @Mike: Boa pergunta
         io_modules.run(&mut universe);
 
-        // Step the machine
         {
-            interpreter::step(&mut universe);
+            // Step the machine (manual loop)
+            /*interpreter::step_micro(&mut universe);
             let mut iterations = 0;
             while !universe.is_consistent() {
                 println!("{}", universe.now());
                 // In resolution
-                interpreter::step(&mut universe);
+                interpreter::step_micro(&mut universe);
                 // println!("time resolution {}", universe.now());
 
                 iterations += 1;
@@ -58,11 +58,19 @@ fn main() -> std::io::Result<()> {
                     panic!("Consistency failure.");
                 }
             }
+            let machine = universe.now();*/
+
+            // Step the machine (auto loop)
+            let machine = match interpreter::step(&mut universe) {
+                Some ((machine, _)) => machine,
+                None => panic!("Consistency failure."),
+            };
+
             println!("t = {}", t+1);
-            println!("{}", universe.now());
+            println!("{}", machine);
 
             println!("Display:");
-            let words = &universe.now().ram.0[0x14..=0x1a];
+            let words = &machine.ram.0[0x14..=0x1a];
             for d in 0usize..4 {
                 // println!("{}", d);
                 let mask = (1 << d) as u8;

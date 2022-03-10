@@ -66,11 +66,19 @@ impl Timeline {
     }
 
     pub fn push_back(&mut self, x: Machine) {
-        if self.states.len() == MAX_WINDOW {
-            self.states.pop_front();
-            self.t0 += 1;            
+        if self.states.len() == 2*MAX_WINDOW {
+            self.pop_front();
         };
         self.states.push_back(x);
+    }
+
+    pub fn pop_front(&mut self) -> Machine {
+        self.t0 += 1;
+        self.states.pop_front().unwrap()
+    }
+
+    pub fn is_full(&self) -> bool {
+        self.states.len() == MAX_WINDOW
     }
 }
 
@@ -145,6 +153,10 @@ impl Universe {
     pub fn push_new_state(&mut self) {
         dprintln!("push_new_state now=t={:?}", self.t);
         self.push_state(self.now().clone())
+    }
+
+    pub fn pop_state(&mut self) -> Machine {
+        self.timeline.pop_front()
     }
 
     pub fn now(&self) -> &Machine {

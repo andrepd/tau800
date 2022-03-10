@@ -371,7 +371,8 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
     }
 }
 
-pub fn step_micro(universe: &mut Universe) -> Instruction {
+/// Performs one micro step on `universe`
+pub fn step_micro(universe: &mut Universe) {
     dprintln!("μStep: t={} mode={:?}", universe.t, universe.mode);
 
     // Pending reads, são aqui que se checam
@@ -399,11 +400,15 @@ pub fn step_micro(universe: &mut Universe) -> Instruction {
         // Maybe inconsistent: if we reach the end of the window, it is consistent
         Mode::Maybe (ti, tf) if universe.t == tf => {
             universe.mode = Mode::Consistent;
+            dprintln!(">mode  t={} mode={:?}", universe.t, universe.mode);
+            return
         }
         // Definitely inconsistent: if we reach the end of the window, rewind to start as "maybe consistent"
         Mode::Inconsistent (ti, tf) if universe.t == tf => {
             universe.mode = Mode::Maybe(ti, tf);
-            universe.t = ti
+            universe.t = ti;
+            dprintln!(">mode  t={} mode={:?}", universe.t, universe.mode);
+            return
         }
         // Anything else: continue execution
         _ => ()
@@ -436,10 +441,11 @@ pub fn step_micro(universe: &mut Universe) -> Instruction {
         for i in &universe.pending_reads { dprintln!("pending r: {:?}", i) };
     }
 
-    instruction
+    ()
 }
 
-pub fn step(universe: &mut Universe) -> Instruction {
+/// Performs one full step on universe: micro steps until a fixed state can be yielded
+pub fn step(universe: &mut Universe) -> Option<(Machine, Instruction)> {
     // Fix memory leak: every 2000 iterations clean unreachable in pending_{reads,writes}
     if universe.t % 2000 == 0 {
         let ti = universe.timeline.ti();
@@ -447,5 +453,17 @@ pub fn step(universe: &mut Universe) -> Instruction {
         universe.pending_writes.retain(|x| x.0 >= ti);  
     }
 
-    step_micro(universe)
+    const INCONSISTENT_ITERATIONS_LIMIT: usize = 1000;
+    let mut inconsistent_iterations: usize = 0;
+    while !universe.is_consistent() || !universe.timeline.is_full() {
+        step_micro(universe);
+        if !universe.is_consistent() { inconsistent_iterations += 1 };
+        if inconsistent_iterations == INCONSISTENT_ITERATIONS_LIMIT { return None }
+    }
+
+    // Now universe is consistent and full. Which means the state we pop from front is stable
+    let machine = universe.pop_state();
+    let instruction = Instruction::decode(&mut machine.clone());
+
+    Some((machine, instruction))
 }
