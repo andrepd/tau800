@@ -82,8 +82,18 @@ impl std::fmt::Display for Machine {
         for j in 0..64 { write!(f, "{:02x} ", j).unwrap() };
         write!(f, "\n").unwrap();
         for i in 0..64 {
+            let mut do_print = false;
+            for j in 0..64 {
+                if self.ram[(i*64+j) as usize].value() != 0 {
+                    do_print = true;
+                    break
+                }
+            }
+            if i >= 4 && !do_print { continue }
+
             /*write!(f, "{:4x} | ", i*64).unwrap();*/
             write!(f, "{:02x} | ", i).unwrap();
+            // if self.ram[i*64 .. i*65].all(|x| x == 0)
             for j in 0..64 {
                 if self.cpu.pc.value() == i*64+j {
                     write!(f, "\x08^").unwrap()

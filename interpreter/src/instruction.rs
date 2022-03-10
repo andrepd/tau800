@@ -91,6 +91,9 @@ pub enum Instruction {
     Lsl(Operand),
     Lsr(Operand),
 
+    Inc(Operand),
+    Dec(Operand),
+
     Cmp(Operands),
     Bit(Operands),
 
@@ -110,6 +113,7 @@ pub enum Instruction {
     Ret,
 
     Nop,
+    Hcf,
 }
 
 /// Read a timed register from the RAM.
@@ -175,88 +179,104 @@ fn write_time(m: &mut Machine, x: &IWord) -> () {
 impl Operand {
     fn decode(m: &mut Machine, mode: UWord) -> Self {
         use Op::*;
-        match mode.value() {
-            0x0 => Timed { op: Reg(read_register(m)), time: read_time(m) },
-            0x1 => Timed { op: Imm(read_word(m)),     time: 0.into()     },
-            0x2 => Timed { op: Abs(read_address(m)),  time: read_time(m) },
-            0x3 => Timed { op: Ind(read_address(m)),  time: read_time(m) },
-            0x4 => Timed { op: Abx(read_address(m)),  time: read_time(m) },
-            _ => unreachable!(),
+        let time_flag = mode.value() & 0b100000 != 0;
+        let operand_flag = mode.value() & 0b011111;
+        match time_flag {
+            true => match operand_flag {
+                0x0 => Timed { op: Reg(read_register(m)), time: read_time(m) },
+                0x1 => Timed { op: Abs(read_address(m)),  time: read_time(m) },
+                0x2 => Timed { op: Ind(read_address(m)),  time: read_time(m) },
+                0x3 => Timed { op: Abx(read_address(m)),  time: read_time(m) },
+                0x4 => Timed { op: Imm(read_word(m)),     time: 0.into()     },
+                _ => unreachable!(),
+            }
+            false => match operand_flag {
+                0x0 => Timed { op: Reg(read_register(m)), time: 0.into() },
+                0x1 => Timed { op: Abs(read_address(m)),  time: 0.into() },
+                0x2 => Timed { op: Ind(read_address(m)),  time: 0.into() },
+                0x3 => Timed { op: Abx(read_address(m)),  time: 0.into() },
+                0x4 => Timed { op: Imm(read_word(m)),     time: 0.into() },
+                _ => unreachable!(),
+            }
         }
     }
 
     fn encode(m: &mut Machine, x: &Operand) -> () {
         use Op::*;
+        let time_flag = x.time.value() != 0;
+        let mode = |a,b| UWord::from((a as u8) | (b as u8));
         match &x.op {
             Reg(y) => {
-                m.write_pc(UWord::from(0x0));
+                m.write_pc(mode(0x0, time_flag));
                 write_register(m, &y);
-                write_time(m, &x.time);
-            }
-            Imm(y) => {
-                m.write_pc(UWord::from(0x1));
-                write_word(m, &y);
             }
             Abs(y) => {
-                m.write_pc(UWord::from(0x2));
+                m.write_pc(mode(0x1, time_flag));
                 write_address(m, &y);
-                write_time(m, &x.time);
             }
             Ind(y) => {
-                m.write_pc(UWord::from(0x3));
+                m.write_pc(mode(0x2, time_flag));
                 write_address(m, &y);
-                write_time(m, &x.time);
             }
             Abx(y) => {
-                m.write_pc(UWord::from(0x4));
+                m.write_pc(mode(0x3, time_flag));
                 write_address(m, &y);
-                write_time(m, &x.time);
             }
-        }
+            Imm(y) => {
+                m.write_pc(mode(0x4, false));
+                write_word(m, &y);
+            }
+        };
+        if time_flag { write_time(m, &x.time) };
     }
 }
 
 impl Operands {
     fn decode(m: &mut Machine, mode: UWord) -> Self {
-        let src_mode = (mode.value() & 0b000111) >> 0;
-        let dst_mode = (mode.value() & 0b111000) >> 3;
-        let src = Operand::decode(m, UWord::from(src_mode));
-        let dst = Operand::decode(m, UWord::from(dst_mode));
+        let time_mode = (mode.value() & 0b100000);
+        let src_mode  = (mode.value() & 0b011111) % 0x5;
+        let dst_mode  = (mode.value() & 0b011111) / 0x5;
+        let src = Operand::decode(m, UWord::from(src_mode | time_mode));
+        let dst = Operand::decode(m, UWord::from(dst_mode | time_mode));
         Operands { src, dst }
     }
 
     fn encode(m: &mut Machine, x: &Operands) -> () {
         use Op::*;
         let mut mode = 0;
+        let time_flag = x.src.time.value() != 0 || x.dst.time.value() != 0;
+        if time_flag { mode |= 0b100000 };
         match x.src.op {
-            Reg(_) => mode |= 0x0 << 0,
-            Imm(_) => mode |= 0x1 << 0,
-            Abs(_) => mode |= 0x2 << 0,
-            Ind(_) => mode |= 0x3 << 0,
-            Abx(_) => mode |= 0x4 << 0,
+            Reg(_) => mode += 0x0,
+            Abs(_) => mode += 0x1,
+            Ind(_) => mode += 0x2,
+            Abx(_) => mode += 0x3,
+            Imm(_) => mode += 0x4,
         };
         match x.dst.op {
-            Reg(_) => mode |= 0x0 << 3,
-            Imm(_) => mode |= 0x1 << 3,
-            Abs(_) => mode |= 0x2 << 3,
-            Ind(_) => mode |= 0x3 << 3,
-            Abx(_) => mode |= 0x4 << 3,
+            Reg(_) => mode += 0x0 * 0x5,
+            Abs(_) => mode += 0x1 * 0x5,
+            Ind(_) => mode += 0x2 * 0x5,
+            Abx(_) => mode += 0x3 * 0x5,
+            Imm(_) => mode += 0x4 * 0x5,
         };
         m.write_pc(UWord::from(mode));
         match &x.src.op {
-            Reg(y) => {write_register(m, &y); write_time(m, &x.src.time)},
+            Reg(y) => write_register(m, &y),
+            Abs(y) => write_address(m, &y),
+            Ind(y) => write_address(m, &y),
+            Abx(y) => write_address(m, &y),
             Imm(y) => write_word(m, &y),
-            Abs(y) => {write_address(m, &y);  write_time(m, &x.src.time)},
-            Ind(y) => {write_address(m, &y);  write_time(m, &x.src.time)},
-            Abx(y) => {write_address(m, &y);  write_time(m, &x.src.time)},
         };
+        if time_flag { write_time(m, &x.src.time) };
         match &x.dst.op {
-            Reg(y) => {write_register(m, &y); write_time(m, &x.dst.time)},
+            Reg(y) => write_register(m, &y),
+            Abs(y) => write_address(m, &y),
+            Ind(y) => write_address(m, &y),
+            Abx(y) => write_address(m, &y),
             Imm(y) => write_word(m, &y),
-            Abs(y) => {write_address(m, &y);  write_time(m, &x.dst.time)},
-            Ind(y) => {write_address(m, &y);  write_time(m, &x.dst.time)},
-            Abx(y) => {write_address(m, &y);  write_time(m, &x.dst.time)},
         };
+        if time_flag { write_time(m, &x.dst.time) };
     }
 }
 
@@ -302,6 +322,8 @@ impl Instruction {
             0x0f => { let mode = m.read_pc(); Not(Operand::decode(m, mode))  },
             0x10 => { let mode = m.read_pc(); Lsl(Operand::decode(m, mode))  },
             0x11 => { let mode = m.read_pc(); Lsr(Operand::decode(m, mode))  },
+            0x23 => { let mode = m.read_pc(); Inc(Operand::decode(m, mode))  },
+            0x24 => { let mode = m.read_pc(); Dec(Operand::decode(m, mode))  },
             0x12 => { let mode = m.read_pc(); Cmp(Operands::decode(m, mode))  },
             0x13 => { let mode = m.read_pc(); Bit(Operands::decode(m, mode))  },
             0x14 => Jmp(address_decode(m)),
@@ -314,6 +336,7 @@ impl Instruction {
             0x1d => Cal(address_decode(m)),
             0x21 => Clc,
             0x22 => Sec,
+            0x3e => Hcf,
             0x3f => Ret,
             _ => unreachable!(),
         }
@@ -324,13 +347,15 @@ impl Instruction {
         match instruction {
             Nop => {
                 m.write_pc(UWord::from(0x00));
-                /*m.write_pc(UWord::from(0x00));*/
             }
             Clc => {
                 m.write_pc(UWord::from(0x21));
             }
             Sec => {
                 m.write_pc(UWord::from(0x22));
+            }
+            Hcf => {
+                m.write_pc(UWord::from(0x3e));
             }
             Ret => {
                 m.write_pc(UWord::from(0x3f));
@@ -397,6 +422,14 @@ impl Instruction {
             }
             Lsr(op) => {
                 m.write_pc(UWord::from(0x11));
+                Operand::encode(m, op);
+            }
+            Inc(op) => {
+                m.write_pc(UWord::from(0x23));
+                Operand::encode(m, op);
+            }
+            Dec(op) => {
+                m.write_pc(UWord::from(0x24));
                 Operand::encode(m, op);
             }
             Cmp(op) => {

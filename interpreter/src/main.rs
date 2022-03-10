@@ -17,6 +17,8 @@ mod universe;
 mod word;
 
 fn main() -> std::io::Result<()> {
+    /*unsafe { interpreter::ZERO = word::UWord::from(0) };*/
+
     let mut buffer = String::new();
     std::io::stdin().read_to_string(&mut buffer)?;
     let buffer = buffer.to_lowercase(); // For flexibility
@@ -45,7 +47,8 @@ fn main() -> std::io::Result<()> {
         {
             interpreter::step(&mut universe);
             let mut iterations = 0;
-            while !universe.is_normal() {
+            while !universe.is_consistent() {
+                println!("{}", universe.now());
                 // In resolution
                 interpreter::step(&mut universe);
                 // println!("time resolution {}", universe.now());

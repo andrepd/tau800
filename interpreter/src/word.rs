@@ -32,8 +32,8 @@ pub struct Word<S>
 where
     S: sig::Signature,
 {
-    value: u8,
-    phantom: PhantomData<S>,
+    pub value: u8,
+    pub phantom: PhantomData<S>,
 }
 
 impl<S: Signature> std::fmt::Debug for Word<S> {
@@ -313,3 +313,6 @@ impl CheckedIncrement for LongWord<sig::Unsigned> {
         }
     }
 }
+
+pub static UZERO: UWord = UWord { value: 0, phantom: std::marker::PhantomData::<sig::Unsigned> };  // sim sim mike, rust é legível
+// let zero: UWord.t = UWord.make 0

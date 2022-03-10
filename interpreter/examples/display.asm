@@ -3,85 +3,19 @@
 
 ;; Main ;;
 
-:start = 0002
+:start
 
 	mov #03 ch      ; r→l
-	cal 2303:sweep
+	cal sweep
 	mov #03 ch
-	cal 1510:sqrt
+	cal sqrt
 
 	mov #00 ch      ; l→r
-	cal 2303:sweep
+	cal sweep
 	mov #00 ch
-	cal 1510:sqrt
+	cal sqrt
 
-	jmp 0002:start
-
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-
+	jmp start
 
 
 
@@ -92,121 +26,58 @@ nop
 ;   cl: increment
 ;   x: offset
 
-:sweep = 2303
+:sweep
 
 	clc
 	mov ch cl
-	add #01 cl  ; Estas 3 linhas fazem 0 → -1 e 3 → +1 
-	lsr cl
-	add #3f cl
+	add #01 cl  ; These lines map 0 → -1 e 3 → +1 
+	lsr cl      ;
+	add #3f cl  ; 
 	clc
 	not cl
 	add #01 cl
 
-	; Digito 1
+	; Digit 1
 	mov ch x
 	mov #01 a
 	mov %1000,x bl
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	clc
 	add cl ch 
 
-	; Digito 2
+	; Digit 2
 	mov ch x
 	mov #02 a
 	mov %1000,x bl
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	clc
 	add cl ch 
 
-	; Digito 3
+	; Digit 3
 	mov ch x
 	mov #04 a
 	mov %1000,x bl
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	clc
 	add cl ch 
 
-	; Digito 4
+	; Digit 4
 	mov ch x
 	mov #08 a
 	mov %1000,x bl
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	ret
-
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-
+	ret
+	ret
+	ret
 
 
 
@@ -217,7 +88,7 @@ nop
 ; Locals:
 ;   x = current segment
 
-:digit = 3806
+:digit
 
 	mov #00 x
 
@@ -225,17 +96,14 @@ nop
 
 	; If number not 1237, then set segment 1
 	sec
-	cmp #01 bl
-	beq +31
-	sec
-	cmp #02 bl
-	beq +23
-	sec
-	cmp #03 bl
-	beq +15
-	sec
 	cmp #07 bl
 	beq +7
+	sec
+	cmp #01 bl  ; bl-1 < 0 ⇔ bl < 1
+	bmi +3
+	sec
+	cmp bl #03  ; 3-bl ≥ 0 ⇔ bl ≤ 3
+	bpl +1
 	or a %1400,x
 
 	clc
@@ -244,10 +112,10 @@ nop
 	; If number not 14, then set segment 2
 	sec
 	cmp #01 bl
-	beq +15
+	beq +4
 	sec
 	cmp #04 bl
-	beq +7
+	beq +1
 	or a %1400,x
 
 	clc
@@ -256,10 +124,10 @@ nop
 	; If number not 56, then set segment 3
 	sec
 	cmp #05 bl
-	beq +15
+	beq +4
 	sec
 	cmp #06 bl
-	beq +7
+	beq +1
 	or a %1400,x
 
 	clc
@@ -268,9 +136,9 @@ nop
 	; If number is 0268, then set segment 4 (clever)
 	sec
 	cmp #04 bl   ; Se for 4
-	beq +14
+	beq +3
 	bit #01 bl  ; Ou ímpar
-	bne +7
+	bne +1
 	or a %1400,x
 
 	clc
@@ -279,13 +147,13 @@ nop
 	; If number not 147, then set segment 5
 	sec
 	cmp #01 bl
-	beq +23
+	beq +7
 	sec
 	cmp #04 bl
-	beq +15
+	beq +4
 	sec
 	cmp #07 bl
-	beq +7
+	beq +1
 	or a %1400,x
 
 	clc
@@ -294,7 +162,7 @@ nop
 	; If number not 2, then set segment 6
 	sec
 	cmp #02 bl
-	beq +7
+	beq +1
 	or a %1400,x
 
 	clc
@@ -302,83 +170,17 @@ nop
 
 	; If number not 017, then set segment 7
 	sec
-	cmp #00 bl
-	beq +23
-	sec
-	cmp #01 bl
-	beq +15
+	cmp bl #01  ; 1-bl ≥ 0 ⇔ bl ≤ 1
+	bpl +4
 	sec
 	cmp #07 bl
-	beq +7
+	beq +1
 	or a %1400,x
 
 	ret
-
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-
+	ret
+	ret
+	ret
 
 
 
@@ -388,277 +190,116 @@ nop
 ; Locals:
 ;   x = current segment
 
-:clear = 1a0b
+:clear
 
 	sec
 	not a
-
 	mov #06 x
+
 	and a %1400,x
 	sub #01 x
-	bne -14
+	bne -3
 	and a %1400,x
 
 	clc
 	not a
 	ret
-
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
+	ret
+	ret
+	ret
 
 
 
-
-;; Subroutine: calculate sqrt of 6-bit number with Newton's method
+;; Subroutine: calculate sqrt of 6-bit number with time-assisted Newton's method
 ; Inputs:
 ;   a: Number
+;   flag C: msb of number
 ; Locals:
-;   bl: guess_i
-;   cl: guess_i+1
+;   bl: guess_{i}
+;   cl: guess_{i+1}
+;   bh: lsb of input number
+;   ch: scratch space
 ; Outputs:
 ;   a: √ of input
 
-:newton = 3f0c
+; Pseudocode:              | time
+;   b ← input/2            | 0s
+;   c ← (b + input/b) / 2  | 1s
+;   b @ 0s ← c @ 2s        | 2s
+;   return b               | 3s
 
-	; Initial guess: b = input / 2
+:newton
+
+	; Setup
+	mov a bh    ; bh ← a & 1
+	and #01 bh
+
+	; Initial guess: b = input' = input / 2
+	lsr a     ; bl ← a ← a/2
 	mov a bl
-	lsr bl
 
-	; If b == 0, then a == 0,1 therefore √a = a
-	bne +1
+	; √0 = 0, √1 = 1
+	bne +2
+	mov bh a
 	ret
 
-	; Improved guess: c = (b + input / b) / 2
+	; Improved guess: c = (b + input / b) / 2 
+	;                   = (b + input' / b * 2 + (input' % b * 2 + bh) / b) / 2
 	clc
-	mov a cl 
+	mov a cl   ; 3rd term: (a % bl * 2 + bh) / b
+	mod bl cl
+	lsl cl
+	add bh cl
 	div bl cl
-	add bl cl
-	lsr cl
+	mov a ch   ; 2nd term: a / bl * 2
+	div bl ch
+	lsl ch
+	add ch cl
+	add bl cl  ; 1st term: bl
+	lsr cl     ; div everything by 2
 
-	; Corner case, if input is 1 less than a perfect square, cl will oscillate rather than fixpoint
-	cmp bl cl  ; If cl<bl, nop. If cl>bl, make cl=bl. I.e. cl = min(bl,cl)
-	bmi +08
+	; c = min(b,c), needed for corner case where input is 1 less than a perfect square
+	cmp bl cl
+	bmi +2
 	mov bl cl
-	bne +02
-	nop  ; Needs these nop to encher chouriças to ensure same time of execution of both branches
-	nop
+	bne +2  ;
+	nop     ; Needs these nop to ensure same time of execution of both branches
+	nop     ; 
 
 	; Put back the improved guess as the initial guess
-	mov cl bl@-10
+	mov cl bl@-16
 
 	; Return result through a
 	mov bl a
 	ret
-
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-
+	ret
+	ret
+	ret
 
 
 
 ;; Subroutine: decimal digits → 6-bit number
 ; Inputs:
 ;   bh,bl: number
+; Locals:
+;   bh
 ; Outputs:
 ;   a: bh×10+bl
+;   flag C: 1 if overflows
 
-:decimal = 020f
+:decimal
 
 	mov bh a
 	clc
 	mul #0a a
-	add bl a
+	add bl a    ; Overflow in add: C set here
+	muh #0a bh  ; Overflow in mul: C set here
+	beq +1
+	sec
 	ret
-
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-
+	ret
+	ret
+	ret
 
 
 
@@ -669,80 +310,14 @@ nop
 ; Outputs:
 ;   a: √ of input
 
-:sqrt = 1510
+:sqrt
 
 	;cmp #00 ch
-	beq +4
-	cal 0a14:sqrt_rl
+	beq +2
+	cal sqrt_rl
 	ret
-	cal 1f11:sqrt_lr
+	cal sqrt_lr
 	ret
-
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-
 
 
 
@@ -750,103 +325,40 @@ nop
 ; Inputs:
 ;   bh,bl: number
 
-:sqrt_lr = 1f11
+:sqrt_lr
 
 	mov %1000 bh
 	mov %1100 bl
-	cal 020f:decimal
-	cal 3f0c:newton
+	cal decimal
+	cal newton
 
 	mov a bl
 	mov #02 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 	mov #00 bl
 	mov #01 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	mov %1200 bh
 	mov %1300 bl
-	cal 020f:decimal
-	cal 3f0c:newton
+	cal decimal
+	cal newton
 
 	mov a bl
 	mov #08 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 	mov #00 bl
 	mov #04 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	ret
-
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-
+	ret
+	ret
+	ret
 
 
 
@@ -854,100 +366,37 @@ nop
 ; Inputs:
 ;   bh,bl: number
 
-:sqrt_rl = 0a14
+:sqrt_rl
 
 	mov %1300 bh
 	mov %1200 bl
-	cal 020f:decimal
-	cal 3f0c:newton
+	cal decimal
+	cal newton
 
 	mov a bl
 	mov #02 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 	mov #00 bl
 	mov #01 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	mov %1100 bh
 	mov %1000 bl
-	cal 020f:decimal
-	cal 3f0c:newton
+	cal decimal
+	cal newton
 
 	mov a bl
 	mov #08 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 	mov #00 bl
 	mov #04 a
-	cal 1a0b:clear
-	cal 3806:digit
+	cal clear
+	cal digit
 
 	ret
-
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-
+	ret
+	ret
+	ret
