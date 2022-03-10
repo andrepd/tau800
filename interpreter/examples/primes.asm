@@ -6,6 +6,7 @@
 	cal init
 	mov #04 a
 	cal sieve
+	cal output
 	hcf
 
 
@@ -26,7 +27,7 @@
 	bne -3
 	dec a
 	beq +2
-	inc %1702  ; high word of addr in (1)
+	inc %1a02  ; high word of addr in (1)
 	jmp loop_init
 
 	mov #20 %1a02
@@ -36,10 +37,10 @@
 
 ;; Subroutine: sieve ;;
 ; Inputs:
-;   a = 64×size
+;   a = size / 64
 ; Locals:
 ;   %0001 = outer pointer
-;   %0200 = inner pointer
+;   %0201 = inner pointer
 ;   x = value at outer pointer
 
 :sieve
@@ -61,8 +62,7 @@
 	:sieve_inner
 	clc
 	add x %0201        ; Increment inner pointer (with carry) by x
-	bcc +1
-	inc %0301
+	add #00 %0301
 	sec
 	cmp a %0301        ; If we reached the end of the table, exit inner loop
 	beq +2
@@ -82,3 +82,88 @@
     jmp sieve_loop
 
     jmp sieve_outer    ; Loop
+
+
+
+;; Subroutine: output ;;
+; Inputs:
+;   a = 64×size (unused)
+; Locals:
+;   bh,bl = number
+;   %0001 = pointer
+
+:output
+	
+	mov #00 %0001
+	mov #20 %0101
+
+	:output_loop
+	bit #3f (%0001)  ; If not a prime, continue
+	bne +1
+	jmp output_loop_tail
+
+	mov #08 a        ; Clear digits
+	cal clear
+	mov #04 a
+	cal clear
+	mov #02 a
+	cal clear
+	mov #01 a
+	cal clear
+
+	mov %0001 bl     ; Write digits
+	mov #00 bh ;;TODO
+	clc
+	add #02 bl
+	add #00 bh
+
+	cal num2dec      ; Digit 4
+	mov bl cl
+	mov a bl
+	mov #08 a
+	cal digit
+	mov cl bl
+
+	mov bl x         ; If rest of digits are 0 continue
+	or bh x
+	bne +1
+	jmp output_loop_tail
+
+	cal num2dec      ; Digit 3
+	mov bl cl
+	mov a bl
+	mov #04 a
+	cal digit
+	mov cl bl
+
+	mov bl x         ; If rest of digits are 0 continue
+	or bh x
+	bne +1
+	jmp output_loop_tail
+
+	cal num2dec      ; Digit 2
+	mov bl cl
+	mov a bl
+	mov #02 a
+	cal digit
+	mov cl bl
+
+	mov bl x         ; If rest of digits are 0 continue
+	or bh x
+	bne +1
+	jmp output_loop_tail
+
+	cal num2dec      ; Digit 1
+	mov bl cl
+	mov a bl
+	mov #01 a
+	cal digit
+	mov cl bl
+
+	:output_loop_tail
+	clc              ; Increment pointer
+	add #01 %0001
+	add #00 %0101
+	jmp output_loop
+
+	ret
