@@ -36,7 +36,7 @@ fn main() -> std::io::Result<()> {
     io_modules.run(&mut universe);
 
     println!("{}", universe.now());
-    for _ in 0..10000 {
+    for t in 0.. {
         // Run IO modules
         // @André: Não sei quais as consequências de não correr isto na fase de
         //         resolução, se pode causar inconsistência.
@@ -58,6 +58,7 @@ fn main() -> std::io::Result<()> {
                     panic!("Consistency failure.");
                 }
             }
+            println!("t = {}", t+1);
             println!("{}", universe.now());
 
             println!("Display:");
