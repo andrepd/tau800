@@ -440,10 +440,9 @@ pub fn step_micro(universe: &mut Universe) -> Instruction {
 pub fn step(universe: &mut Universe) -> Instruction {
     // Fix memory leak: every 2000 iterations clean unreachable in pending_{reads,writes}
     if universe.t % 2000 == 0 {
-        let pending_reads_ = universe.pending_reads.clone().into_iter().filter(|x| x.0 >= universe.timeline.ti());  
-        universe.pending_reads = pending_reads_.collect::<Vec<_>>();
-        let pending_writes_ = universe.pending_writes.clone().into_iter().filter(|x| x.0 >= universe.timeline.ti());  
-        universe.pending_writes = pending_writes_.collect::<Vec<_>>();
+        let ti = universe.timeline.ti();
+        universe.pending_reads.retain(|x| x.0 >= ti);  
+        universe.pending_writes.retain(|x| x.0 >= ti);  
     }
 
     step_micro(universe)
