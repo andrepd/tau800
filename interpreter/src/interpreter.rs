@@ -64,7 +64,7 @@ fn operand_get<'a>(universe: &'a mut Universe, operand: &'a Operand) -> &'a UWor
     // Reads from the future
     else {
         // Does that moment in the future not even exist? Then we need to run until it does and then check consistency
-        if dbg!(t2) >= dbg!(universe.timeline.tf()) || universe.timeline.tf() == universe.t + 1 {
+        if (t2) >= (universe.timeline.tf()) || universe.timeline.tf() == universe.t + 1 {
             universe.pending_reads.push((t2, t1, operand.op.clone(), UZERO));  // Bootstrap with 0
             &UZERO
         }
@@ -372,7 +372,7 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
 }
 
 pub fn step_micro(universe: &mut Universe) -> Instruction {
-    eprintln!("μStep: t={} mode={:?}", universe.t, universe.mode);
+    dprintln!("μStep: t={} mode={:?}", universe.t, universe.mode);
 
     // Pending reads, são aqui que se checam
     /*universe.pending_reads.retain(|&x| {*/
@@ -393,7 +393,7 @@ pub fn step_micro(universe: &mut Universe) -> Instruction {
         });
     universe.pending_reads = pending_reads_.collect::<Vec<_>>();  // ::<_>>()#@__zyx$$&ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn
 
-    eprintln!(">read   t={} mode={:?}", universe.t, universe.mode);
+    dprintln!(">read   t={} mode={:?}", universe.t, universe.mode);
 
     match universe.mode {
         // Maybe inconsistent: if we reach the end of the window, it is consistent
@@ -409,16 +409,16 @@ pub fn step_micro(universe: &mut Universe) -> Instruction {
         _ => ()
     }
 
-    eprintln!(">mode  t={} mode={:?}", universe.t, universe.mode);
+    dprintln!(">mode  t={} mode={:?}", universe.t, universe.mode);
 
     universe.push_new_state();
 
-    eprintln!(">push  t={} mode={:?}", universe.t, universe.mode);
+    dprintln!(">push  t={} mode={:?}", universe.t, universe.mode);
 
     let instruction = Instruction::decode(universe.now_mut());
     execute(universe, &instruction);
 
-    eprintln!(">exec  t={} mode={:?}", universe.t, universe.mode);
+    dprintln!(">exec  t={} mode={:?}", universe.t, universe.mode);
 
     // Pending writes, são aqui que se fazem
     let asdjhfbasdfaj = universe.pending_writes.clone();  // TODO
@@ -429,10 +429,12 @@ pub fn step_micro(universe: &mut Universe) -> Instruction {
         }
     }
 
-    eprintln!(">writ   t={} mode={:?}", universe.t, universe.mode);
+    dprintln!(">writ   t={} mode={:?}", universe.t, universe.mode);
 
-    for i in &universe.pending_writes { eprintln!("pending w: {:?}", i) };
-    for i in &universe.pending_reads { eprintln!("pending r: {:?}", i) };
+    if cfg!(debug_assertions) {
+        for i in &universe.pending_writes { dprintln!("pending w: {:?}", i) };
+        for i in &universe.pending_reads { dprintln!("pending r: {:?}", i) };
+    }
 
     instruction
 }

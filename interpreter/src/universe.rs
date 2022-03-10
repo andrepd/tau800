@@ -124,16 +124,16 @@ impl Universe {
 
     /// Pushes, overwriting existing state if necessary
     pub fn push_state(&mut self, x: Machine) {
-        eprint!("push_state t0={:?} t={:?} len={:?} ", self.timeline.t0, self.t, self.timeline.states.len());
+        dprint!("push_state t0={:?} t={:?} len={:?} ", self.timeline.t0, self.t, self.timeline.states.len());
         self.t += 1;
         // Insert at immediately next time: ok
         if self.timeline.in_next_slot(self.t) {
-            eprintln!("(push)");
+            dprintln!("(push)");
             self.timeline.push_back(x);
         } 
         // Insert over existing time: ok
         else if self.timeline.in_interval(self.t) {
-            eprintln!("(overwrite)");
+            dprintln!("(overwrite)");
             self.timeline[self.t] = x;
         } 
         // Insert anywhere else: fail
@@ -143,7 +143,7 @@ impl Universe {
     }
 
     pub fn push_new_state(&mut self) {
-        eprintln!("push_new_state now=t={:?}", self.t);
+        dprintln!("push_new_state now=t={:?}", self.t);
         self.push_state(self.now().clone())
     }
 

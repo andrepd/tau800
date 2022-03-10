@@ -324,7 +324,7 @@ fn read_time(chars: &mut SlidingWindow) -> ReadResult<IWord> {
             let _ = match_char('-', chars);
             let _ = match_char('+', chars);
             let value = read_decimal(chars)?;
-            eprintln!("qux {:?} {:?}", value, IWord::from(value));
+            dprintln!("qux {:?} {:?}", value, IWord::from(value));
             Ok(IWord::from(value))
         }
     }
