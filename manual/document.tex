@@ -94,8 +94,8 @@
 % -------- %
 
 \makeatletter
-\def\@machinename@short{{{\sffamily TAU-800B} {\itshape Super}}}
-\def\@machinename@long{{\textsf{Time Arithmetic Unit} (Revision 800B, \textit{Super} edition)}}
+\def\@machinename@short{{{\sffamily TAU-800A} {\itshape Super}}}
+\def\@machinename@long{{\textsf{Time Arithmetic Unit} (Revision 800A, \textit{Super} edition)}}
 \def\machinename{\@ifstar\@machinename@long\@machinename@short}
 \makeatother
 
@@ -397,8 +397,10 @@ The following is a quick-reference list of instructions.
 
 \instruction{MUL src dst}{%
 	Set word at \texttt{dst} to the lower bits of $\texttt{dst}×\texttt{src}$. \\
-	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}. %, set \ttt{C} on overflow.
 }
+
+%TODO corrigir que tecnicamente o V é junk em tudo menos no cmp e sub
 
 \instruction{MUH src dst}{%
 	Set word at \texttt{dst} to the upper bits of $\texttt{dst}×\texttt{src}$, where operands are unsigned values. \\
@@ -412,7 +414,8 @@ The following is a quick-reference list of instructions.
 
 %\todo{Como fazer handle de divisoes por zero?}
 \instruction{DIV src dst}{%
-	Set word at \texttt{dst} to $\texttt{dst}\div\texttt{src}$, where operands are unsigned values. \\
+	Set word at \texttt{dst} to $(\texttt{dst}+\ttt{C}\times 2^6)\div\texttt{src}$, where operands are unsigned values. 
+	Division by zero sets \ttt{dst} to an undefined value. \\
 	Flags: set \ttt{Z}.
 }
 
@@ -425,7 +428,8 @@ The following is a quick-reference list of instructions.
 {\mathrel{\mathrm{mod}}}
 
 \instruction{MOD src dst}{%
-	Set word at \texttt{dst} to $\texttt{dst}\mod\texttt{src}$, where operands are unsigned values. \\
+	Set word at \texttt{dst} to $(\texttt{dst}+\ttt{C}\times 2^6)\mod\texttt{src}$, where operands are unsigned values. 
+	Division by zero sets \ttt{dst} to an undefined value. \\
 	Flags: set \ttt{Z}.
 }
 
@@ -461,7 +465,17 @@ The following is a quick-reference list of instructions.
 }
 
 \instruction{LSR dst}{%
-	Shift bits in \ttt{dst} to the right. \\
+	Shift bits in \ttt{dst} to the right, plus $\ttt{C}\times 2^6$. \\
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.
+}
+
+\instruction{INC dst}{%
+	Increment \ttt{dst} by 1. 
+	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.
+}
+
+\instruction{DEC dst}{%
+	Decrement \ttt{dst} by 1. 
 	Flags: set \ttt{Z}, \ttt{N}, \ttt{V}.
 }
 
@@ -510,6 +524,8 @@ The following is a quick-reference list of instructions.
 \subsubsection*{Miscellaneous}
 
 \instruction{NOP}{No-op.}
+
+\instruction{HCF}{Halt execution.}
 
 
 
