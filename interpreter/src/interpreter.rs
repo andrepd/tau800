@@ -367,7 +367,7 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
         Instruction::Clc => state.now_mut().cpu.flags.write(Flag::C, false),
         Instruction::Sec => state.now_mut().cpu.flags.write(Flag::C, true),
         Instruction::Nop => (),
-        Instruction::Hcf => std::process::exit(0),
+        Instruction::Hcf => state.now_mut().cpu.pc = state.now().cpu.pc + IWord::from(-1),  // Ugly hack
     }
 }
 
@@ -445,6 +445,8 @@ pub fn step_micro(universe: &mut Universe) {
 }
 
 /// Performs one full step on universe: micro steps until a fixed state can be yielded
+/// Performs one full step on universe: micro steps until a fixed state can be yielded. 
+/// Returns Some(Machine, Instruction) or None if time inconsistency was reached
 pub fn step(universe: &mut Universe) -> Option<(Machine, Instruction)> {
     // Fix memory leak: every 2000 iterations clean unreachable in pending_{reads,writes}
     if universe.t % 2000 == 0 {
@@ -463,7 +465,7 @@ pub fn step(universe: &mut Universe) -> Option<(Machine, Instruction)> {
 
     // Now universe is consistent and full. Which means the state we pop from front is stable
     let machine = universe.pop_state();
-    let instruction = Instruction::decode(&mut machine.clone());
+    let instruction = Instruction::decode(&mut machine.clone());  // TODO overkill mas acho que não é bottleneck
 
     Some((machine, instruction))
 }

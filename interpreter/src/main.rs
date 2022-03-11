@@ -35,7 +35,6 @@ fn main() -> std::io::Result<()> {
     assembler::assemble_into(universe.now_mut(), buffer.as_str());
     io_modules.run(&mut universe);
 
-    println!("{}", universe.now());
     for t in 0.. {
         // Run IO modules
         // @André: Não sei quais as consequências de não correr isto na fase de
@@ -61,13 +60,13 @@ fn main() -> std::io::Result<()> {
             let machine = universe.now();*/
 
             // Step the machine (auto loop)
-            let machine = match interpreter::step(&mut universe) {
-                Some ((machine, _)) => machine,
-                None => panic!("Consistency failure."),
-            };
+            let (machine, instruction) = interpreter::step(&mut universe).expect("Consistency failure.");
 
-            println!("t = {}", t+1);
+            println!("t = {}", t);
+            println!("instruction: {:?}", instruction);
             println!("{}", machine);
+
+            match instruction { Instruction::Hcf => { println!("Execution ended."); break }, _ => () }
 
             println!("Display:");
             let words = &machine.ram.0[0x14..=0x1a];
