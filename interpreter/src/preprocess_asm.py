@@ -1,6 +1,6 @@
 from sys import argv, stdin, stderr
 
-dbg = len(argv) > 2
+dbg = len(argv) > 1
 
 def lex(it):
 	for i in it:
