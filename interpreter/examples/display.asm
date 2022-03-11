@@ -200,15 +200,15 @@
 
 ;; Subroutine: calculate sqrt of 6-bit number with time-assisted Newton's method
 ; Inputs:
-;   a: Number
-;   flag C: msb of number
+;   a = number
+;   flag C = msb of number
 ; Locals:
-;   bl: guess_{i}
-;   cl: guess_{i+1}
-;   bh: lsb of input number
-;   ch: scratch space
+;   bl = guess_{i}
+;   cl = guess_{i+1}
+;   bh = lsb of input number
+;   ch = scratch space
 ; Outputs:
-;   a: √ of input
+;   a = √ of input
 
 ; Pseudocode:              | time
 ;   b ← input/2            | 0s
@@ -265,12 +265,12 @@
 
 ;; Subroutine: decimal digits → 6-bit number
 ; Inputs:
-;   bh,bl: number
+;   bh,bl = number
 ; Locals:
 ;   bh
 ; Outputs:
-;   a: bh×10+bl
-;   flag C: 1 if overflows
+;   a = bh×10+bl
+;   flag C = 1 if overflows
 
 :decimal
 
@@ -286,90 +286,42 @@
 
 ;; Subroutine: calculate sqrt of hh, of mm, and write to display
 ; Inputs:
-;   ch: direction (0 l→r, 3 r→l)
-;   bh,bl: number
-; Outputs:
-;   a: √ of input
+;   flag Z = direction (0 l→r, 1 r→l)
 
 :sqrt
 
-	;cmp #00 ch
-	beq +2
-	cal sqrt_rl
-	ret
-	cal sqrt_lr
-	ret
+	beq +5
+	mov #13 %3a09  ; l→r
+	mov #12 %3f09
+	mov #11 %1f0a
+	mov #10 %240a
+	bne +4
+	mov #10 %3a09  ; r→l
+	mov #11 %3f09
+	mov #12 %1f0a
+	mov #13 %240a
 
-
-
-;; Subroutine: calculate sqrt of hh, of mm, and write to display
-; Inputs:
-;   bh,bl: number
-
-:sqrt_lr
-
-	mov %1000 bh
-	mov %1100 bl
+	mov %3f00 bh
+	mov %3f00 bl
 	cal decimal
 	cal newton
 
 	mov a bl
+	mov #01 a
+	cal clear
 	mov #02 a
 	cal clear
 	cal digit
-	mov #00 bl
-	mov #01 a
-	cal clear
-	cal digit
 
-	mov %1200 bh
-	mov %1300 bl
+	mov %3f00 bh
+	mov %3f00 bl
 	cal decimal
 	cal newton
 
 	mov a bl
-	mov #08 a
-	cal clear
-	cal digit
-	mov #00 bl
 	mov #04 a
 	cal clear
-	cal digit
-
-	ret
-
-
-;; Subroutine: calculate sqrt of hh, of mm, and write to display
-; Inputs:
-;   bh,bl: number
-
-:sqrt_rl
-
-	mov %1300 bh
-	mov %1200 bl
-	cal decimal
-	cal newton
-
-	mov a bl
-	mov #02 a
-	cal clear
-	cal digit
-	mov #00 bl
-	mov #01 a
-	cal clear
-	cal digit
-
-	mov %1100 bh
-	mov %1000 bl
-	cal decimal
-	cal newton
-
-	mov a bl
 	mov #08 a
-	cal clear
-	cal digit
-	mov #00 bl
-	mov #04 a
 	cal clear
 	cal digit
 
