@@ -66,11 +66,19 @@ impl Timeline {
     }
 
     pub fn push_back(&mut self, x: Machine) {
-        if self.states.len() == MAX_WINDOW {
-            self.states.pop_front();
-            self.t0 += 1;            
+        if self.states.len() == 2*MAX_WINDOW {
+            self.pop_front();
         };
         self.states.push_back(x);
+    }
+
+    pub fn pop_front(&mut self) -> Machine {
+        self.t0 += 1;
+        self.states.pop_front().unwrap()
+    }
+
+    pub fn is_full(&self) -> bool {
+        self.states.len() == MAX_WINDOW
     }
 }
 
@@ -124,16 +132,16 @@ impl Universe {
 
     /// Pushes, overwriting existing state if necessary
     pub fn push_state(&mut self, x: Machine) {
-        eprint!("push_state t0={:?} t={:?} len={:?} ", self.timeline.t0, self.t, self.timeline.states.len());
+        dprint!("push_state t0={:?} t={:?} len={:?} ", self.timeline.t0, self.t, self.timeline.states.len());
         self.t += 1;
         // Insert at immediately next time: ok
         if self.timeline.in_next_slot(self.t) {
-            eprintln!("(push)");
+            dprintln!("(push)");
             self.timeline.push_back(x);
         } 
         // Insert over existing time: ok
         else if self.timeline.in_interval(self.t) {
-            eprintln!("(overwrite)");
+            dprintln!("(overwrite)");
             self.timeline[self.t] = x;
         } 
         // Insert anywhere else: fail
@@ -143,8 +151,12 @@ impl Universe {
     }
 
     pub fn push_new_state(&mut self) {
-        eprintln!("push_new_state now=t={:?}", self.t);
+        dprintln!("push_new_state now=t={:?}", self.t);
         self.push_state(self.now().clone())
+    }
+
+    pub fn pop_state(&mut self) -> Machine {
+        self.timeline.pop_front()
     }
 
     pub fn now(&self) -> &Machine {

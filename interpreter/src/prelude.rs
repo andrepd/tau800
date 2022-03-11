@@ -10,3 +10,31 @@ pub fn div_rem<
 >(a: T, b: T) -> (T, T) {
   (a / b, a % b)
 }
+
+
+
+// Debug macros (como é que isto não vem standard)
+#[allow(unused_macros)]
+
+#[cfg(debug_assertions)]
+macro_rules! dprintln {
+    ($( $args:expr ),*) => { eprintln!( $( $args ),* ); }
+}
+
+#[cfg(not(debug_assertions))]
+macro_rules! dprintln {
+    ($( $args:expr ),*) => {()}
+}
+
+#[cfg(debug_assertions)]
+macro_rules! dprint {
+    ($( $args:expr ),*) => { eprint!( $( $args ),* ); }
+}
+
+#[cfg(not(debug_assertions))]
+macro_rules! dprint {
+    ($( $args:expr ),*) => {()}
+}
+
+pub(crate) use dprintln;
+pub(crate) use dprint;

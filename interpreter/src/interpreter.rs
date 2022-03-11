@@ -64,7 +64,7 @@ fn operand_get<'a>(universe: &'a mut Universe, operand: &'a Operand) -> &'a UWor
     // Reads from the future
     else {
         // Does that moment in the future not even exist? Then we need to run until it does and then check consistency
-        if dbg!(t2) >= dbg!(universe.timeline.tf()) || universe.timeline.tf() == universe.t + 1 {
+        if (t2) >= (universe.timeline.tf()) || universe.timeline.tf() == universe.t + 1 {
             universe.pending_reads.push((t2, t1, operand.op.clone(), UZERO));  // Bootstrap with 0
             &UZERO
         }
@@ -367,12 +367,13 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
         Instruction::Clc => state.now_mut().cpu.flags.write(Flag::C, false),
         Instruction::Sec => state.now_mut().cpu.flags.write(Flag::C, true),
         Instruction::Nop => (),
-        Instruction::Hcf => std::process::exit(0),
+        Instruction::Hcf => state.now_mut().cpu.pc = state.now().cpu.pc + IWord::from(-1),  // Ugly hack
     }
 }
 
-pub fn step_micro(universe: &mut Universe) -> Instruction {
-    eprintln!("μStep: t={} mode={:?}", universe.t, universe.mode);
+/// Performs one micro step on `universe`
+pub fn step_micro(universe: &mut Universe) {
+    dprintln!("μStep: t={} mode={:?}", universe.t, universe.mode);
 
     // Pending reads, são aqui que se checam
     /*universe.pending_reads.retain(|&x| {*/
@@ -393,32 +394,36 @@ pub fn step_micro(universe: &mut Universe) -> Instruction {
         });
     universe.pending_reads = pending_reads_.collect::<Vec<_>>();  // ::<_>>()#@__zyx$$&ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn
 
-    eprintln!(">read   t={} mode={:?}", universe.t, universe.mode);
+    dprintln!(">read   t={} mode={:?}", universe.t, universe.mode);
 
     match universe.mode {
         // Maybe inconsistent: if we reach the end of the window, it is consistent
         Mode::Maybe (ti, tf) if universe.t == tf => {
             universe.mode = Mode::Consistent;
+            dprintln!(">mode  t={} mode={:?}", universe.t, universe.mode);
+            return
         }
         // Definitely inconsistent: if we reach the end of the window, rewind to start as "maybe consistent"
         Mode::Inconsistent (ti, tf) if universe.t == tf => {
             universe.mode = Mode::Maybe(ti, tf);
-            universe.t = ti
+            universe.t = ti;
+            dprintln!(">mode  t={} mode={:?}", universe.t, universe.mode);
+            return
         }
         // Anything else: continue execution
         _ => ()
     }
 
-    eprintln!(">mode  t={} mode={:?}", universe.t, universe.mode);
+    dprintln!(">mode  t={} mode={:?}", universe.t, universe.mode);
 
     universe.push_new_state();
 
-    eprintln!(">push  t={} mode={:?}", universe.t, universe.mode);
+    dprintln!(">push  t={} mode={:?}", universe.t, universe.mode);
 
     let instruction = Instruction::decode(universe.now_mut());
     execute(universe, &instruction);
 
-    eprintln!(">exec  t={} mode={:?}", universe.t, universe.mode);
+    dprintln!(">exec  t={} mode={:?}", universe.t, universe.mode);
 
     // Pending writes, são aqui que se fazem
     let asdjhfbasdfaj = universe.pending_writes.clone();  // TODO
@@ -429,22 +434,38 @@ pub fn step_micro(universe: &mut Universe) -> Instruction {
         }
     }
 
-    eprintln!(">writ   t={} mode={:?}", universe.t, universe.mode);
+    dprintln!(">writ   t={} mode={:?}", universe.t, universe.mode);
 
-    for i in &universe.pending_writes { eprintln!("pending w: {:?}", i) };
-    for i in &universe.pending_reads { eprintln!("pending r: {:?}", i) };
-
-    instruction
-}
-
-pub fn step(universe: &mut Universe) -> Instruction {
-    // Fix memory leak: every 2000 iterations clean unreachable in pending_{reads,writes}
-    if universe.t % 2000 == 0 {
-        let pending_reads_ = universe.pending_reads.clone().into_iter().filter(|x| x.0 >= universe.timeline.ti());  
-        universe.pending_reads = pending_reads_.collect::<Vec<_>>();
-        let pending_writes_ = universe.pending_writes.clone().into_iter().filter(|x| x.0 >= universe.timeline.ti());  
-        universe.pending_writes = pending_writes_.collect::<Vec<_>>();
+    if cfg!(debug_assertions) {
+        for i in &universe.pending_writes { dprintln!("pending w: {:?}", i) };
+        for i in &universe.pending_reads { dprintln!("pending r: {:?}", i) };
     }
 
-    step_micro(universe)
+    ()
+}
+
+/// Performs one full step on universe: micro steps until a fixed state can be yielded
+/// Performs one full step on universe: micro steps until a fixed state can be yielded. 
+/// Returns Some(Machine, Instruction) or None if time inconsistency was reached
+pub fn step(universe: &mut Universe) -> Option<(Machine, Instruction)> {
+    // Fix memory leak: every 2000 iterations clean unreachable in pending_{reads,writes}
+    if universe.t % 2000 == 0 {
+        let ti = universe.timeline.ti();
+        universe.pending_reads.retain(|x| x.0 >= ti);  
+        universe.pending_writes.retain(|x| x.0 >= ti);  
+    }
+
+    const INCONSISTENT_ITERATIONS_LIMIT: usize = 1000;
+    let mut inconsistent_iterations: usize = 0;
+    while !universe.is_consistent() || !universe.timeline.is_full() {
+        step_micro(universe);
+        if !universe.is_consistent() { inconsistent_iterations += 1 };
+        if inconsistent_iterations == INCONSISTENT_ITERATIONS_LIMIT { return None }
+    }
+
+    // Now universe is consistent and full. Which means the state we pop from front is stable
+    let machine = universe.pop_state();
+    let instruction = Instruction::decode(&mut machine.clone());  // TODO overkill mas acho que não é bottleneck
+
+    Some((machine, instruction))
 }

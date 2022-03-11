@@ -268,7 +268,7 @@ impl std::ops::Add<Word<sig::Signed>> for LongWord<sig::Unsigned> {
         let z = x + y;
         debug_assert!(z > 0);
         let (high, low) = div_rem(z, 1 << 6);
-        eprintln!("add {}+{}={} {} {}", x, y, z, high, low);
+        /*eprintln!("add {}+{}={} {} {}", x, y, z, high, low);*/
         LongWord::from_words(Word::from(high as u8), Word::from(low as u8))
     }
 }

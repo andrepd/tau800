@@ -35,22 +35,21 @@ fn main() -> std::io::Result<()> {
     assembler::assemble_into(universe.now_mut(), buffer.as_str());
     io_modules.run(&mut universe);
 
-    println!("{}", universe.now());
-    for _ in 0..10000 {
+    for t in 0.. {
         // Run IO modules
         // @André: Não sei quais as consequências de não correr isto na fase de
         //         resolução, se pode causar inconsistência.
         // @Mike: Boa pergunta
         io_modules.run(&mut universe);
 
-        // Step the machine
         {
-            interpreter::step(&mut universe);
+            // Step the machine (manual loop)
+            /*interpreter::step_micro(&mut universe);
             let mut iterations = 0;
             while !universe.is_consistent() {
                 println!("{}", universe.now());
                 // In resolution
-                interpreter::step(&mut universe);
+                interpreter::step_micro(&mut universe);
                 // println!("time resolution {}", universe.now());
 
                 iterations += 1;
@@ -58,10 +57,19 @@ fn main() -> std::io::Result<()> {
                     panic!("Consistency failure.");
                 }
             }
-            println!("{}", universe.now());
+            let machine = universe.now();*/
+
+            // Step the machine (auto loop)
+            let (machine, instruction) = interpreter::step(&mut universe).expect("Consistency failure.");
+
+            println!("t = {}", t);
+            println!("instruction: {:?}", instruction);
+            println!("{}", machine);
+
+            match instruction { Instruction::Hcf => { println!("Execution ended."); break }, _ => () }
 
             println!("Display:");
-            let words = &universe.now().ram.0[0x14..=0x1a];
+            let words = &machine.ram.0[0x14..=0x1a];
             for d in 0usize..4 {
                 // println!("{}", d);
                 let mask = (1 << d) as u8;
