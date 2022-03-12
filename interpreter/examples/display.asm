@@ -1,5 +1,5 @@
-; Inputs: %10 %11 %12 %13
-; Outputs: %14 ... 1a
+; Inputs (hh:mm): %10 %11 %12 %13
+; Outputs (display segments): %14 ... 1a
 
 ;; Main ;;
 
@@ -21,10 +21,10 @@
 
 ;; Subroutine: do one sweep of all digits ;;
 ; Inputs:
-;   ch: direction (0 l→r, 3 r→l)
+;   ch = direction (0 l→r, 3 r→l)
 ; Locals:
-;   cl: increment
-;   x: offset
+;   cl = increment
+;   x = offset
 
 :sweep
 
@@ -77,6 +77,7 @@
 	ret
 
 
+
 ;; Subroutine: set one digit ;;
 ; Inputs:
 ;   a = current bit mask
@@ -102,8 +103,7 @@
 	bpl +1
 	or a %1400,x
 
-	clc
-	add #01 x
+	inc x
 
 	; If number not 14, then set segment 2
 	sec
@@ -114,8 +114,7 @@
 	beq +1
 	or a %1400,x
 
-	clc
-	add #01 x
+	inc x
 
 	; If number not 56, then set segment 3
 	sec
@@ -126,19 +125,17 @@
 	beq +1
 	or a %1400,x
 
-	clc
-	add #01 x
+	inc x
 
 	; If number is 0268, then set segment 4 (clever)
 	sec
-	cmp #04 bl   ; Se for 4
+	cmp #04 bl  ; If 4
 	beq +3
-	bit #01 bl  ; Ou ímpar
+	bit #01 bl  ; Or odd
 	bne +1
 	or a %1400,x
 
-	clc
-	add #01 x
+	inc x
 
 	; If number not 147, then set segment 5
 	sec
@@ -152,8 +149,7 @@
 	beq +1
 	or a %1400,x
 
-	clc
-	add #01 x
+	inc x
 
 	; If number not 2, then set segment 6
 	sec
@@ -161,8 +157,7 @@
 	beq +1
 	or a %1400,x
 
-	clc
-	add #01 x
+	inc x
 
 	; If number not 017, then set segment 7
 	sec
@@ -174,6 +169,7 @@
 	or a %1400,x
 
 	ret
+
 
 
 ;; Subroutine: clear one digit ;;
@@ -196,6 +192,7 @@
 	clc
 	not a
 	ret
+
 
 
 ;; Subroutine: calculate sqrt of 6-bit number with time-assisted Newton's method
@@ -284,22 +281,24 @@
 	ret
 
 
+
 ;; Subroutine: calculate sqrt of hh, of mm, and write to display
 ; Inputs:
 ;   flag Z = direction (0 l→r, 1 r→l)
 
 :sqrt
 
+	; Self-modifying code, handle with care!
 	beq +5
-	mov #13 %3a09  ; l→r
-	mov #12 %3f09
-	mov #11 %1f0a
-	mov #10 %240a
+	mov #13 %2e09  ; l→r
+	mov #12 %3309
+	mov #11 %130a
+	mov #10 %180a
 	bne +4
-	mov #10 %3a09  ; r→l
-	mov #11 %3f09
-	mov #12 %1f0a
-	mov #13 %240a
+	mov #10 %2e09  ; r→l
+	mov #11 %3309
+	mov #12 %130a
+	mov #13 %180a
 
 	mov %3f00 bh
 	mov %3f00 bl
