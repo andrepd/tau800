@@ -195,15 +195,15 @@
 
 
 
-;; Subroutine: calculate sqrt of 6-bit number with time-assisted Newton's method
+;; Subroutine: calculate sqrt of 6-bit number in O(1), with time-assisted Newton's method
 ; Inputs:
 ;   a = number
 ;   flag C = msb of number
 ; Locals:
 ;   bl = guess_{i}
 ;   cl = guess_{i+1}
-;   bh = lsb of input number
-;   ch = scratch space
+;   bh = scratch space
+;   ch = store carry bit
 ; Outputs:
 ;   a = √ of input
 
@@ -215,44 +215,42 @@
 
 :newton
 
-	; Setup
-	mov a bh    ; bh ← a & 1
-	and #01 bh
+	; Stash carry bit
+	mov #00 ch
+	bcc +1
+	mov #01 ch
 
 	; Initial guess: b = input' = input / 2
-	lsr a     ; bl ← a ← a/2
 	mov a bl
+	lsr bl     ; bl ← a ← a/2
 
 	; √0 = 0, √1 = 1
-	bne +2
-	mov bh a
+	bne +1
 	ret
 
-	; Improved guess: c = (b + input / b) / 2 
-	;                   = (b + input' / b * 2 + (input' % b * 2 + bh) / b) / 2
+	; Restore carry bit
 	clc
-	mov a cl   ; 3rd term: (a % bl * 2 + bh) / b
-	mod bl cl
-	lsl cl
+	mov ch ch
+	beq +1
+	sec
+
+	; Improved guess: c = (b + input / b) / 2 
+	mov bl cl
+	mov a bh
+	div bl bh
 	add bh cl
-	div bl cl
-	mov a ch   ; 2nd term: a / bl * 2
-	div bl ch
-	lsl ch
-	add ch cl
-	add bl cl  ; 1st term: bl
-	lsr cl     ; div everything by 2
+	lsr cl
 
 	; c = min(b,c), needed for corner case where input is 1 less than a perfect square
 	cmp bl cl
 	bmi +2
 	mov bl cl
-	bne +2  ;
-	nop     ; Needs these nop to ensure same time of execution of both branches
+	bne +2  ; Needs these nop to ensure same time of execution of both branches, 
+	nop     ; and thus avoid temporal inconsistencies.
 	nop     ; 
 
 	; Put back the improved guess as the initial guess
-	mov cl bl@-16
+	mov cl bl@-10
 
 	; Return result through a
 	mov bl a
@@ -290,15 +288,15 @@
 
 	; Self-modifying code, handle with care!
 	beq +5
-	mov #13 %2e09  ; l→r
-	mov #12 %3309
-	mov #11 %130a
-	mov #10 %180a
+	mov #13 %1d09  ; l→r
+	mov #12 %2209
+	mov #11 %020a
+	mov #10 %070a
 	bne +4
-	mov #10 %2e09  ; r→l
-	mov #11 %3309
-	mov #12 %130a
-	mov #13 %180a
+	mov #10 %1d09  ; r→l
+	mov #11 %2209
+	mov #12 %020a
+	mov #13 %070a
 
 	mov %3f00 bh
 	mov %3f00 bl
