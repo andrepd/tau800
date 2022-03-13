@@ -29,10 +29,22 @@ fn main() -> std::io::Result<()> {
     let mut io_modules =
         ModuleCollection::new(vec![Box::new(&mut clock_module), Box::new(&mut display_module)]);
 
-    // Emulation
+    // Compilation
 
     let mut universe = Universe::new();
     assembler::assemble_into(universe.now_mut(), buffer.as_str());
+
+    // For printing the punch cards: write the compiled program in binary to a file
+    // Do this if the PUNCHCARD env. variable is set.
+    if let Ok(_) = std::env::var("PUNCHCARD") {
+        for word in universe.now().ram.0.iter() {
+            println!("{:06b}" ,word.value);
+        }
+        return Ok(()); // Exit(0)
+    }
+
+    // Emulation
+
     io_modules.run(&mut universe);
 
     for t in 0.. {

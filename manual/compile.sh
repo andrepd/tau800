@@ -7,6 +7,6 @@ function borkify {
 set -e # abort on any error
 mkdir -p out
 latexmk -output-directory=out -pdf document.tex $@
-borkify "out/document.pdf" "out/document-scan.pdf"
-borkify "out/document-scan.pdf" "out/document-scan.pdf"
-borkify "out/document-scan.pdf" "out/document-scan.pdf"
+#borkify "out/document.pdf" "out/document-scan.pdf"
+#borkify "out/document-scan.pdf" "out/document-scan.pdf"
+#borkify "out/document-scan.pdf" "out/document-scan.pdf"
