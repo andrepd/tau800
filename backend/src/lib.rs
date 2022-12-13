@@ -10,6 +10,7 @@ use std::thread;
 use crate::emu::assembler;
 use crate::emu::modules::{ClockModule, DisplayModule, ModuleCollection};
 use crate::emu::universe::Universe;
+use crate::emu::interpreter;
 
 mod emu;
 
