@@ -224,25 +224,28 @@ impl Operand {
             Reg(y) => {
                 m.write_pc(mode(0x0, time_flag));
                 write_register(m, &y);
+                if time_flag { write_time(m, &x.time) };
             }
             Abs(y) => {
                 m.write_pc(mode(0x1, time_flag));
                 write_address(m, &y);
+                if time_flag { write_time(m, &x.time) };
             }
             Ind(y) => {
                 m.write_pc(mode(0x2, time_flag));
                 write_address(m, &y);
+                if time_flag { write_time(m, &x.time) };
             }
             Abx(y) => {
                 m.write_pc(mode(0x3, time_flag));
                 write_address(m, &y);
+                if time_flag { write_time(m, &x.time) };
             }
             Imm(y) => {
-                m.write_pc(mode(0x4, false));
+                m.write_pc(mode(0x4, time_flag));
                 write_word(m, &y);
             }
         };
-        if time_flag { write_time(m, &x.time) };
     }
 }
 
@@ -277,21 +280,19 @@ impl Operands {
         };
         m.write_pc(UWord::from(mode));
         match &x.src.op {
-            Reg(y) => write_register(m, &y),
-            Abs(y) => write_address(m, &y),
-            Ind(y) => write_address(m, &y),
-            Abx(y) => write_address(m, &y),
+            Reg(y) => { write_register(m, &y); if time_flag { write_time(m, &x.src.time) } }
+            Abs(y) => { write_address(m, &y);  if time_flag { write_time(m, &x.src.time) } }
+            Ind(y) => { write_address(m, &y);  if time_flag { write_time(m, &x.src.time) } }
+            Abx(y) => { write_address(m, &y);  if time_flag { write_time(m, &x.src.time) } }
             Imm(y) => write_word(m, &y),
         };
-        if time_flag { write_time(m, &x.src.time) };
         match &x.dst.op {
-            Reg(y) => write_register(m, &y),
-            Abs(y) => write_address(m, &y),
-            Ind(y) => write_address(m, &y),
-            Abx(y) => write_address(m, &y),
+            Reg(y) => { write_register(m, &y); if time_flag { write_time(m, &x.dst.time) } }
+            Abs(y) => { write_address(m, &y);  if time_flag { write_time(m, &x.dst.time) } }
+            Ind(y) => { write_address(m, &y);  if time_flag { write_time(m, &x.dst.time) } }
+            Abx(y) => { write_address(m, &y);  if time_flag { write_time(m, &x.dst.time) } }
             Imm(y) => write_word(m, &y),
         };
-        if time_flag { write_time(m, &x.dst.time) };
     }
 }
 

@@ -29,7 +29,7 @@ def words_line(str):
 	elif op in ['bcc','bcs','bne','beq','bpl','bmi']:
 		return 1+1
 	else:
-		return 2 + sum(words_arg(x) for x in args) + len(args)*('@' in str)
+		return 2 + sum(words_arg(x) for x in args) + sum(1 for x in args if '#' not in x)*('@' in str)
 
 cursor = 0x80
 labels = {}
