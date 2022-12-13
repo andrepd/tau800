@@ -11,6 +11,11 @@ pub const WORD_SIZE: usize = 6;
 pub const MAX_UNSIGNED_VALUE: u8 = (1 << WORD_SIZE) as u8 - 1;
 pub const MAX_SIGNED_VALUE: i8 = (1 << (WORD_SIZE - 1)) as i8 - 1;
 pub const MIN_SIGNED_VALUE: i8 = -MAX_SIGNED_VALUE - 1;
+
+pub const MAX_UNSIGNED_DOUBLE: u16 = (1 << (2*WORD_SIZE)) as u16 - 1;
+pub const MAX_SIGNED_DOUBLE: i16 = (1 << (2*WORD_SIZE - 1)) as i16 - 1;
+pub const MIN_SIGNED_DOUBLE: i16 = -MAX_SIGNED_DOUBLE - 1;
+
 pub const SIGN_BIT: u8 = (1 << WORD_SIZE) as u8;
 
 pub mod sig {
@@ -28,10 +33,7 @@ pub mod sig {
 #[derive(Clone, Copy)]
 /// A value with `WORD_SIZE` bits, that can represent a signed or unsigned bit,
 /// as indicated by the `Signature` type.
-pub struct Word<S>
-where
-    S: sig::Signature,
-{
+pub struct Word<S: Signature> {
     pub value: u8,
     pub phantom: PhantomData<S>,
 }
@@ -48,10 +50,9 @@ impl<S: Signature> PartialEq for Word<S> {
     }
 }
 
-impl<S> Word<S>
-where
-    S: sig::Signature,
-{
+impl<S: Signature> Eq for Word<S> {}
+
+impl<S: Signature> Word<S> {
     pub fn zero() -> Self {
         Self {
             value: 0,
@@ -67,14 +68,13 @@ where
 }
 
 /// All words are by default initialized to zero.
-impl<S> Default for Word<S>
-where
-    S: sig::Signature,
-{
+impl<S: Signature> Default for Word<S> {
     fn default() -> Self {
         Self::zero()
     }
 }
+
+//
 
 pub type UWord = Word<sig::Unsigned>;
 pub type IWord = Word<sig::Signed>;
@@ -96,12 +96,7 @@ impl Word<sig::Unsigned> {
 
 impl From<u8> for Word<sig::Unsigned> {
     fn from(value: u8) -> Self {
-        debug_assert!(
-            value <= MAX_UNSIGNED_VALUE,
-            "Value ${:x} is > ${:x}",
-            value,
-            MAX_UNSIGNED_VALUE
-        );
+        debug_assert_le!(value, MAX_UNSIGNED_VALUE);
         Word {
             value,
             phantom: PhantomData::default(),
@@ -133,13 +128,8 @@ impl Word<sig::Signed> {
 
 impl From<i8> for Word<sig::Signed> {
     fn from(value: i8) -> Self {
-        debug_assert!(
-            MIN_SIGNED_VALUE <= value && value <= MAX_SIGNED_VALUE,
-            "Value {} isn't in {} – {}",
-            value,
-            MIN_SIGNED_VALUE,
-            MAX_SIGNED_VALUE
-        );
+        debug_assert_le!(MIN_SIGNED_VALUE, value);
+        debug_assert_le!(value, MAX_SIGNED_VALUE);
 
         let negative = value < 0;
         let abs = value.abs() as u8;
@@ -167,38 +157,14 @@ impl From<Word<sig::Signed>> for i8 {
     }
 }
 
-// Long word:
+//
 
 #[derive(Debug, Clone, Copy)]
 /// A "word" that actually consists of two `Words`, representing high-value bits
 /// and low-value bits.
-///
-/// Although the type admits `word::Signed` and `word::Unsigned` variants, the
-/// `word::Signed` variant does not implement a conversion into a value, because
-/// both (high and low) words are required to have the same signature, and so the
-/// sign of the value is not well defined.
-pub struct LongWord<S>
-where
-    S: sig::Signature,
-{
+pub struct LongWord<S: Signature> {
     pub high: Word<S>,
-    pub low: Word<S>,
-}
-
-impl<S> LongWord<S>
-where
-    S: sig::Signature,
-{
-    pub fn from_words(high: Word<S>, low: Word<S>) -> Self {
-        LongWord { high, low }
-    }
-
-    pub fn zero() -> Self {
-        LongWord {
-            high: Word::<S>::zero(),
-            low: Word::<S>::zero(),
-        }
-    }
+    pub low: Word<sig::Unsigned>,
 }
 
 impl<S: Signature> PartialEq for LongWord<S> {
@@ -207,38 +173,22 @@ impl<S: Signature> PartialEq for LongWord<S> {
     }
 }
 
-pub type ULongWord = LongWord<sig::Unsigned>;
+impl<S: Signature> Eq for LongWord<S> {}
 
-impl LongWord<sig::Unsigned> {
-    pub fn value(self) -> u16 {
-        (u8::from(self.low) as u16) + ((u8::from(self.high) as u16) << WORD_SIZE)
+impl<S: Signature> LongWord<S> {
+    pub fn from_words(high: Word<S>, low: Word<sig::Unsigned>) -> Self {
+        LongWord { high, low }
     }
-}
 
-impl From<u16> for LongWord<sig::Unsigned> {
-    fn from(x: u16) -> Self {
-        debug_assert!(x < 1 << (2 * WORD_SIZE));
-        let (high, low) = div_rem(x, (MAX_UNSIGNED_VALUE + 1) as u16);
+    pub fn zero() -> Self {
         LongWord {
-            high: u8::into(high as u8),
-            low: u8::into(low as u8),
+            high: Word::<S>::zero(),
+            low: Word::<sig::Unsigned>::zero(),
         }
     }
 }
 
-impl From<LongWord<sig::Unsigned>> for u16 {
-    fn from(word: LongWord<sig::Unsigned>) -> Self {
-        word.value()
-    }
-}
-
-impl Into<usize> for LongWord<sig::Unsigned> {
-    fn into(self) -> usize {
-        self.value() as usize
-    }
-}
-
-impl Default for LongWord<sig::Unsigned> {
+impl<S: Signature> Default for LongWord<S> {
     fn default() -> Self {
         Self {
             high: Default::default(),
@@ -247,7 +197,76 @@ impl Default for LongWord<sig::Unsigned> {
     }
 }
 
-impl std::ops::Add<Word<sig::Unsigned>> for LongWord<sig::Unsigned> {
+// Implementations for unsigned long words
+
+pub type ULongWord = LongWord<sig::Unsigned>;
+
+impl ULongWord {
+    pub fn value(self) -> u16 {
+        (u8::from(self.low) as u16) + ((u8::from(self.high) as u16) << WORD_SIZE)
+    }
+}
+
+impl From<u16> for ULongWord {
+    fn from(x: u16) -> Self {
+        debug_assert_le!(x, MAX_UNSIGNED_DOUBLE);
+        let (high, low) = div_rem(x, (MAX_UNSIGNED_VALUE + 1) as u16);
+        LongWord {
+            high: u8::into(high as u8),
+            low: u8::into(low as u8),
+        }
+    }
+}
+
+impl From<ULongWord> for u16 {
+    fn from(word: ULongWord) -> Self {
+        word.value()
+    }
+}
+
+impl Into<usize> for ULongWord {
+    fn into(self) -> usize {
+        self.value() as usize
+    }
+}
+
+// Implementations for signed long words
+
+pub type ILongWord = LongWord<sig::Signed>;
+
+impl ILongWord {
+    pub fn value(self) -> i16 {
+        (u8::from(self.low) as i16) + ((i8::from(self.high) as i16) << WORD_SIZE)
+    }
+}
+
+impl From<i16> for ILongWord {
+    fn from(x: i16) -> Self {
+        debug_assert_le!(MIN_SIGNED_DOUBLE, x);
+        debug_assert_le!(x, MAX_SIGNED_DOUBLE);
+        let (high, low) = div_rem(x, (MAX_UNSIGNED_VALUE + 1) as i16);
+        LongWord {
+            high: i8::into(high as i8),
+            low: u8::into(low as u8),
+        }
+    }
+}
+
+impl From<ILongWord> for i16 {
+    fn from(word: ILongWord) -> Self {
+        word.value()
+    }
+}
+
+impl Into<isize> for ILongWord {
+    fn into(self) -> isize {
+        self.value() as isize
+    }
+}
+
+// Operations
+
+impl std::ops::Add<Word<sig::Unsigned>> for ULongWord {
     type Output = Self;
 
     fn add(self, other: Word<sig::Unsigned>) -> Self {
@@ -259,7 +278,7 @@ impl std::ops::Add<Word<sig::Unsigned>> for LongWord<sig::Unsigned> {
     }
 }
 
-impl std::ops::Add<Word<sig::Signed>> for LongWord<sig::Unsigned> {
+impl std::ops::Add<Word<sig::Signed>> for ULongWord {
     type Output = Self;
 
     fn add(self, other: Word<sig::Signed>) -> Self {
@@ -303,7 +322,7 @@ impl CheckedIncrement for Word<sig::Unsigned> {
     }
 }
 
-impl CheckedIncrement for LongWord<sig::Unsigned> {
+impl CheckedIncrement for ULongWord {
     fn try_increment(&mut self) -> Result<(), ()> {
         if self.low.try_increment().is_ok() {
             Ok(())
@@ -314,5 +333,4 @@ impl CheckedIncrement for LongWord<sig::Unsigned> {
     }
 }
 
-pub static UZERO: UWord = UWord { value: 0, phantom: std::marker::PhantomData::<sig::Unsigned> };  // sim sim mike, rust é legível
-// let zero: UWord.t = UWord.make 0
+pub static UZERO: UWord = UWord::default();

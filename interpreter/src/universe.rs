@@ -1,7 +1,8 @@
 use super::prelude::*;
+
 use std::collections::VecDeque;
 
-const MAX_WINDOW: usize = 200;
+const MAX_WINDOW: usize = 4 * (MAX_SIGNED_DOUBLE as usize);
 
 /// Represents a timeline slice starting at time t0
 #[derive(Debug, Clone)]
@@ -10,10 +11,10 @@ pub struct Timeline {
     states: VecDeque<Machine>, 
 }
 
-impl std::ops::Add<&IWord> for usize {
+impl std::ops::Add<&ILongWord> for usize {
     type Output = Self;
 
-    fn add(self, other: &IWord) -> Self {
+    fn add(self, other: &ILongWord) -> Self {
         (self as isize + other.value() as isize) as usize
     }
 }

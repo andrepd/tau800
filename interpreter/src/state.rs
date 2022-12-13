@@ -21,7 +21,8 @@ impl From<Flag> for u8 {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy)]
+#[derive(PartialEq, Eq)]
 pub struct FlagWord {
     pub word: UWord,
 }
@@ -54,6 +55,7 @@ impl FlagWord {
 pub type Address = ULongWord;
 
 #[derive(Debug, Clone)]
+#[derive(PartialEq, Eq)]
 pub struct Cpu {
     pub a: UWord,
     pub flags: FlagWord,
@@ -64,20 +66,6 @@ pub struct Cpu {
     pub x: UWord,
     pub sp: Address,
     pub pc: Address,
-}
-
-impl PartialEq for Cpu {
-    fn eq(&self, other: &Self) -> bool {
-        self.a == other.a
-            && self.flags == other.flags
-            && self.bh == other.bh
-            && self.bl == other.bl
-            && self.ch == other.ch
-            && self.cl == other.cl
-            && self.x == other.x
-            && self.sp == other.sp
-            && self.pc == other.pc
-    }
 }
 
 impl Default for Cpu {

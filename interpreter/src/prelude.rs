@@ -1,3 +1,5 @@
+pub(super) use more_asserts::*;
+
 pub(super) use super::word::*;
 pub(super) use super::state::*;
 pub(super) use super::machine::Machine;

@@ -1,5 +1,6 @@
 use super::prelude::*;
 
+/// Addressable registers
 #[derive(Debug, Clone)]
 pub enum Register {
     A,
@@ -12,20 +13,21 @@ pub enum Register {
     // SP,
 }
 
+/// An operand T at a given time offset
 #[derive(Debug, Clone)]
-/// An object referencing an operand at a time different from the call
 pub struct Timed<T> {
     pub op: T,
     /// Relative time of operation (w.r.t. call)
-    pub time: IWord,
+    pub time: ILongWord,
 }
 
 impl<T> Timed<T> {
-    pub fn new(op: T, time: IWord) -> Self {
+    pub fn new(op: T, time: ILongWord) -> Self {
         Timed { op, time }
     }
 }
 
+/// The basic addressing modes
 #[derive(Debug, Clone)]
 pub enum Op {
     /// Named register
@@ -44,15 +46,10 @@ pub enum Op {
     Inr(Timed<Register>),*/
 }
 
+/// The argument of an instruction that takes one operand
 pub type Operand = Timed<Op>;
 
-// You can match on structs in Rust. If you want to check for, for example, ImmReg,
-// you can accomplish this with
-//
-//      match ops {
-//          Operands { src: Imm(src), reg: Reg(reg) } => ...,
-//          _ => ...
-//      }
+/// The argument of an instruction that takes two operands
 #[derive(Debug, Clone)]
 pub struct Operands {
     pub src: Operand,
@@ -65,11 +62,15 @@ impl Operands {
     }
 }
 
+/// The argument of an instruction that a pc offset
 pub type Offset = IWord;
+
+//
 
 #[derive(Debug, Clone)]
 pub enum Instruction {
     Mov(Operands),
+    /*Xch(Operands),*/
     Psh(Operand),
     Pop(Operand),
 
@@ -87,9 +88,9 @@ pub enum Instruction {
     Or(Operands),
     Xor(Operands),
     Not(Operand),
-
     Lsl(Operand),
     Lsr(Operand),
+    Asr(Operand),
 
     Inc(Operand),
     Dec(Operand),
@@ -116,7 +117,8 @@ pub enum Instruction {
     Hcf,
 }
 
-/// Read a timed register from the RAM.
+//
+
 fn read_register(m: &mut Machine) -> Register {
     use Register::*;
     match m.read_pc().value() {
@@ -132,23 +134,29 @@ fn read_register(m: &mut Machine) -> Register {
     }
 }
 
-/// Read a literal word from the RAM at pc.
 fn read_word(m: &mut Machine) -> UWord {
     m.read_pc()
 }
 
-/// Read a timed address from the RAM.
 fn read_address(m: &mut Machine) -> Address {
     let low = m.read_pc();
     let high = m.read_pc();
     Address { low, high }
 }
 
-fn read_time(m: &mut Machine) -> IWord {
+fn read_offset(m: &mut Machine) -> Offset {
     m.read_pc().cast_to_signed()
 }
 
-fn write_register(m: &mut Machine, x: &Register) -> () {
+fn read_time(m: &mut Machine) -> ILongWord {
+    let low = m.read_pc();
+    let high = m.read_pc().cast_to_signed();    
+    ILongWord { low, high }
+}
+
+//
+
+fn write_register(m: &mut Machine, x: &Register) {
     use Op::*;
     use Register::*;
     match x {
@@ -163,18 +171,25 @@ fn write_register(m: &mut Machine, x: &Register) -> () {
     }
 }
 
-fn write_word(m: &mut Machine, x: &UWord) -> () {
+fn write_word(m: &mut Machine, x: &UWord) {
     m.write_pc(*x)
 }
 
-fn write_address(m: &mut Machine, x: &Address) -> () {
+fn write_address(m: &mut Machine, x: &Address) {
     m.write_pc(x.low);
     m.write_pc(x.high);
 }
 
-fn write_time(m: &mut Machine, x: &IWord) -> () {
-    m.write_pc(x.cast_to_unsigned());
+fn write_offset(m: &mut Machine, x: &Offset) {
+    m.write_pc(x.cast_to_unsigned())
 }
+
+fn write_time(m: &mut Machine, x: &ILongWord) {
+    m.write_pc(x.low);
+    m.write_pc(x.high.cast_to_unsigned());
+}
+
+// 
 
 impl Operand {
     fn decode(m: &mut Machine, mode: UWord) -> Self {
@@ -280,25 +295,6 @@ impl Operands {
     }
 }
 
-fn address_decode(m: &mut Machine) -> Address {
-    let low = m.read_pc();
-    let high = m.read_pc();
-    Address { low, high }
-}
-
-fn offset_decode(m: &mut Machine) -> Offset {
-    m.read_pc().cast_to_signed()
-}
-
-fn address_encode(m: &mut Machine, x: &Address) {
-    m.write_pc(x.low);
-    m.write_pc(x.high);
-}
-
-fn offset_encode(m: &mut Machine, x: &Offset) {
-    m.write_pc(x.cast_to_unsigned())
-}
-
 impl Instruction {
     pub fn decode(m: &mut Machine) -> Self {
         use Instruction::*;
@@ -307,52 +303,54 @@ impl Instruction {
         match opcode.value() {
             0x00 => Nop, 
             0x01 => { let mode = m.read_pc(); Mov(Operands::decode(m, mode)) },
-            0x02 => { let mode = m.read_pc(); Psh(Operand::decode(m, mode))  },
-            0x03 => { let mode = m.read_pc(); Pop(Operand::decode(m, mode))  },
-            0x04 => { let mode = m.read_pc(); Add(Operands::decode(m, mode)) },
-            0x05 => { let mode = m.read_pc(); Sub(Operands::decode(m, mode)) },
-            0x06 => { let mode = m.read_pc(); Mul(Operands::decode(m, mode)) },
-            0x20 => { let mode = m.read_pc(); Muh(Operands::decode(m, mode)) },
-            0x07 => { let mode = m.read_pc(); Mus(Operands::decode(m, mode)) },
-            0x08 => { let mode = m.read_pc(); Div(Operands::decode(m, mode)) },
-            0x0a => { let mode = m.read_pc(); Mod(Operands::decode(m, mode)) },
-            0x0c => { let mode = m.read_pc(); And(Operands::decode(m, mode)) },
-            0x0d => { let mode = m.read_pc(); Or (Operands::decode(m, mode)) },
-            0x0e => { let mode = m.read_pc(); Xor(Operands::decode(m, mode)) },
-            0x0f => { let mode = m.read_pc(); Not(Operand::decode(m, mode))  },
-            0x10 => { let mode = m.read_pc(); Lsl(Operand::decode(m, mode))  },
-            0x11 => { let mode = m.read_pc(); Lsr(Operand::decode(m, mode))  },
-            0x23 => { let mode = m.read_pc(); Inc(Operand::decode(m, mode))  },
-            0x24 => { let mode = m.read_pc(); Dec(Operand::decode(m, mode))  },
-            0x12 => { let mode = m.read_pc(); Cmp(Operands::decode(m, mode))  },
-            0x13 => { let mode = m.read_pc(); Bit(Operands::decode(m, mode))  },
-            0x14 => Jmp(address_decode(m)),
-            0x15 => Bcc(offset_decode(m)),
-            0x16 => Bcs(offset_decode(m)),
-            0x17 => Bne(offset_decode(m)),
-            0x18 => Beq(offset_decode(m)),
-            0x19 => Bpl(offset_decode(m)),
-            0x1a => Bmi(offset_decode(m)),
-            0x1d => Cal(address_decode(m)),
-            0x21 => Clc,
-            0x22 => Sec,
+            /*0x02 => { let mode = m.read_pc(); Xch(Operands::decode(m, mode)) },*/
+            0x03 => { let mode = m.read_pc(); Psh(Operand::decode(m, mode))  },
+            0x04 => { let mode = m.read_pc(); Pop(Operand::decode(m, mode))  },
+            0x10 => { let mode = m.read_pc(); Add(Operands::decode(m, mode)) },
+            0x11 => { let mode = m.read_pc(); Sub(Operands::decode(m, mode)) },
+            0x12 => { let mode = m.read_pc(); Mul(Operands::decode(m, mode)) },
+            0x13 => { let mode = m.read_pc(); Muh(Operands::decode(m, mode)) },
+            0x14 => { let mode = m.read_pc(); Mus(Operands::decode(m, mode)) },
+            0x15 => { let mode = m.read_pc(); Div(Operands::decode(m, mode)) },
+            0x16 => { let mode = m.read_pc(); Mod(Operands::decode(m, mode)) },
+            0x17 => { let mode = m.read_pc(); And(Operands::decode(m, mode)) },
+            0x18 => { let mode = m.read_pc(); Or (Operands::decode(m, mode)) },
+            0x19 => { let mode = m.read_pc(); Xor(Operands::decode(m, mode)) },
+            0x1a => { let mode = m.read_pc(); Not(Operand::decode(m, mode))  },
+            0x1b => { let mode = m.read_pc(); Lsl(Operand::decode(m, mode))  },
+            0x1c => { let mode = m.read_pc(); Lsr(Operand::decode(m, mode))  },
+            0x1d => { let mode = m.read_pc(); Asr(Operand::decode(m, mode))  },
+            0x1e => { let mode = m.read_pc(); Inc(Operand::decode(m, mode))  },
+            0x1f => { let mode = m.read_pc(); Dec(Operand::decode(m, mode))  },
+            0x20 => { let mode = m.read_pc(); Cmp(Operands::decode(m, mode)) },
+            0x21 => { let mode = m.read_pc(); Bit(Operands::decode(m, mode)) },
+            0x30 => Jmp(read_address(m)),
+            0x31 => Bcc(read_offset(m)),
+            0x32 => Bcs(read_offset(m)),
+            0x33 => Bne(read_offset(m)),
+            0x34 => Beq(read_offset(m)),
+            0x35 => Bpl(read_offset(m)),
+            0x36 => Bmi(read_offset(m)),
+            0x37 => Cal(read_address(m)),
+            0x38 => Clc,
+            0x39 => Sec,
             0x3e => Hcf,
             0x3f => Ret,
-            _ => unreachable!(),
+            _ => panic!("Invalid instruction {:x} at {:x}.", opcode.value(), m.cpu.pc.value() - 1),
         }
     }
 
-    pub fn encode(m: &mut Machine, instruction: &Instruction) -> () {
+    pub fn encode(m: &mut Machine, instruction: &Instruction) {
         use Instruction::*;
         match instruction {
             Nop => {
                 m.write_pc(UWord::from(0x00));
             }
             Clc => {
-                m.write_pc(UWord::from(0x21));
+                m.write_pc(UWord::from(0x38));
             }
             Sec => {
-                m.write_pc(UWord::from(0x22));
+                m.write_pc(UWord::from(0x39));
             }
             Hcf => {
                 m.write_pc(UWord::from(0x3e));
@@ -364,113 +362,121 @@ impl Instruction {
                 m.write_pc(UWord::from(0x01));
                 Operands::encode(m, ops);
             }
-            Psh(op) => {
+            /*Xch(ops) => {
                 m.write_pc(UWord::from(0x02));
-                Operand::encode(m, op);
-            }
-            Pop(op) => {
+                Operands::encode(m, ops);
+            }*/
+            Psh(op) => {
                 m.write_pc(UWord::from(0x03));
                 Operand::encode(m, op);
             }
-            Add(ops) => {
+            Pop(op) => {
                 m.write_pc(UWord::from(0x04));
+                Operand::encode(m, op);
+            }
+            Add(ops) => {
+                m.write_pc(UWord::from(0x10));
                 Operands::encode(m, ops);
             }
             Sub(ops) => {
-                m.write_pc(UWord::from(0x05));
+                m.write_pc(UWord::from(0x11));
                 Operands::encode(m, ops);
             }
             Mul(ops) => {
-                m.write_pc(UWord::from(0x06));
+                m.write_pc(UWord::from(0x12));
                 Operands::encode(m, ops);
             }
             Muh(ops) => {
-                m.write_pc(UWord::from(0x20));
+                m.write_pc(UWord::from(0x13));
                 Operands::encode(m, ops);
             }
             Mus(ops) => {
-                m.write_pc(UWord::from(0x07));
+                m.write_pc(UWord::from(0x14));
                 Operands::encode(m, ops);
             }
             Div(ops) => {
-                m.write_pc(UWord::from(0x08));
+                m.write_pc(UWord::from(0x15));
                 Operands::encode(m, ops);
             }
             Mod(ops) => {
-                m.write_pc(UWord::from(0x0a));
+                m.write_pc(UWord::from(0x16));
                 Operands::encode(m, ops);
             }
             And(ops) => {
-                m.write_pc(UWord::from(0x0c));
+                m.write_pc(UWord::from(0x17));
                 Operands::encode(m, ops);
             }
             Or(ops) => {
-                m.write_pc(UWord::from(0x0d));
+                m.write_pc(UWord::from(0x18));
                 Operands::encode(m, ops);
             }
             Xor(ops) => {
-                m.write_pc(UWord::from(0x0e));
+                m.write_pc(UWord::from(0x19));
                 Operands::encode(m, ops);
             }
             Not(op) => {
-                m.write_pc(UWord::from(0x0f));
+                m.write_pc(UWord::from(0x1a));
                 Operand::encode(m, op);
             }
             Lsl(op) => {
-                m.write_pc(UWord::from(0x10));
+                m.write_pc(UWord::from(0x1b));
                 Operand::encode(m, op);
             }
             Lsr(op) => {
-                m.write_pc(UWord::from(0x11));
+                m.write_pc(UWord::from(0x1c));
+                Operand::encode(m, op);
+            }
+            Asr(op) => {
+                m.write_pc(UWord::from(0x1d));
                 Operand::encode(m, op);
             }
             Inc(op) => {
-                m.write_pc(UWord::from(0x23));
+                m.write_pc(UWord::from(0x1e));
                 Operand::encode(m, op);
             }
             Dec(op) => {
-                m.write_pc(UWord::from(0x24));
+                m.write_pc(UWord::from(0x1f));
                 Operand::encode(m, op);
             }
             Cmp(op) => {
-                m.write_pc(UWord::from(0x12));
+                m.write_pc(UWord::from(0x20));
                 Operands::encode(m, op);
             }
             Bit(op) => {
-                m.write_pc(UWord::from(0x13));
+                m.write_pc(UWord::from(0x21));
                 Operands::encode(m, op);
             }
             Jmp(x) => {
-                m.write_pc(UWord::from(0x14));
-                address_encode(m, x);
+                m.write_pc(UWord::from(0x30));
+                write_address(m, x);
             }
             Bcc(x) => {
-                m.write_pc(UWord::from(0x15));
-                offset_encode(m, x);
+                m.write_pc(UWord::from(0x31));
+                write_offset(m, x);
             }
             Bcs(x) => {
-                m.write_pc(UWord::from(0x16));
-                offset_encode(m, x);
+                m.write_pc(UWord::from(0x32));
+                write_offset(m, x);
             }
             Bne(x) => {
-                m.write_pc(UWord::from(0x17));
-                offset_encode(m, x);
+                m.write_pc(UWord::from(0x33));
+                write_offset(m, x);
             }
             Beq(x) => {
-                m.write_pc(UWord::from(0x18));
-                offset_encode(m, x);
+                m.write_pc(UWord::from(0x34));
+                write_offset(m, x);
             }
             Bpl(x) => {
-                m.write_pc(UWord::from(0x19));
-                offset_encode(m, x);
+                m.write_pc(UWord::from(0x35));
+                write_offset(m, x);
             }
             Bmi(x) => {
-                m.write_pc(UWord::from(0x1a));
-                offset_encode(m, x);
+                m.write_pc(UWord::from(0x36));
+                write_offset(m, x);
             }
             Cal(x) => {
-                m.write_pc(UWord::from(0x1d));
-                address_encode(m, x);
+                m.write_pc(UWord::from(0x37));
+                write_address(m, x);
             }
         }
     }

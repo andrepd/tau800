@@ -284,6 +284,13 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
             mk_mref(state, &x, word);
             set_flag_nvz(state.now_mut(), &word);
         }
+        Instruction::Asr(x) => {
+            let carry = 0b00100000 * u8::from(get_flag_c(state.now()));
+            let result = (mk_ref(state, &x).cast_to_signed().value() >> 1) as u8 + carry;
+            let word = UWord::from(result & 0b00111111);
+            mk_mref(state, &x, word);
+            set_flag_nvz(state.now_mut(), &word);
+        }
         Instruction::Inc(x) => {
             let result = mk_ref(state, &x).value() + 1;
             let word = UWord::from(result & 0b00111111);
