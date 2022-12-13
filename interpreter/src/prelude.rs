@@ -1,8 +1,7 @@
 pub(super) use more_asserts::*;
 
 pub(super) use super::word::*;
-pub(super) use super::state::*;
-pub(super) use super::machine::Machine;
+pub(super) use super::machine::*;
 pub(super) use super::instruction::{Instruction, Op, Operand, Operands, Register};
 pub(super) use super::universe::{Universe, Mode};
 
