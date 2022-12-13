@@ -1,3 +1,7 @@
+/// External modules that interact with the machine via mem-mapped IO
+
+use super::prelude::*;
+
 use std::{
     error::Error,
     fmt::{Debug, Display},
@@ -5,8 +9,6 @@ use std::{
 };
 
 use chrono::{Local, Timelike};
-
-use super::{universe::Universe, word::UWord};
 
 pub trait Module: Debug {
     /// Number of words this module writes to memory.
@@ -58,6 +60,7 @@ impl Module for ClockModule {
     }
 }
 
+/// A module that reads a 4-digit seven-segment display from memory.
 #[derive(Debug)]
 pub struct DisplayModule {
     pub hours: String,
@@ -72,17 +75,17 @@ impl DisplayModule {
     }
 
     fn read_seven_segment(bits: &[bool]) -> char {
-        let number = match &bits[..] {
-            [true, true, true, true, true, true, false] => '0',
-            [false, false, true, false, false, true, false] => '1',
-            [false, true, true, true, true, false, true] => '2',
-            [false, true, true, false, true, true, true] => '3',
-            [true, false, true, false, false, true, true] => '4',
-            [true, true, false, false, true, true, true] => '5',
-            [true, true, false, true, true, true, true] => '6',
-            [false, true, true, false, false, true, false] => '7',
-            [true, true, true, true, true, true, true] => '8',
-            [true, true, true, false, true, true, true] => '9',
+        match &bits[..] {
+            [true,  true,  true,  true,  true,  true,  false] => '0',
+            [false, false, true,  false, false, true,  false] => '1',
+            [false, true,  true,  true,  true,  false, true ] => '2',
+            [false, true,  true,  false, true,  true,  true ] => '3',
+            [true,  false, true,  false, false, true,  true ] => '4',
+            [true,  true,  false, false, true,  true,  true ] => '5',
+            [true,  true,  false, true,  true,  true,  true ] => '6',
+            [false, true,  true,  false, false, true,  false] => '7',
+            [true,  true,  true,  true,  true,  true,  true ] => '8',
+            [true,  true,  true,  false, true,  true,  true ] => '9',
             bits => {
                 // Return garbage for visual effect;
                 // we convert the boolean values to an equivalent binary number,
@@ -94,12 +97,10 @@ impl DisplayModule {
                         acc
                     }
                 });
-                const ALPHABET: &'static str = "abcd";
+                const ALPHABET: &'static str = "x%@#";
                 ALPHABET.chars().nth(index % ALPHABET.len()).unwrap()
             }
-        };
-
-        number
+        }
     }
 }
 
