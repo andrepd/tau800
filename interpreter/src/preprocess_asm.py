@@ -5,7 +5,7 @@ dbg = len(argv) > 1
 def lex(it):
 	for i in it:
 		i = i.split(';')[0].strip()
-		if i != '': yield i.tolower()
+		if i != '': yield i.lower()
 
 def to_le(x):
 	h,l = x // 0x40, x % 0x40
