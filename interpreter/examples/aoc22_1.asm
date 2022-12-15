@@ -2,6 +2,11 @@
 ;   - loop through array (of 4-word values) from %0030 to %3f3f
 ;   - for each block: sum the values, put into 4-th element of array starting at %0020, bubble sort high to low
 
+; Teste
+
+; Array inicial: __ 10 __ __ / 01 10 __ __ / 3f 0f __ __ / 0a 10 __ __ 
+; Array final:   0a 10 __ __ / 01 10 __ __ / __ 10 __ __ / 3f 0f __ __ 
+
 mov #00 %0020
 mov #10 %0120
 
@@ -15,15 +20,15 @@ mov #0a %0c20
 mov #10 %0d20
 
 mov #04 a
-
 cal bubble
+mov #04 a
 cal bubble
+mov #04 a
 cal bubble
+mov #04 a
 cal bubble
+mov #04 a
 cal bubble
-
-; initial: __ 10 __ __ / 01 10 __ __ / 3f 0f __ __ / 0a 10 __ __ 
-; final:   0a 10 __ __ / 01 10 __ __ / __ 10 __ __ / 3f 0f __ __ 
 
 hcf
 
