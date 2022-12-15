@@ -11,11 +11,8 @@ use std::{
 use chrono::{Local, Timelike};
 
 pub trait Module: Debug {
-    /// Number of words this module writes to memory.
-    fn size(&self) -> usize;
-
-    /// Update the mem-mapped memory.
-    fn run(&mut self, memory: &mut [UWord]) -> Result<(), Box<dyn Error>>;
+    /// Update the state.
+    fn run(&mut self, m: &mut Machine) -> Result<(), Box<dyn Error>>;
 }
 
 pub struct ModuleCollection<'a>(Vec<Box<&'a mut dyn Module>>);
@@ -26,13 +23,8 @@ impl<'a> ModuleCollection<'a> {
     }
 
     pub fn run(&mut self, universe: &mut Universe) {
-        let mut slice_start = 0x10;
         for module in self.0.iter_mut() {
-            let slice_length = module.size();
-            let memmap = &mut universe.now_mut().ram.0[slice_start..(slice_start + slice_length)];
-            println!("{:?}", slice_start..(slice_start + slice_length));
-            module.run(memmap).expect("Failed to run IO module.");
-            slice_start += slice_length;
+            module.run(universe.now_mut()).expect("Failed to run IO module.");
         }
     }
 }
@@ -43,16 +35,12 @@ impl<'a> ModuleCollection<'a> {
 pub struct ClockModule;
 
 impl Module for ClockModule {
-    fn size(&self) -> usize {
-        4
-    }
-
-    fn run(&mut self, memory: &mut [UWord]) -> Result<(), Box<dyn Error>> {
+    fn run(&mut self, m: &mut Machine) -> Result<(), Box<dyn Error>> {
         let now = Local::now();
         let hour = format!("{:0>2}", now.hour());
         let minute = format!("{:0>2}", now.minute());
         let digits = hour.chars().chain(minute.chars());
-        memory
+        m.ram.0[0x10..0x14]
             .iter_mut()
             .zip(digits)
             .for_each(|(p, s)| *p = UWord::from(s.to_digit(10).unwrap() as u8));
@@ -105,12 +93,8 @@ impl DisplayModule {
 }
 
 impl Module for DisplayModule {
-    fn size(&self) -> usize {
-        7
-    }
-
-    fn run(&mut self, memory: &mut [UWord]) -> Result<(), Box<dyn Error>> {
-        println!("{:?}", memory);
+    fn run(&mut self, m: &mut Machine) -> Result<(), Box<dyn Error>> {
+        let memory = &m.ram.0[0x14..0x14+7];
 
         let a = memory[0..7]
             .iter()
