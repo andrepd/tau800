@@ -1,6 +1,6 @@
 use crate::{
     instruction::Instruction,
-    modules::{ClockModule, DisplayModule, Module, ModuleCollection},
+    modules::{ClockModule, DisplayModule, DiskModule, Module, ModuleCollection},
 };
 use core::panic;
 use std::io::Read;
@@ -27,10 +27,19 @@ fn main() -> std::io::Result<()> {
     let mut io_modules = {
         let clock_module = ClockModule;
         let display_module = DisplayModule::new();
-        ModuleCollection::new(vec![
-            Box::new(clock_module), 
-            Box::new(display_module),
-        ])
+        if let Some(fname) = std::env::args().nth(1) {
+            let disk_module = DiskModule::new(fname).unwrap();
+            ModuleCollection::new(vec![
+                Box::new(clock_module), 
+                Box::new(display_module),
+                Box::new(disk_module),
+            ])
+        } else {
+            ModuleCollection::new(vec![
+                Box::new(clock_module), 
+                Box::new(display_module),
+            ])
+        }
     };
 
     // Compilation

@@ -40,7 +40,7 @@ impl Module for ClockModule {
         let hour = format!("{:0>2}", now.hour());
         let minute = format!("{:0>2}", now.minute());
         let digits = hour.chars().chain(minute.chars());
-        m.ram.0[0x10..0x14]
+        m.ram[0x10..0x14]
             .iter_mut()
             .zip(digits)
             .for_each(|(p, s)| *p = UWord::from(s.to_digit(10).unwrap() as u8));
@@ -94,7 +94,7 @@ impl DisplayModule {
 
 impl Module for DisplayModule {
     fn run(&mut self, m: &mut Machine) -> Result<(), Box<dyn Error>> {
-        let memory = &m.ram.0[0x14..0x14+7];
+        let memory = &m.ram[0x14..0x14+7];
 
         let a = memory[0..7]
             .iter()
@@ -130,6 +130,38 @@ impl Module for DisplayModule {
             d.encode_utf8(&mut bytes[1..2]);
         }
 
+        Ok(())
+    }
+}
+
+/// A module that maps an external file. Page n is requested by writing n-1 
+/// to %3000–%3100, and served on addresses %0030–%003f.
+#[derive(Debug)]
+pub struct DiskModule (Vec<UWord>);
+
+impl DiskModule {
+    pub fn new<P: AsRef<std::path::Path>>(path: P) -> std::io::Result<Self> {
+        use std::io::prelude::*;
+        let mut data = vec![];
+        let mut f = std::io::BufReader::new(std::fs::File::open(path)?);
+        for line in f.lines() {
+            for word in line?.split_whitespace() {
+                data.push(UWord::from(u8::from_str_radix(word, 16).unwrap()))
+            }
+        };
+        Ok(DiskModule(data))
+    }
+}
+
+impl Module for DiskModule {
+    fn run(&mut self, m: &mut Machine) -> Result<(), Box<dyn Error>> {
+        let page = ULongWord { low: m.ram[0x30], high: m.ram[0x31] };
+        if page.value() != 0 {
+            let page = (page.value() - 1) as usize;
+            let src = &self.0[page * 1024 .. (page+1) * 1024];
+            let dst = &mut m.ram[0x30*0x40 .. 0x40*0x40];
+            dst.clone_from_slice(src)
+        }
         Ok(())
     }
 }

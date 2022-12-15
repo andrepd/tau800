@@ -136,6 +136,37 @@ impl std::ops::IndexMut<Address> for Ram {
     }
 }
 
+impl std::ops::Index<std::ops::Range<usize>> for Ram {
+    type Output = [UWord];
+
+    fn index(&self, range: std::ops::Range<usize>) -> &Self::Output {
+        debug_assert_le!(range.end, self.0.len()); //TODO
+        &self.0[range]
+    }
+}
+
+impl std::ops::Index<std::ops::Range<Address>> for Ram {
+    type Output = [UWord];
+
+    fn index(&self, range: std::ops::Range<Address>) -> &Self::Output {
+        &self[(range.start.value() as usize)..(range.end.value() as usize)]
+    }
+}
+
+impl std::ops::IndexMut<std::ops::Range<usize>> for Ram {
+    fn index_mut(&mut self, range: std::ops::Range<usize>) -> &mut Self::Output {
+        debug_assert_le!(range.end, RAM_SIZE);
+        if dbg!(range.end) >= dbg!(self.0.len()) { self.0.resize(range.end, UZERO) };
+        &mut self.0[range]
+    }
+}
+
+impl std::ops::IndexMut<std::ops::Range<Address>> for Ram {
+    fn index_mut(&mut self, range: std::ops::Range<Address>) -> &mut Self::Output {
+        &mut self[(range.start.value() as usize)..(range.end.value() as usize)]
+    }
+}
+
 impl Default for Ram {
     fn default() -> Self {
         Self(Vec::with_capacity(64 * 4))
