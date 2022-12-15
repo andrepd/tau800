@@ -158,9 +158,22 @@ impl Module for DiskModule {
         let page = ULongWord { low: m.ram[0x30], high: m.ram[0x31] };
         if page.value() != 0 {
             let page = (page.value() - 1) as usize;
-            let src = &self.0[page * 1024 .. (page+1) * 1024];
-            let dst = &mut m.ram[0x30*0x40 .. 0x40*0x40];
-            dst.clone_from_slice(src)
+            let start = page * 1024;
+            let end = start + 1024;
+            if start >= self.0.len() { 
+                ()
+            } else if end >= self.0.len() {
+                let len = self.0.len() - start;
+                let src = &self.0[start..start+len];
+                let dst = &mut m.ram[0x30*0x40 .. 0x30*0x40+len];
+                dst.clone_from_slice(src);
+                let dst = &mut m.ram[0x30*0x40+len .. 0x40*0x40];
+                dst.fill(UZERO);
+            } else {
+                let src = &self.0[start..end];
+                let dst = &mut m.ram[0x30*0x40 .. 0x40*0x40];
+                dst.clone_from_slice(src);
+            }
         }
         Ok(())
     }
