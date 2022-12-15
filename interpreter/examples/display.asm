@@ -191,6 +191,7 @@
 
 	clc
 	not a
+	
 	ret
 
 
@@ -288,15 +289,15 @@
 
 	; Self-modifying code, handle with care!
 	beq +5
-	mov #13 %1d09  ; l→r
-	mov #12 %2209
-	mov #11 %020a
-	mov #10 %070a
+	mov #13 %1f09  ; l→r
+	mov #12 %2409
+	mov #11 %040a
+	mov #10 %090a
 	bne +4
-	mov #10 %1d09  ; r→l
-	mov #11 %2209
-	mov #12 %020a
-	mov #13 %070a
+	mov #10 %1f09  ; r→l
+	mov #11 %2409
+	mov #12 %040a
+	mov #13 %090a
 
 	mov %3f00 bh
 	mov %3f00 bl
