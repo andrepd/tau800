@@ -55,22 +55,6 @@ fn main() -> std::io::Result<()> {
         io_modules.run(&mut universe);
 
         {
-            // Step the machine (manual loop)
-            /*interpreter::step_micro(&mut universe);
-            let mut iterations = 0;
-            while !universe.is_consistent() {
-                println!("{}", universe.now());
-                // In resolution
-                interpreter::step_micro(&mut universe);
-                // println!("time resolution {}", universe.now());
-
-                iterations += 1;
-                if iterations > 100*10 {
-                    panic!("Consistency failure.");
-                }
-            }
-            let machine = universe.now();*/
-
             // Step the machine (auto loop)
             let (machine, instruction) = interpreter::step(&mut universe).expect("Consistency failure.");
 
@@ -78,7 +62,7 @@ fn main() -> std::io::Result<()> {
             println!("instruction: {:?}", instruction);
             println!("{}", machine);
 
-            match instruction { Instruction::Hcf => { println!("Execution ended."); break }, _ => () }
+            if let Instruction::Hcf = instruction { println!("Execution ended."); break };
 
             println!("Display:");
             let words = &machine.ram.0[0x14..=0x1a];

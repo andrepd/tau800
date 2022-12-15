@@ -341,9 +341,9 @@ impl Instruction {
         }
     }
 
-    pub fn encode(m: &mut Machine, instruction: &Instruction) {
+    pub fn encode(&self, m: &mut Machine) {
         use Instruction::*;
-        match instruction {
+        match self {
             Nop => {
                 m.write_pc(UWord::from(0x00));
             }

@@ -22,7 +22,7 @@ fn operand_to_ref_inner<'a>(state: &'a Machine, op: &'a Op) -> &'a UWord {
         Ind(op) => {
             let low = state.ram[*op];
             let high = state.ram[u16::from(*op) as usize + 1];
-            let address = LongWord::<sig::Unsigned> { low, high };
+            let address = ULongWord {low, high};
             &state.ram[u16::from(address) as usize]
         }
     }
@@ -45,7 +45,7 @@ fn operand_to_mut_ref_inner<'a>(state: &'a mut Machine, op: &'a Op) -> &'a mut U
         Ind(op) => {
             let low = state.ram[*op];
             let high = state.ram[u16::from(*op) as usize + 1];
-            let address = LongWord::<sig::Unsigned> { low, high };
+            let address = ULongWord {low, high};
             &mut state.ram[u16::from(address) as usize]
         }
     }

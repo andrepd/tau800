@@ -5,7 +5,7 @@ dbg = len(argv) > 1
 def lex(it):
 	for i in it:
 		i = i.split(';')[0].strip()
-		if i != '': yield i
+		if i != '': yield i.tolower()
 
 def to_le(x):
 	h,l = x // 0x40, x % 0x40
@@ -29,7 +29,7 @@ def words_line(str):
 	elif op in ['bcc','bcs','bne','beq','bpl','bmi']:
 		return 1+1
 	else:
-		return 2 + sum(words_arg(x) for x in args) + sum(1 for x in args if '#' not in x)*('@' in str)
+		return 2 + sum(words_arg(x) for x in args) + sum(2 for x in args if '#' not in x)*('@' in str)
 
 cursor = 0x80
 labels = {}

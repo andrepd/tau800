@@ -46,7 +46,7 @@ pub fn assemble<'i>(input: &'i str) -> InstructionIterator<'i> {
 
 pub fn assemble_into(m: &mut Machine, input: &str) {
     for i in assemble(input) {
-        Instruction::encode(m, &i);
+        i.encode(m);
     }
 
     m.cpu.pc = Address::from(0x80);
@@ -81,6 +81,7 @@ fn read_instruction(literal: &str, line_idx: usize) -> Instruction {
         "not" => Instruction::Not(read_operand(&mut iter).or_panic(line_idx)),
         "lsl" => Instruction::Lsl(read_operand(&mut iter).or_panic(line_idx)),
         "lsr" => Instruction::Lsr(read_operand(&mut iter).or_panic(line_idx)),
+        "asr" => Instruction::Asr(read_operand(&mut iter).or_panic(line_idx)),
         "inc" => Instruction::Inc(read_operand(&mut iter).or_panic(line_idx)),
         "dec" => Instruction::Dec(read_operand(&mut iter).or_panic(line_idx)),
         "cmp" => Instruction::Cmp(read_operands(&mut iter).or_panic(line_idx)),
@@ -317,15 +318,28 @@ fn read_decimal(chars: &mut SlidingWindow) -> ReadResult<IWord> {
     Ok(IWord::from(value))
 }
 
-fn read_time(chars: &mut SlidingWindow) -> ReadResult<IWord> {
+fn read_decimal_long(chars: &mut SlidingWindow) -> ReadResult<ILongWord> {
+    let mut subwindow = chars.window_from_here();
+    let value = subwindow
+        .take_while(|c| c.is_digit(10) || *c == '+' || *c == '-')
+        .collect()
+        .map_or(Err(ReadError::NoMoreChars), |s| Ok(s))?;
+    if value.is_empty() {
+        return Err(ReadError::UnexpectedChar(chars.pos()));
+    }
+    let value = value.trim().parse::<i16>().unwrap();
+    Ok(ILongWord::from(value))
+}
+
+fn read_time(chars: &mut SlidingWindow) -> ReadResult<ILongWord> {
     match match_char('@', chars).optional() {
-        None => Ok(IWord::zero()),
+        None => Ok(ILongWord::zero()),
         Some(_) => {
             let _ = match_char('-', chars);
             let _ = match_char('+', chars);
-            let value = read_decimal(chars)?;
-            dprintln!("qux {:?} {:?}", value, IWord::from(value));
-            Ok(IWord::from(value))
+            let value = read_decimal_long(chars)?;
+            dprintln!("qux {:?} {:?}", value, ILongWord::from(value));
+            Ok(ILongWord::from(value))
         }
     }
 }
@@ -465,6 +479,7 @@ pub fn mnemonic(cmd: Instruction) -> String {
         Instruction::Not(op) => format!("not {}", mnemonic_timed_op(op)),
         Instruction::Lsl(op) => format!("lsl {}", mnemonic_timed_op(op)),
         Instruction::Lsr(op) => format!("lsr {}", mnemonic_timed_op(op)),
+        Instruction::Asr(op) => format!("asr {}", mnemonic_timed_op(op)),
         Instruction::Inc(op) => format!("inc {}", mnemonic_timed_op(op)),
         Instruction::Dec(op) => format!("dec {}", mnemonic_timed_op(op)),
         Instruction::Cmp(Operands { src, dst }) => {

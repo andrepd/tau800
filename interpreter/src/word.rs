@@ -149,11 +149,7 @@ impl From<i8> for Word<sig::Signed> {
 
 impl From<Word<sig::Signed>> for i8 {
     fn from(word: Word<sig::Signed>) -> Self {
-        if (word.value & SIGN_BIT) != 0 {
-            -((!(word.value - 1) & MAX_UNSIGNED_VALUE) as i8)
-        } else {
-            word.value as i8
-        }
+        word.value()
     }
 }
 
@@ -244,7 +240,8 @@ impl From<i16> for ILongWord {
     fn from(x: i16) -> Self {
         debug_assert_le!(MIN_SIGNED_DOUBLE, x);
         debug_assert_le!(x, MAX_SIGNED_DOUBLE);
-        let (high, low) = div_rem(x, (MAX_UNSIGNED_VALUE + 1) as i16);
+        let high = x >> WORD_SIZE;
+        let low  = x & (MAX_UNSIGNED_VALUE as i16);
         LongWord {
             high: i8::into(high as i8),
             low: u8::into(low as u8),
@@ -333,4 +330,5 @@ impl CheckedIncrement for ULongWord {
     }
 }
 
-pub static UZERO: UWord = UWord::default();
+// pub static UZERO: UWord = UWord::zero();
+pub static UZERO: UWord = UWord{ value: 0, phantom: PhantomData::<sig::Unsigned> };

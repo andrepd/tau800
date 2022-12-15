@@ -15,6 +15,7 @@ impl std::ops::Add<&ILongWord> for usize {
     type Output = Self;
 
     fn add(self, other: &ILongWord) -> Self {
+        if other.value() != 0 { dprintln!("Time jump of {}", other.value() as isize) };
         (self as isize + other.value() as isize) as usize
     }
 }
