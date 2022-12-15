@@ -166,13 +166,13 @@ impl Module for DiskModule {
                 let len = self.0.len() - start;
                 let src = &self.0[start..start+len];
                 let dst = &mut m.ram[0x30*0x40 .. 0x30*0x40+len];
-                dst.clone_from_slice(src);
-                let dst = &mut m.ram[0x30*0x40+len .. 0x40*0x40];
-                dst.fill(UZERO);
+                dst.clone_from_slice(src)
+                /*let dst = &mut m.ram[0x30*0x40+len .. 0x40*0x40];
+                dst.fill(UZERO);*/
             } else {
                 let src = &self.0[start..end];
                 let dst = &mut m.ram[0x30*0x40 .. 0x40*0x40];
-                dst.clone_from_slice(src);
+                dst.clone_from_slice(src)
             }
         }
         Ok(())
