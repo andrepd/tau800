@@ -4,6 +4,7 @@ pub(super) use super::word::*;
 pub(super) use super::machine::*;
 pub(super) use super::instruction::{Instruction, Op, Operand, Operands, Register};
 pub(super) use super::universe::{Universe, Mode};
+pub(super) use super::modules::ModuleCollection;
 
 /// Tou sempre a ter de usar isto
 pub fn div_rem<

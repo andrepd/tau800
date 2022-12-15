@@ -376,7 +376,7 @@ fn execute(state: &mut Universe, instruction: &Instruction) {
 }
 
 /// Performs one micro step on `universe`
-pub fn step_micro(universe: &mut Universe) {
+pub fn step_micro(universe: &mut Universe, modules: &mut ModuleCollection) {
     dprintln!("μStep: t={} mode={:?}", universe.t, universe.mode);
 
     // Pending reads, são aqui que se checam
@@ -404,6 +404,7 @@ pub fn step_micro(universe: &mut Universe) {
 
     dprintln!(">push  t={} mode={:?}", universe.t, universe.mode);
 
+    modules.run(universe);
     let instruction = Instruction::decode(universe.now_mut());
     execute(universe, &instruction);
 
@@ -451,9 +452,9 @@ pub fn step_micro(universe: &mut Universe) {
 /// Performs one full step on universe: micro steps until a fixed state can be yielded
 /// Performs one full step on universe: micro steps until a fixed state can be yielded. 
 /// Returns Some(Machine, Instruction) or None if time inconsistency was reached
-pub fn step(universe: &mut Universe) -> Option<(Machine, Instruction)> {
-    // Fix memory leak: every 2000 iterations clean unreachable in pending_{reads,writes}
-    if universe.t % 2000 == 0 {
+pub fn step(universe: &mut Universe, modules: &mut ModuleCollection) -> Option<(Machine, Instruction)> {
+    // Fix memory leak: every 4000 iterations clean unreachable in pending_{reads,writes}
+    if universe.t % 4000 == 0 {
         let ti = universe.timeline.ti();
         universe.pending_reads.retain(|x| x.0 >= ti);  
         universe.pending_writes.retain(|x| x.0 >= ti);  
@@ -462,7 +463,7 @@ pub fn step(universe: &mut Universe) -> Option<(Machine, Instruction)> {
     const INCONSISTENT_ITERATIONS_LIMIT: usize = 1000;
     let mut inconsistent_iterations: usize = 0;
     while !universe.is_consistent() || !universe.timeline.is_full() {
-        step_micro(universe);
+        step_micro(universe, modules);
         if !universe.is_consistent() { inconsistent_iterations += 1 };
         if inconsistent_iterations == INCONSISTENT_ITERATIONS_LIMIT { return None }
     }

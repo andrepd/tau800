@@ -65,11 +65,12 @@ fn main() -> std::io::Result<()> {
         // @André: Não sei quais as consequências de não correr isto na fase de
         //         resolução, se pode causar inconsistência.
         // @Mike: Boa pergunta
-        io_modules.run(&mut universe);
+        // Mudei para dentro do step_micro no interpreter
+        /*io_modules.run(&mut universe);*/
 
         {
             // Step the machine (auto loop)
-            let (machine, instruction) = interpreter::step(&mut universe).expect("Consistency failure.");
+            let (machine, instruction) = interpreter::step(&mut universe, &mut io_modules).expect("Consistency failure.");
 
             println!("t = {}", t);
             println!("instruction: {:?}", instruction);
