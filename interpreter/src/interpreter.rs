@@ -1,7 +1,4 @@
-use super::instruction::{Instruction, Op, Operand, Operands, Register};
 use super::prelude::*;
-use super::state::Flag;
-use super::universe::Universe;
 
 //
 
@@ -403,6 +400,24 @@ pub fn step_micro(universe: &mut Universe) {
 
     dprintln!(">read   t={} mode={:?}", universe.t, universe.mode);
 
+    universe.push_new_state();
+
+    dprintln!(">push  t={} mode={:?}", universe.t, universe.mode);
+
+    let instruction = Instruction::decode(universe.now_mut());
+    execute(universe, &instruction);
+
+    dprintln!(">exec  t={} mode={:?}", universe.t, universe.mode);
+
+    // Pending writes, são aqui que se fazem
+    let asdjhfbasdfaj = universe.pending_writes.clone();  // TODO
+    for (t, op, value) in &asdjhfbasdfaj {
+        if *t == universe.t {
+            let state = universe.now_mut();
+            *operand_to_mut_ref_inner(state, &op) = *value
+        }
+    }
+
     match universe.mode {
         // Maybe inconsistent: if we reach the end of the window, it is consistent
         Mode::Maybe (ti, tf) if universe.t == tf => {
@@ -422,24 +437,6 @@ pub fn step_micro(universe: &mut Universe) {
     }
 
     dprintln!(">mode  t={} mode={:?}", universe.t, universe.mode);
-
-    universe.push_new_state();
-
-    dprintln!(">push  t={} mode={:?}", universe.t, universe.mode);
-
-    let instruction = Instruction::decode(universe.now_mut());
-    execute(universe, &instruction);
-
-    dprintln!(">exec  t={} mode={:?}", universe.t, universe.mode);
-
-    // Pending writes, são aqui que se fazem
-    let asdjhfbasdfaj = universe.pending_writes.clone();  // TODO
-    for (t, op, value) in &asdjhfbasdfaj {
-        if *t == universe.t {
-            let state = universe.now_mut();
-            *operand_to_mut_ref_inner(state, &op) = *value
-        }
-    }
 
     dprintln!(">writ   t={} mode={:?}", universe.t, universe.mode);
 
