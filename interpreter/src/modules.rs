@@ -15,10 +15,10 @@ pub trait Module: Debug {
     fn run(&mut self, m: &mut Machine) -> Result<(), Box<dyn Error>>;
 }
 
-pub struct ModuleCollection<'a>(Vec<Box<&'a mut dyn Module>>);
+pub struct ModuleCollection(Vec<Box<dyn Module>>);
 
-impl<'a> ModuleCollection<'a> {
-    pub fn new(modules: Vec<Box<&'a mut dyn Module>>) -> Self {
+impl ModuleCollection {
+    pub fn new(modules: Vec<Box<dyn Module>>) -> Self {
         Self(modules)
     }
 
