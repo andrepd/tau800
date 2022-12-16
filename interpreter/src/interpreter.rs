@@ -451,32 +451,40 @@ pub fn step_micro(universe: &mut Universe, modules: &mut ModuleCollection) {
     ()
 }
 
-/// Performs one full step on universe: micro steps until a fixed state can be yielded. 
-/// Returns Some(Machine, Instruction) or None if time inconsistency was reached
-pub fn step(universe: &mut Universe, modules: &mut ModuleCollection) -> Option<(Machine, Instruction)> {
-    // Fix memory leak: every 4000 iterations clean unreachable in pending_{reads,writes}
-    if universe.t % 4000 == 0 {
+/// Performs one full step on universe: micro steps until a fixed state can be yielded and pushed onto universe. 
+/// Returns `false` iff inconsistency is reached
+pub fn step_one(universe: &mut Universe, modules: &mut ModuleCollection) -> bool {
+    dprintln!("step_one");
+    // Fix memory leak: every 2^12 iterations clean unreachable in pending_{reads,writes}
+    if universe.t % (1<<12) == 0 {
         let ti = universe.timeline.ti();
         universe.pending_reads.retain(|x| x.0 >= ti);  
         universe.pending_writes.retain(|x| x.0 >= ti);  
     }
 
-    const INCONSISTENT_ITERATIONS_LIMIT: usize = 1000;
+    // Do step_micro until we hit inconsistency
+    step_micro(universe, modules);
+    const INCONSISTENT_ITERATIONS_LIMIT: usize = 1000*10;
     let mut inconsistent_iterations: usize = 0;
     while !universe.is_consistent() {
-        if inconsistent_iterations == INCONSISTENT_ITERATIONS_LIMIT { return None }
+        if dbg!(inconsistent_iterations) == INCONSISTENT_ITERATIONS_LIMIT { return false }
         step_micro(universe, modules);
         inconsistent_iterations += 1
-    }
+    };
 
+    true
+}
+
+/// Returns Some(Machine, Instruction) or None if time inconsistency was reached
+pub fn step(universe: &mut Universe, modules: &mut ModuleCollection) -> Option<(Machine, Instruction)> {
+    dprintln!("step {} {}", universe.timeline.tf() - universe.timeline.ti(), universe.timeline.is_full());
     // Universe not full: continue filling
-    if !universe.timeline.is_full() {
-        step(universe, modules)
+    while !universe.timeline.is_full() {
+        dprintln!("foo {} {}", universe.timeline.ti(), universe.timeline.tf());
+        if !step_one(universe, modules) { return None }
     } 
     // Universe full (and consistent): this means the state we pop from front is stable
-    else {
-        let machine = universe.pop_state();
-        let instruction = Instruction::decode(&mut machine.clone());  // TODO overkill mas acho que não é bottleneck
-        Some((machine, instruction))
-    }
+    let machine = universe.pop_state();
+    let instruction = Instruction::decode(&mut machine.clone());  // TODO overkill mas acho que não é bottleneck
+    Some((machine, instruction))
 }
