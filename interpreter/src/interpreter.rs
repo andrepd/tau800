@@ -463,15 +463,20 @@ pub fn step(universe: &mut Universe, modules: &mut ModuleCollection) -> Option<(
 
     const INCONSISTENT_ITERATIONS_LIMIT: usize = 1000;
     let mut inconsistent_iterations: usize = 0;
-    while !universe.is_consistent() || !universe.timeline.is_full() {
-        step_micro(universe, modules);
-        if !universe.is_consistent() { inconsistent_iterations += 1 };
+    while !universe.is_consistent() {
         if inconsistent_iterations == INCONSISTENT_ITERATIONS_LIMIT { return None }
+        step_micro(universe, modules);
+        inconsistent_iterations += 1
     }
 
-    // Now universe is consistent and full. Which means the state we pop from front is stable
-    let machine = universe.pop_state();
-    let instruction = Instruction::decode(&mut machine.clone());  // TODO overkill mas acho que não é bottleneck
-
-    Some((machine, instruction))
+    // Universe not full: continue filling
+    if !universe.timeline.is_full() {
+        step(universe, modules)
+    } 
+    // Universe full (and consistent): this means the state we pop from front is stable
+    else {
+        let machine = universe.pop_state();
+        let instruction = Instruction::decode(&mut machine.clone());  // TODO overkill mas acho que não é bottleneck
+        Some((machine, instruction))
+    }
 }
