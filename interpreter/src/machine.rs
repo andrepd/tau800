@@ -156,7 +156,7 @@ impl std::ops::Index<std::ops::Range<Address>> for Ram {
 impl std::ops::IndexMut<std::ops::Range<usize>> for Ram {
     fn index_mut(&mut self, range: std::ops::Range<usize>) -> &mut Self::Output {
         debug_assert_le!(range.end, RAM_SIZE);
-        if dbg!(range.end) >= dbg!(self.0.len()) { self.0.resize(range.end, UZERO) };
+        if range.end >= self.0.len() { self.0.resize(range.end, UZERO) };
         &mut self.0[range]
     }
 }

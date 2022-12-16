@@ -444,6 +444,10 @@ pub fn step_micro(universe: &mut Universe, modules: &mut ModuleCollection) {
         for i in &universe.pending_reads { dprintln!("pending r: {:?}", i) };
     }
 
+    println!(">finish");
+    /*println!("{:?}", instruction);
+    println!("{}", universe.now());*/
+
     ()
 }
 
