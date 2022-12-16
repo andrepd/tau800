@@ -382,8 +382,7 @@ pub fn step_micro(universe: &mut Universe, modules: &mut ModuleCollection) {
     // Pending reads, são aqui que se checam
     /*universe.pending_reads.retain(|&x| {*/
     let pending_reads_ = 
-        universe.pending_reads.clone().into_iter().filter(|x| {
-            let (t, ti, op, value) = x;
+        universe.pending_reads.clone().into_iter().filter(|(t, ti, op, value)| {
             if *t == universe.t {
                 let state = universe.now();
                 if *operand_to_ref_inner(state, &op) == *value {
@@ -411,8 +410,7 @@ pub fn step_micro(universe: &mut Universe, modules: &mut ModuleCollection) {
     dprintln!(">exec  t={} mode={:?}", universe.t, universe.mode);
 
     // Pending writes, são aqui que se fazem
-    let asdjhfbasdfaj = universe.pending_writes.clone();  // TODO
-    for (t, op, value) in &asdjhfbasdfaj {
+    for (t, op, value) in &universe.pending_writes.clone() {
         if *t == universe.t {
             let state = universe.now_mut();
             *operand_to_mut_ref_inner(state, &op) = *value
@@ -449,7 +447,6 @@ pub fn step_micro(universe: &mut Universe, modules: &mut ModuleCollection) {
     ()
 }
 
-/// Performs one full step on universe: micro steps until a fixed state can be yielded
 /// Performs one full step on universe: micro steps until a fixed state can be yielded. 
 /// Returns Some(Machine, Instruction) or None if time inconsistency was reached
 pub fn step(universe: &mut Universe, modules: &mut ModuleCollection) -> Option<(Machine, Instruction)> {
