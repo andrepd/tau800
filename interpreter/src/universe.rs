@@ -80,7 +80,7 @@ impl Timeline {
     }
 
     pub fn is_full(&self) -> bool {
-        self.states.len() == MAX_WINDOW
+        self.states.len() >= MAX_WINDOW
     }
 }
 
