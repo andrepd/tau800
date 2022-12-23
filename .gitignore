@@ -10,3 +10,7 @@ manual/document.log
 manual/document.out
 manual/document.synctex.gz
 manual/document.toc
+
+**/*.old*
+**/log*.txt
+**/log*.txt.xz
