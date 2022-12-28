@@ -1,10 +1,5 @@
-use crate::{
-    instruction::Instruction,
-    modules::{ClockModule, DisplayModule, DiskModule, Module, ModuleCollection},
-};
-use core::panic;
-use std::io::Read;
-use universe::Universe;
+pub(crate) use crate::prelude::*;
+use crate::modules::{ClockModule, DisplayModule, DiskModule, Module, ModuleCollection};
 
 mod assembler;
 mod instruction;
@@ -19,6 +14,7 @@ mod word;
 fn main() -> std::io::Result<()> {
     /*unsafe { interpreter::ZERO = word::UWord::from(0) };*/
 
+    use std::io::Read;
     let mut buffer = String::new();
     std::io::stdin().read_to_string(&mut buffer)?;
     let buffer = buffer.to_lowercase(); // For flexibility
@@ -51,7 +47,7 @@ fn main() -> std::io::Result<()> {
     // Do this if the PUNCHCARD env. variable is set.
     if let Ok(_) = std::env::var("PUNCHCARD") {
         for word in universe.now().ram.0.iter() {
-            println!("{:06b}" ,word.value);
+            println!("{:06b}" ,word.value());
         }
         return Ok(()); // Exit(0)
     }

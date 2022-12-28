@@ -49,7 +49,7 @@ pub fn assemble_into(m: &mut Machine, input: &str) {
         i.encode(m);
     }
 
-    m.cpu.pc = Address::from(0x80);
+    m.cpu.pc = Address::try_from(0x80).unwrap();
 }
 
 fn read_instruction(literal: &str, line_idx: usize) -> Instruction {
@@ -271,7 +271,7 @@ fn read_register(chars: &mut SlidingWindow) -> ReadResult<Register> {
     Ok(register)
 }
 
-fn read_hex_word(chars: &mut SlidingWindow) -> ReadResult<UWord> {
+fn read_hex_word(chars: &mut SlidingWindow) -> ReadResult<uWord> {
     let mut read_hex_char = || {
         let next = chars.peek();
         if next.is_none() {
@@ -295,17 +295,17 @@ fn read_hex_word(chars: &mut SlidingWindow) -> ReadResult<UWord> {
 
     let value = high + low;
 
-    Ok(UWord::from(value))
+    Ok(uWord::try_from(value).unwrap())
 }
 
 fn read_address(chars: &mut SlidingWindow) -> ReadResult<Address> {
-    let low = read_hex_word(chars)?;
-    let high = read_hex_word(chars)?;
-    Ok(Address { low, high })
+    let lo = read_hex_word(chars)?;
+    let hi = read_hex_word(chars)?;
+    Ok(Address::from_hi_lo(hi, lo))
 }
 
 // Can be signed
-fn read_decimal(chars: &mut SlidingWindow) -> ReadResult<IWord> {
+fn read_decimal(chars: &mut SlidingWindow) -> ReadResult<iWord> {
     let mut subwindow = chars.window_from_here();
     let value = subwindow
         .take_while(|c| c.is_digit(10) || *c == '+' || *c == '-')
@@ -315,10 +315,10 @@ fn read_decimal(chars: &mut SlidingWindow) -> ReadResult<IWord> {
         return Err(ReadError::UnexpectedChar(chars.pos()));
     }
     let value = value.trim().parse::<i8>().unwrap();
-    Ok(IWord::from(value))
+    Ok(iWord::try_from(value).unwrap())
 }
 
-fn read_decimal_long(chars: &mut SlidingWindow) -> ReadResult<ILongWord> {
+fn read_decimal_long(chars: &mut SlidingWindow) -> ReadResult<iLong> {
     let mut subwindow = chars.window_from_here();
     let value = subwindow
         .take_while(|c| c.is_digit(10) || *c == '+' || *c == '-')
@@ -328,18 +328,18 @@ fn read_decimal_long(chars: &mut SlidingWindow) -> ReadResult<ILongWord> {
         return Err(ReadError::UnexpectedChar(chars.pos()));
     }
     let value = value.trim().parse::<i16>().unwrap();
-    Ok(ILongWord::from(value))
+    Ok(iLong::try_from(value).unwrap())
 }
 
-fn read_time(chars: &mut SlidingWindow) -> ReadResult<ILongWord> {
+fn read_time(chars: &mut SlidingWindow) -> ReadResult<iLong> {
     match match_char('@', chars).optional() {
-        None => Ok(ILongWord::zero()),
+        None => Ok(iLong::ZERO),
         Some(_) => {
             let _ = match_char('-', chars);
             let _ = match_char('+', chars);
             let value = read_decimal_long(chars)?;
-            dprintln!("qux {:?} {:?}", value, ILongWord::from(value));
-            Ok(ILongWord::from(value))
+            dprintln!("qux {:?} {:?}", value, iLong::try_from(value).unwrap());
+            Ok(iLong::try_from(value).unwrap())
         }
     }
 }
@@ -350,14 +350,13 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
         '#' => {
             match_char('#', chars)?;
             let word = read_hex_word(chars)?;
-            Timed::new(Op::Imm(word), 0.into())
+            Timed{op: Op::Imm(word), time: iLong::ZERO}
         }
         '%' => {
             match_char('%', chars)?;
-            let low = read_hex_word(chars)?;
-            let high = read_hex_word(chars)?;
-            let op = Address { low, high };
-
+            let lo = read_hex_word(chars)?;
+            let hi = read_hex_word(chars)?;
+            let op = Address::from_hi_lo(hi, lo);
             
             let next = chars.peek();
             if next.is_some() && *next.unwrap() == ',' {
@@ -365,28 +364,28 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
                 match_char('x', chars)?;
 
                 let time = read_time(chars)?;
-                Timed::new(Op::Abx(op), time)
+                Timed{op: Op::Abx(op), time: time}
             } else {
                 
                 let time = read_time(chars)?;
-                Timed::new(Op::Abs(op), time)
+                Timed{op: Op::Abs(op), time: time}
             }
         }
         '(' => {
             match_char('(', chars)?;
             let operand = match read_char(chars)? {
                 '%' => {
-                    let low = read_hex_word(chars)?;
-                    let high = read_hex_word(chars)?;
-                    let op = Address { low, high };
+                    let lo = read_hex_word(chars)?;
+                    let hi = read_hex_word(chars)?;
+                    let op = Address::from_hi_lo(hi, lo);
                     let time = read_time(chars)?;
 
-                    Timed::new(Op::Ind(op), time)
+                    Timed{op: Op::Ind(op), time: time}
                 }
                 _ => unreachable!(), /*{
                                          let register = read_register(chars)?;
                                          let time = read_time(chars)?;
-                                         Operand::Reg(Timed::new(register, time))
+                                         Operand::Reg(Timed{op: register, time: time)}
                                      }*/
             };
             match_char(')', chars)?;
@@ -395,7 +394,7 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
         _ => {
             let register = read_register(chars)?;
             let time = read_time(chars)?;
-            Timed::new(Op::Reg(register), time)
+            Timed{op: Op::Reg(register), time: time}
         }
     };
     Ok(operand)
@@ -404,8 +403,8 @@ fn read_operand(chars: &mut SlidingWindow) -> ReadResult<Operand> {
 fn read_operands(chars: &mut SlidingWindow) -> ReadResult<Operands> {
     let src = read_operand(chars)?;
     eat_whitespace(chars);
-    let dest = read_operand(chars)?;
-    Ok(Operands::new(src, dest))
+    let dst = read_operand(chars)?;
+    Ok(Operands{src, dst})
 }
 
 pub fn mnemonic(cmd: Instruction) -> String {
@@ -420,23 +419,19 @@ pub fn mnemonic(cmd: Instruction) -> String {
                 Register::X => "x",
             }
             .to_string(),
-            Op::Imm(v) => format!("#{}", radix(v.value(), 10)),
-            Op::Abs(v) => format!("%{}", radix(v.value(), 10)),
-            Op::Abx(v) => format!("%{},x", radix(v.value(), 10)),
-            Op::Ind(v) => format!("(%{})", radix(v.value(), 10)),
+            Op::Imm(v) => format!("#{}", v.value()),
+            Op::Abs(v) => format!("%{}", v.value()),
+            Op::Abx(v) => format!("%{},x", v.value()),
+            Op::Ind(v) => format!("(%{})", v.value()),
         }
     };
     let mnemonic_timed_op = |op: Operand| -> String {
-        let time = op.time.value();
+        let time: i16 = op.time.into();
         let op = op.op;
         if time == 0 {
             mnemonic_op(op)
         } else {
-            if time > 0 {
-                format!("{}@+{}", mnemonic_op(op), radix(time, 10))
-            } else {
-                format!("{}@-{}", mnemonic_op(op), radix(time.abs(), 10))
-            }
+            format!("{}@{:+}", mnemonic_op(op), time)
         }
     };
 
@@ -489,12 +484,12 @@ pub fn mnemonic(cmd: Instruction) -> String {
             format!(" {} {}", mnemonic_timed_op(src), mnemonic_timed_op(dst))
         }
         Instruction::Jmp(op) => format!("jmp %{}", radix(op.value(), 16)),
-        Instruction::Bcc(op) => format!("bcc #{}", radix(op.value() as u8, 16)),
-        Instruction::Bcs(op) => format!("bcs #{}", radix(op.value() as u8, 16)),
-        Instruction::Bne(op) => format!("bne #{}", radix(op.value() as u8, 16)),
-        Instruction::Beq(op) => format!("beq #{}", radix(op.value() as u8, 16)),
-        Instruction::Bpl(op) => format!("bpl #{}", radix(op.value() as u8, 16)),
-        Instruction::Bmi(op) => format!("bmi #{}", radix(op.value() as u8, 16)),
+        Instruction::Bcc(op) => format!("bcc #{}", radix(op.value(), 16)),
+        Instruction::Bcs(op) => format!("bcs #{}", radix(op.value(), 16)),
+        Instruction::Bne(op) => format!("bne #{}", radix(op.value(), 16)),
+        Instruction::Beq(op) => format!("beq #{}", radix(op.value(), 16)),
+        Instruction::Bpl(op) => format!("bpl #{}", radix(op.value(), 16)),
+        Instruction::Bmi(op) => format!("bmi #{}", radix(op.value(), 16)),
         Instruction::Clc => "clc".to_string(),
         Instruction::Sec => "sec".to_string(),
         Instruction::Cal(op) => format!("cal #{}", radix(op.value(), 16)),

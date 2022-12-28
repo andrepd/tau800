@@ -5,10 +5,7 @@ use super::prelude::*;
 use std::{
     error::Error,
     fmt::{Debug, Display},
-    sync::Arc,
 };
-
-use chrono::{Local, Timelike};
 
 pub trait Module: Debug {
     /// Update the state.
@@ -30,25 +27,27 @@ impl ModuleCollection {
 }
 
 /// A module that maps the current time as four words (digits; h h m m) into
-/// memory.
+/// memory, at locations %1000–%1300.
 #[derive(Debug)]
 pub struct ClockModule;
 
 impl Module for ClockModule {
     fn run(&mut self, m: &mut Machine) -> Result<(), Box<dyn Error>> {
-        let now = Local::now();
+        use chrono::Timelike;
+        let now = chrono::Local::now();
         let hour = format!("{:0>2}", now.hour());
         let minute = format!("{:0>2}", now.minute());
         let digits = hour.chars().chain(minute.chars());
         m.ram[0x10..0x14]
             .iter_mut()
             .zip(digits)
-            .for_each(|(p, s)| *p = UWord::from(s.to_digit(10).unwrap() as u8));
+            .for_each(|(p, s)| *p = uWord::try_from(s.to_digit(10).unwrap() as u8).unwrap());
         Ok(())
     }
 }
 
-/// A module that reads a 4-digit seven-segment display from memory.
+/// A module that reads a 4-digit seven-segment display from memory (see 
+/// manual for the format).
 #[derive(Debug)]
 pub struct DisplayModule {
     pub hours: String,
@@ -79,11 +78,7 @@ impl DisplayModule {
                 // we convert the boolean values to an equivalent binary number,
                 // and index into some garbage &'static str.
                 let index = bits.iter().enumerate().fold(0, |acc, (i, &value)| {
-                    if value {
-                        acc + 2_usize.pow(i as u32)
-                    } else {
-                        acc
-                    }
+                    (acc << 1) + (value as usize)
                 });
                 const ALPHABET: &'static str = "x%@#";
                 ALPHABET.chars().nth(index % ALPHABET.len()).unwrap()
@@ -134,19 +129,21 @@ impl Module for DisplayModule {
     }
 }
 
-/// A module that maps an external file. Page n is requested by writing n-1 
-/// to %3000–%3100, and served on addresses %0030–%003f.
+/// A module that emulates a "disk drive", i.e. maps an external file. Page `n` 
+/// (1k word pages) is requested by writing `n-1` to %3000,%3100 (big endian), 
+/// and served on addresses %0030–%3f3f.
 #[derive(Debug)]
-pub struct DiskModule (Vec<UWord>);
+pub struct DiskModule (Vec<uWord>);
 
 impl DiskModule {
+    /// Create a DiskModule mapping file `path`.
     pub fn new<P: AsRef<std::path::Path>>(path: P) -> std::io::Result<Self> {
         use std::io::prelude::*;
         let mut data = vec![];
         let mut f = std::io::BufReader::new(std::fs::File::open(path)?);
         for line in f.lines() {
             for word in line?.split_whitespace() {
-                data.push(UWord::from(u8::from_str_radix(word, 16).unwrap()))
+                data.push(u8::from_str_radix(word, 16).unwrap().try_into().unwrap())
             }
         };
         Ok(DiskModule(data))
@@ -155,8 +152,8 @@ impl DiskModule {
 
 impl Module for DiskModule {
     fn run(&mut self, m: &mut Machine) -> Result<(), Box<dyn Error>> {
-        let page = ULongWord { low: m.ram[0x30], high: m.ram[0x31] };
-        if page.value() != 0 {
+        let page = uLong::from_hi_lo(m.ram[0x31], m.ram[0x30]);
+        if dbg!(page.value()) != 0 {
             let page = (page.value() - 1) as usize;
             let start = page * 1024;
             let end = start + 1024;
@@ -168,7 +165,7 @@ impl Module for DiskModule {
                 let dst = &mut m.ram[0x30*0x40 .. 0x30*0x40+len];
                 dst.clone_from_slice(src)
                 /*let dst = &mut m.ram[0x30*0x40+len .. 0x40*0x40];
-                dst.fill(UZERO);*/
+                dst.fill(uWord::ZERO);*/
             } else {
                 let src = &self.0[start..end];
                 let dst = &mut m.ram[0x30*0x40 .. 0x40*0x40];

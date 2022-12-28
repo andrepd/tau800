@@ -1,6 +1,4 @@
-use super::prelude::*;
-
-use super::{modules::Module, prelude::*};
+use crate::prelude::*;
 
 // CPU //
 
@@ -21,61 +19,46 @@ impl From<Flag> for u8 {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
-#[derive(PartialEq, Eq)]
-pub struct FlagWord {
-    pub word: UWord,
-}
-
-impl Default for FlagWord {
-    fn default() -> Self {
-        Self { word: Default::default() }
-    }
-}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct FlagWord (uWord);
 
 impl FlagWord {
     pub fn read(&self, flag: Flag) -> bool {
         let mask = u8::from(flag);
-        self.word.value() & mask != 0
+        u8::from(self.0) & mask != 0
     }
 
     pub fn write(&mut self, flag: Flag, value: bool) -> () {
         let mask = u8::from(flag);
         let new = if value {
-            self.word.value() | mask
+            u8::from(self.0) | mask
         } else {
-            self.word.value() & !mask
+            u8::from(self.0) & !mask
         };
-        *self.word.raw_inner_mut() = new
+        self.0 = new.try_into().unwrap()
     }
 }
 
-pub type Address = ULongWord;
+pub type Address = uLong;
 
 #[derive(Debug, Clone)]
 #[derive(PartialEq, Eq)]
 pub struct Cpu {
-    pub a: UWord,
+    pub a: uWord,
     pub flags: FlagWord,
-    pub bh: UWord,
-    pub bl: UWord,
-    pub ch: UWord,
-    pub cl: UWord,
-    pub x: UWord,
+    pub bh: uWord,
+    pub bl: uWord,
+    pub ch: uWord,
+    pub cl: uWord,
+    pub x: uWord,
     pub sp: Address,
     pub pc: Address,
 }
 
 impl Default for Cpu {
     fn default() -> Self {
-        let pc = Address {
-            high: UWord::from(0x02),
-            low: UWord::from(0x00),
-        };
-        let sp = Address {
-            high: UWord::from(0x01),
-            low: UWord::from(0x3f),
-        };
+        let pc = Address::from_hi_lo(uWord::lit(0x02), uWord::lit(0x00));
+        let sp = Address::from_hi_lo(uWord::lit(0x01), uWord::lit(0x3f));
         Self {
             a: Default::default(),
             flags: Default::default(),
@@ -92,11 +75,24 @@ impl Default for Cpu {
 
 // RAM //
 
-const RAM_SIZE: usize = 1 << (2 * WORD_SIZE);
+const RAM_SIZE: usize = Address::MAX.value() as usize + 1;
 
-#[derive(Clone)]
-#[derive(PartialEq, Eq)]  //TODO: subtle bug (because of resizing)
-pub struct Ram(pub Vec<UWord>);
+#[derive(Clone, Eq)]
+pub struct Ram(pub Vec<uWord>);
+
+// To save space, RAM is represented by a vector with size ≤ RAM_SIZE. Memory  
+// past the size of the vector is assumed to be 0.
+impl PartialEq for Ram {
+    fn eq(&self, other: &Self) -> bool {
+        let (min, max) = if self.0.len() < other.0.len() {
+            (&self.0, &other.0)
+        } else {
+            (&other.0, &self.0)
+        };
+        min[..min.len()] == max[..min.len()]
+        && max[min.len()..max.len()].iter().all(|x| x == &uWord::ZERO)
+    }
+}
 
 impl std::fmt::Debug for Ram {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -105,39 +101,39 @@ impl std::fmt::Debug for Ram {
 }
 
 impl std::ops::Index<usize> for Ram {
-    type Output = UWord;
+    type Output = uWord;
 
     fn index(&self, index: usize) -> &Self::Output {
         debug_assert_lt!(index, RAM_SIZE);
-        if index >= self.0.len() { return &UZERO };
+        if index >= self.0.len() { return &uWord::ZERO };
         &self.0[index]
     }
 }
 
 impl std::ops::Index<Address> for Ram {
-    type Output = UWord;
+    type Output = uWord;
 
     fn index(&self, index: Address) -> &Self::Output {
-        &self[index.value() as usize]
+        &self[usize::from(index)]
     }
 }
 
 impl std::ops::IndexMut<usize> for Ram {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         debug_assert_lt!(index, RAM_SIZE);
-        if index >= self.0.len() { self.0.resize(index+1, UZERO) };
+        if index >= self.0.len() { self.0.resize(index+1, uWord::ZERO) };
         &mut self.0[index]
     }
 }
 
 impl std::ops::IndexMut<Address> for Ram {
     fn index_mut(&mut self, index: Address) -> &mut Self::Output {
-        &mut self[index.value() as usize]
+        &mut self[usize::from(index)]
     }
 }
 
 impl std::ops::Index<std::ops::Range<usize>> for Ram {
-    type Output = [UWord];
+    type Output = [uWord];
 
     fn index(&self, range: std::ops::Range<usize>) -> &Self::Output {
         debug_assert_le!(range.end, self.0.len()); //TODO
@@ -146,30 +142,30 @@ impl std::ops::Index<std::ops::Range<usize>> for Ram {
 }
 
 impl std::ops::Index<std::ops::Range<Address>> for Ram {
-    type Output = [UWord];
+    type Output = [uWord];
 
     fn index(&self, range: std::ops::Range<Address>) -> &Self::Output {
-        &self[(range.start.value() as usize)..(range.end.value() as usize)]
+        &self[usize::from(range.start)..usize::from(range.end)]
     }
 }
 
 impl std::ops::IndexMut<std::ops::Range<usize>> for Ram {
     fn index_mut(&mut self, range: std::ops::Range<usize>) -> &mut Self::Output {
         debug_assert_le!(range.end, RAM_SIZE);
-        if range.end >= self.0.len() { self.0.resize(range.end, UZERO) };
+        if range.end >= self.0.len() { self.0.resize(range.end, uWord::ZERO) };
         &mut self.0[range]
     }
 }
 
 impl std::ops::IndexMut<std::ops::Range<Address>> for Ram {
     fn index_mut(&mut self, range: std::ops::Range<Address>) -> &mut Self::Output {
-        &mut self[(range.start.value() as usize)..(range.end.value() as usize)]
+        &mut self[usize::from(range.start)..usize::from(range.end)]
     }
 }
 
 impl Default for Ram {
     fn default() -> Self {
-        Self(Vec::with_capacity(64 * 4))
+        Self(vec![uWord::ZERO; 64*2])
     }
 }
 
@@ -190,45 +186,39 @@ impl Machine {
         }
     }
 
-    fn increment_pc_or_overflow(&mut self) {
-        // self.cpu.pc.try_increment().expect("Overflowed program counter.");
-        // Don't panic on overflow of PC because the futures on the timeline will
-        // panic when close to the maximum.
-        // Instead, overflow the PC
-        if self.cpu.pc.try_increment().is_err() {
-            self.cpu.pc = ULongWord { low: UWord::zero(), high: UWord::zero() };
-        }
+    fn increment_pc(&mut self) {
+        self.cpu.pc = self.cpu.pc + 1_i8
     }
 
     /// Read the next value in ram, as indicated by the Program Counter (PC) in
     /// CPU, and increment the PC.
-    pub fn read_pc(&mut self) -> UWord {
+    pub fn read_pc(&mut self) -> uWord {
         let word = self.ram[self.cpu.pc];
-        self.increment_pc_or_overflow();
+        self.increment_pc();
         word
     }
 
     /// Write a word at PC and increment the PC.
-    pub fn write_pc(&mut self, word: UWord) {
+    pub fn write_pc(&mut self, word: uWord) {
         self.ram[self.cpu.pc] = word;
-        self.increment_pc_or_overflow();
+        self.increment_pc();
 
     }
 
     /// Read a word from stack and increment the sp. 
-    pub fn read_sp(&mut self) -> UWord {
-        self.cpu.sp = self.cpu.sp + IWord::from(1);  // Ugly af
+    pub fn read_sp(&mut self) -> uWord {
+        self.cpu.sp = self.cpu.sp + 1_i8;
         let word = self.ram[self.cpu.sp];
         word
     }
 
     /// Write a word to stack and decrement the sp. 
-    pub fn write_sp(&mut self, word: UWord) -> () {
+    pub fn write_sp(&mut self, word: uWord) {
         self.ram[self.cpu.sp] = word;
-        self.cpu.sp = self.cpu.sp + IWord::from(-1);  // Ugly af
+        self.cpu.sp = self.cpu.sp + (-1_i8);
     }
 
-    pub fn reset_cpu(&mut self) -> () {
+    pub fn reset_cpu(&mut self) {
         self.cpu = Cpu::default();
     }
 }
@@ -244,8 +234,8 @@ impl std::fmt::Display for Machine {
             self.cpu.bh.value(), self.cpu.bl.value(),
             self.cpu.ch.value(), self.cpu.cl.value(),
             self.cpu.x.value(),
-            self.cpu.sp.high.value(), self.cpu.sp.low.value(),
-            self.cpu.pc.high.value(), self.cpu.pc.low.value(),
+            self.cpu.sp.hi().value(), self.cpu.sp.lo().value(),
+            self.cpu.pc.hi().value(), self.cpu.pc.lo().value(),
         ).unwrap();
         write!(f, "Mem: ").unwrap();
         for j in 0..64 { write!(f, "{:02x} ", j).unwrap() };

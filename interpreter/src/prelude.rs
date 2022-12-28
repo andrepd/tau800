@@ -1,19 +1,10 @@
 pub(super) use more_asserts::*;
 
-pub(super) use super::word::*;
-pub(super) use super::machine::*;
-pub(super) use super::instruction::{Instruction, Op, Operand, Operands, Register};
-pub(super) use super::universe::{Universe, Mode};
-pub(super) use super::modules::ModuleCollection;
-
-/// Tou sempre a ter de usar isto
-pub fn div_rem<
-  T: Copy + std::ops::Div<Output = T> + std::ops::Rem<Output = T>
->(a: T, b: T) -> (T, T) {
-  (a / b, a % b)
-}
-
-
+pub(super) use crate::word::*;
+pub(super) use crate::machine::*;
+pub(super) use crate::instruction::{Instruction, Op, Operand, Operands, Register};
+pub(super) use crate::universe::{Universe, Mode};
+pub(super) use crate::modules::ModuleCollection;
 
 // Debug macros (como é que isto não vem standard)
 #[allow(unused_macros)]

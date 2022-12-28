@@ -1,8 +1,7 @@
-use super::prelude::*;
-
+use crate::prelude::*;
 use std::collections::VecDeque;
 
-const MAX_WINDOW: usize = 4 * (MAX_SIGNED_DOUBLE as usize);
+const MAX_WINDOW: usize = 4 * (iLong::MAX.value() as usize);
 
 /// Represents a timeline slice starting at time t0
 #[derive(Debug, Clone)]
@@ -11,10 +10,10 @@ pub struct Timeline {
     states: VecDeque<Machine>, 
 }
 
-impl std::ops::Add<&ILongWord> for usize {
+impl std::ops::Add<iLong> for usize {
     type Output = Self;
 
-    fn add(self, other: &ILongWord) -> Self {
+    fn add(self, other: iLong) -> Self {
         if other.value() != 0 { dprintln!("Time jump of {}", other.value() as isize) };
         (self as isize + other.value() as isize) as usize
     }
@@ -50,11 +49,12 @@ impl Timeline {
         }
     }*/
 
+    /// Start of timeline
     pub fn ti(&self) -> usize {
         self.t0
     }
 
-    // One-past
+    // (One-past the) end of timeline
     pub fn tf(&self) -> usize {
         self.t0 + self.states.len()
     }
@@ -95,9 +95,9 @@ pub enum Mode {
 }
 
 // Basic state flow on Mode: 
-//   Consistent --temporal inconsistency found-> Inconsistent
-//   Inconsistent --reached end of interval-> Maybe
-//   Maybe --reached end of interval-> Consistent
+//   Consistent   -- temporal inconsistency found -> Inconsistent
+//   Inconsistent -- reached end of interval      -> Maybe
+//   Maybe        -- reached end of interval      -> Consistent
 
 impl Mode {
     pub fn add_inconsistent(&mut self, ti: usize, tf: usize) {
@@ -114,8 +114,8 @@ pub struct Universe {
     pub timeline: Timeline, 
     pub t: usize,
     pub mode: Mode, 
-    pub pending_writes: Vec<(usize, Op, UWord)>,
-    pub pending_reads: Vec<(usize, usize, Op, UWord)>,
+    pub pending_writes: Vec<(usize, Op, uWord)>,  // Janky
+    pub pending_reads: Vec<(usize, usize, Op, uWord)>,
 }
 
 impl Universe {
@@ -178,7 +178,7 @@ impl Universe {
     }*/
 
     pub fn is_consistent(&self) -> bool {
-        match self.mode { Mode::Consistent => true, _ => false }
+        matches!(self.mode, Mode::Consistent)
     }
 }
 
