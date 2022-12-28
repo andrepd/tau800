@@ -24,12 +24,6 @@ pub struct Timed<T> {
     pub time: TimeOffset,
 }
 
-/*impl<T> Timed<T> {
-    pub fn new(op: T, time: iLong) -> Self {
-        Timed { op, time }
-    }
-}*/
-
 /// The basic addressing modes
 #[derive(Debug, Clone)]
 pub enum Op {
@@ -58,12 +52,6 @@ pub struct Operands {
     pub src: Operand,
     pub dst: Operand,
 }
-
-/*impl Operands {
-    pub fn new(src: Operand, dst: Operand) -> Self {
-        Operands { src, dst }
-    }
-}*/
 
 /// The argument of an instruction that is a pc offset
 pub type Offset = iWord;

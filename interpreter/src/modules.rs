@@ -2,12 +2,9 @@
 
 use super::prelude::*;
 
-use std::{
-    error::Error,
-    fmt::{Debug, Display},
-};
+use std::error::Error;
 
-pub trait Module: Debug {
+pub trait Module: std::fmt::Debug {
     /// Update the state.
     fn run(&mut self, m: &mut Machine) -> Result<(), Box<dyn Error>>;
 }
@@ -77,7 +74,7 @@ impl DisplayModule {
                 // Return garbage for visual effect;
                 // we convert the boolean values to an equivalent binary number,
                 // and index into some garbage &'static str.
-                let index = bits.iter().enumerate().fold(0, |acc, (i, &value)| {
+                let index = bits.iter().fold(0, |acc, &value| {
                     (acc << 1) + (value as usize)
                 });
                 const ALPHABET: &'static str = "x%@#";
@@ -140,7 +137,7 @@ impl DiskModule {
     pub fn new<P: AsRef<std::path::Path>>(path: P) -> std::io::Result<Self> {
         use std::io::prelude::*;
         let mut data = vec![];
-        let mut f = std::io::BufReader::new(std::fs::File::open(path)?);
+        let f = std::io::BufReader::new(std::fs::File::open(path)?);
         for line in f.lines() {
             for word in line?.split_whitespace() {
                 data.push(u8::from_str_radix(word, 16).unwrap().try_into().unwrap())
@@ -153,7 +150,7 @@ impl DiskModule {
 impl Module for DiskModule {
     fn run(&mut self, m: &mut Machine) -> Result<(), Box<dyn Error>> {
         let page = uLong::from_hi_lo(m.ram[0x31], m.ram[0x30]);
-        if dbg!(page.value()) != 0 {
+        if page.value() != 0 {
             let page = (page.value() - 1) as usize;
             let start = page * 1024;
             let end = start + 1024;

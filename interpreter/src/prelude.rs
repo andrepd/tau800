@@ -11,7 +11,7 @@ pub(super) use crate::modules::ModuleCollection;
 
 #[cfg(debug_assertions)]
 macro_rules! dprintln {
-    ($( $args:expr ),*) => { eprintln!( $( $args ),* ); }
+    ($( $args:expr ),*) => { eprintln!( $( $args ),* ) }
 }
 
 #[cfg(not(debug_assertions))]
@@ -21,7 +21,7 @@ macro_rules! dprintln {
 
 #[cfg(debug_assertions)]
 macro_rules! dprint {
-    ($( $args:expr ),*) => { eprint!( $( $args ),* ); }
+    ($( $args:expr ),*) => { eprint!( $( $args ),* ) }
 }
 
 #[cfg(not(debug_assertions))]

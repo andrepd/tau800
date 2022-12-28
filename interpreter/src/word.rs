@@ -1,4 +1,4 @@
-use super::prelude::*;
+use crate::prelude::*;
 
 /// The number of bits in a word.
 pub const WORD_SIZE: usize = 6;

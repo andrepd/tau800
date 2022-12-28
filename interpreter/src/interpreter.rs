@@ -370,7 +370,6 @@ pub fn step_micro(universe: &mut Universe, modules: &mut ModuleCollection) {
     dprintln!("μStep: t={} mode={:?}", universe.t, universe.mode);
 
     // Pending reads, são aqui que se checam
-    /*universe.pending_reads.retain(|&x| {*/
     let pending_reads_ = 
         universe.pending_reads.clone().into_iter().filter(|(t, ti, op, value)| {
             if *t == universe.t {
@@ -412,15 +411,6 @@ pub fn step_micro(universe: &mut Universe, modules: &mut ModuleCollection) {
             }
         });
     universe.pending_writes = asdf.collect::<Vec<_>>();
-    /*universe.pending_writes.retain(|(t, op, value)| {
-        if *t == universe.t {
-            let state = universe.now_mut();
-            *operand_to_mut_ref_inner(state, &op) = *value;
-            false
-        } else {
-            true
-        }
-    });*/
 
     match universe.mode {
         // Maybe inconsistent: if we reach the end of the window, it is consistent
@@ -468,8 +458,7 @@ pub fn step_micro(universe: &mut Universe, modules: &mut ModuleCollection) {
 /// Performs one full step on universe: micro steps until a fixed state can be yielded and pushed onto universe. 
 /// Returns `false` iff inconsistency is reached
 pub fn step_one(universe: &mut Universe, modules: &mut ModuleCollection) -> bool {
-    /*dprintln!("step_one");*/
-    // Fix memory leak: every 2^12 iterations clean unreachable in pending_{reads,writes}
+    // Prevent memory leak: every 2^12 iterations clean unreachable in pending_{reads,writes}
     if universe.t % (1<<12) == 0 {
         let ti = universe.timeline.ti();
         universe.pending_reads.retain(|x| x.0 >= ti);  
@@ -481,7 +470,7 @@ pub fn step_one(universe: &mut Universe, modules: &mut ModuleCollection) -> bool
     const INCONSISTENT_ITERATIONS_LIMIT: usize = 1000*10;
     let mut inconsistent_iterations: usize = 0;
     while !universe.is_consistent() {
-        if dbg!(inconsistent_iterations) == INCONSISTENT_ITERATIONS_LIMIT { return false }
+        if inconsistent_iterations == INCONSISTENT_ITERATIONS_LIMIT { return false }
         step_micro(universe, modules);
         inconsistent_iterations += 1
     };
@@ -491,10 +480,8 @@ pub fn step_one(universe: &mut Universe, modules: &mut ModuleCollection) -> bool
 
 /// Returns Some(Machine, Instruction) or None if time inconsistency was reached
 pub fn step(universe: &mut Universe, modules: &mut ModuleCollection) -> Option<(Machine, Instruction)> {
-    /*dprintln!("step {} {}", universe.timeline.tf() - universe.timeline.ti(), universe.timeline.is_full());*/
     // Universe not full: continue filling
     while !universe.timeline.is_full() {
-        /*dprintln!("foo {} {}", universe.timeline.ti(), universe.timeline.tf());*/
         if !step_one(universe, modules) { return None }
     } 
     // Universe full (and consistent): this means the state we pop from front is stable

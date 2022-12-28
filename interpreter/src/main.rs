@@ -1,5 +1,5 @@
 pub(crate) use crate::prelude::*;
-use crate::modules::{ClockModule, DisplayModule, DiskModule, Module, ModuleCollection};
+use crate::modules::{ClockModule, DisplayModule, DiskModule, ModuleCollection};
 
 mod assembler;
 mod instruction;

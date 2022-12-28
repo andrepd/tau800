@@ -1,10 +1,9 @@
-use radix_fmt::radix;
+use crate::prelude::*;
 
 use super::instruction::{Instruction, Op, Operand, Operands, Register, Timed};
-use super::modules::{Module, ModuleCollection};
-use super::prelude::*;
 use std::iter::Peekable;
 use std::str::{CharIndices, Lines};
+use radix_fmt::radix;
 
 pub struct InstructionIterator<'i> {
     lines: Lines<'i>,
